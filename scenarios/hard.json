@@ -1,0 +1,208 @@
+{
+  "scenario_id": "INC-003",
+  "difficulty": "hard",
+  "alert": "SRE: diffuse elevation in tail latency and intermittent timeouts across all production tiers. No single service dominates error budget; pattern started after a network maintenance window.",
+  "services": [
+    "api_gateway",
+    "auth",
+    "order_service",
+    "payment",
+    "inventory",
+    "cache",
+    "database"
+  ],
+  "max_queries": 35,
+  "service_metrics": {
+    "api_gateway": {
+      "latency_ms": 280.0,
+      "error_rate": 0.018,
+      "cpu_percent": 48.0,
+      "memory_percent": 52.0,
+      "status": "degraded"
+    },
+    "auth": {
+      "latency_ms": 210.0,
+      "error_rate": 0.015,
+      "cpu_percent": 44.0,
+      "memory_percent": 49.0,
+      "status": "degraded"
+    },
+    "order_service": {
+      "latency_ms": 265.0,
+      "error_rate": 0.017,
+      "cpu_percent": 46.0,
+      "memory_percent": 51.0,
+      "status": "degraded"
+    },
+    "payment": {
+      "latency_ms": 240.0,
+      "error_rate": 0.016,
+      "cpu_percent": 43.0,
+      "memory_percent": 50.0,
+      "status": "degraded"
+    },
+    "inventory": {
+      "latency_ms": 255.0,
+      "error_rate": 0.016,
+      "cpu_percent": 45.0,
+      "memory_percent": 48.0,
+      "status": "degraded"
+    },
+    "cache": {
+      "latency_ms": 95.0,
+      "error_rate": 0.014,
+      "cpu_percent": 42.0,
+      "memory_percent": 47.0,
+      "status": "degraded"
+    },
+    "database": {
+      "latency_ms": 320.0,
+      "error_rate": 0.019,
+      "cpu_percent": 52.0,
+      "memory_percent": 55.0,
+      "status": "degraded"
+    }
+  },
+  "logs": {
+    "api_gateway": [
+      "tcp_retransmits_detected rate=0.3% peer_variance=low",
+      "client_tls_handshake_retries elevated across AZs"
+    ],
+    "auth": [
+      "tcp_retransmits_detected rate=0.3% iface=eth0",
+      "grpc_stream_reset count+12% vs baseline"
+    ],
+    "order_service": [
+      "tcp_retransmits_detected rate=0.3%",
+      "downstream_connect_jitter p99 +40ms"
+    ],
+    "payment": [
+      "tcp_retransmits_detected rate=0.3%",
+      "partner_webhook tail_latency +35ms"
+    ],
+    "inventory": [
+      "tcp_retransmits_detected rate=0.3%",
+      "db_round_trip_variance elevated"
+    ],
+    "cache": [
+      "tcp_retransmits_detected rate=0.3%",
+      "inter-node_replication_latency p99 +28ms"
+    ],
+    "database": [
+      "tcp_retransmits_detected rate=0.3%",
+      "replica_lag_ms jitter stddev high; not disk bound"
+    ]
+  },
+  "traces": {
+    "api_gateway": [
+      {
+        "trace_id": "t-net-001",
+        "span": "ingress",
+        "duration_ms": 275.0,
+        "status": "degraded"
+      }
+    ],
+    "auth": [
+      {
+        "trace_id": "t-net-002",
+        "span": "validate",
+        "duration_ms": 205.0,
+        "status": "degraded"
+      }
+    ],
+    "order_service": [
+      {
+        "trace_id": "t-net-003",
+        "span": "order",
+        "duration_ms": 260.0,
+        "status": "degraded"
+      }
+    ],
+    "payment": [
+      {
+        "trace_id": "t-net-004",
+        "span": "charge",
+        "duration_ms": 238.0,
+        "status": "degraded"
+      }
+    ],
+    "inventory": [
+      {
+        "trace_id": "t-net-005",
+        "span": "reserve",
+        "duration_ms": 250.0,
+        "status": "degraded"
+      }
+    ],
+    "cache": [
+      {
+        "trace_id": "t-net-006",
+        "span": "mget",
+        "duration_ms": 92.0,
+        "status": "degraded"
+      }
+    ],
+    "database": [
+      {
+        "trace_id": "t-net-007",
+        "span": "query",
+        "duration_ms": 315.0,
+        "status": "degraded"
+      }
+    ]
+  },
+  "dependencies": {
+    "api_gateway": {
+      "upstream": [],
+      "downstream": ["auth", "order_service"]
+    },
+    "auth": {
+      "upstream": ["api_gateway"],
+      "downstream": ["database"]
+    },
+    "order_service": {
+      "upstream": ["api_gateway"],
+      "downstream": ["payment", "inventory", "database", "cache"]
+    },
+    "payment": {
+      "upstream": ["order_service"],
+      "downstream": ["database"]
+    },
+    "inventory": {
+      "upstream": ["order_service"],
+      "downstream": ["database", "cache"]
+    },
+    "cache": {
+      "upstream": ["order_service", "inventory"],
+      "downstream": []
+    },
+    "database": {
+      "upstream": ["auth", "order_service", "payment", "inventory"],
+      "downstream": []
+    }
+  },
+  "ground_truth": {
+    "root_cause_service": "network",
+    "root_cause_type": "packet_loss",
+    "affected_services": [
+      "api_gateway",
+      "auth",
+      "order_service",
+      "payment",
+      "inventory",
+      "cache",
+      "database"
+    ],
+    "causal_chain": [
+      "network",
+      "api_gateway",
+      "auth",
+      "order_service",
+      "payment",
+      "inventory",
+      "cache",
+      "database"
+    ],
+    "optimal_queries": 10
+  }
+}

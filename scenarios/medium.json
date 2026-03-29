@@ -1,0 +1,184 @@
+{
+  "scenario_id": "INC-002",
+  "difficulty": "medium",
+  "alert": "Checkout and catalog pricing endpoints show elevated latency and 5xx bursts. Multiple tiers report saturation; auth shows a small concurrent spike.",
+  "services": [
+    "api_gateway",
+    "auth",
+    "order_service",
+    "pricing_service",
+    "payment",
+    "inventory",
+    "cache",
+    "database"
+  ],
+  "max_queries": 30,
+  "service_metrics": {
+    "api_gateway": {
+      "latency_ms": 920.0,
+      "error_rate": 0.06,
+      "cpu_percent": 72.0,
+      "memory_percent": 68.0,
+      "status": "degraded"
+    },
+    "auth": {
+      "latency_ms": 95.0,
+      "error_rate": 0.012,
+      "cpu_percent": 41.0,
+      "memory_percent": 45.0,
+      "status": "degraded"
+    },
+    "order_service": {
+      "latency_ms": 680.0,
+      "error_rate": 0.05,
+      "cpu_percent": 76.0,
+      "memory_percent": 74.0,
+      "status": "degraded"
+    },
+    "pricing_service": {
+      "latency_ms": 540.0,
+      "error_rate": 0.04,
+      "cpu_percent": 63.0,
+      "memory_percent": 59.0,
+      "status": "degraded"
+    },
+    "payment": {
+      "latency_ms": 140.0,
+      "error_rate": 0.003,
+      "cpu_percent": 33.0,
+      "memory_percent": 46.0,
+      "status": "healthy"
+    },
+    "inventory": {
+      "latency_ms": 110.0,
+      "error_rate": 0.002,
+      "cpu_percent": 31.0,
+      "memory_percent": 43.0,
+      "status": "healthy"
+    },
+    "cache": {
+      "latency_ms": 420.0,
+      "error_rate": 0.02,
+      "cpu_percent": 91.0,
+      "memory_percent": 82.0,
+      "status": "down"
+    },
+    "database": {
+      "latency_ms": 210.0,
+      "error_rate": 0.008,
+      "cpu_percent": 58.0,
+      "memory_percent": 61.0,
+      "status": "degraded"
+    }
+  },
+  "logs": {
+    "cache": [
+      "config_reload ttl_seconds=0 key_namespace=pricing",
+      "memcached: evictions_per_sec=45000 stampede_detected=true",
+      "warning: thundering herd on key catalog:prices:v3"
+    ],
+    "pricing_service": [
+      "fallback_to_origin=true cache_miss_storm keys=120k/min",
+      "upstream_latency_p99=510ms"
+    ],
+    "order_service": [
+      "pricing_client_timeout retries=2",
+      "checkout_flow_latency elevated waiting on pricing_service"
+    ],
+    "api_gateway": [
+      "route=/v2/prices 503_rate=4.2%",
+      "route=/checkout latency_p99=980ms"
+    ],
+    "auth": [
+      "jwt_validation_latency_p99=88ms minor_spike=true note=red_herring"
+    ],
+    "payment": [
+      "no_anomaly"
+    ],
+    "inventory": [
+      "no_anomaly"
+    ],
+    "database": [
+      "qps_elevated pricing_refresh_queries=8k/s"
+    ]
+  },
+  "traces": {
+    "cache": [
+      {
+        "trace_id": "t-cache-882",
+        "span": "GET pricing:v3",
+        "duration_ms": 380.0,
+        "status": "error"
+      }
+    ],
+    "pricing_service": [
+      {
+        "trace_id": "t-price-221",
+        "span": "compute_prices",
+        "duration_ms": 520.0,
+        "status": "error"
+      }
+    ],
+    "order_service": [
+      {
+        "trace_id": "t-ord-992",
+        "span": "checkout_aggregate",
+        "duration_ms": 650.0,
+        "status": "error"
+      }
+    ],
+    "api_gateway": [
+      {
+        "trace_id": "t-agw-441",
+        "span": "GET /checkout",
+        "duration_ms": 900.0,
+        "status": "error"
+      }
+    ],
+    "auth": [],
+    "payment": [],
+    "inventory": [],
+    "database": []
+  },
+  "dependencies": {
+    "api_gateway": {
+      "upstream": [],
+      "downstream": ["auth", "order_service", "pricing_service"]
+    },
+    "auth": {
+      "upstream": ["api_gateway"],
+      "downstream": ["database"]
+    },
+    "order_service": {
+      "upstream": ["api_gateway"],
+      "downstream": ["payment", "inventory", "cache", "database", "pricing_service"]
+    },
+    "pricing_service": {
+      "upstream": ["api_gateway", "order_service"],
+      "downstream": ["cache", "database"]
+    },
+    "payment": {
+      "upstream": ["order_service"],
+      "downstream": ["database"]
+    },
+    "inventory": {
+      "upstream": ["order_service"],
+      "downstream": ["database", "cache"]
+    },
+    "cache": {
+      "upstream": ["order_service", "inventory", "pricing_service"],
+      "downstream": []
+    },
+    "database": {
+      "upstream": ["auth", "order_service", "payment", "inventory", "pricing_service"],
+      "downstream": []
+    }
+  },
+  "ground_truth": {
+    "root_cause_service": "cache",
+    "root_cause_type": "misconfiguration_ttl_zero_stampede",
+    "affected_services": ["pricing_service", "order_service", "api_gateway"],
+    "causal_chain": ["cache", "pricing_service", "order_service", "api_gateway"],
+    "optimal_queries": 6
+  }
+}
