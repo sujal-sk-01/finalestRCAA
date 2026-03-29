@@ -1,4 +1,4 @@
-"""Google Gemini baseline agent: drives env.step() in a reproducible loop."""
+"""Baseline agent: drives env.step() via OpenAI-compatible HF router."""
 
 from __future__ import annotations
 
@@ -6,20 +6,18 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(_ROOT / ".env")
 load_dotenv()
 
 import json
-import os
 import re
 from typing import Any
-
-import google.generativeai as genai
 
 from models import Action, ActionType
 from server.environment import RCAEnvironment
 from server.grader import grade
-from server.llm import get_baseline_model
+from server.llm import call_llm, is_llm_configured
 
 
 def extract_json(text: str) -> dict:
@@ -30,42 +28,22 @@ def extract_json(text: str) -> dict:
 
 
 def _system_prompt(services: list[str]) -> str:
-    svc = ", ".join(services)
-    return f"""You are an on-call SRE debugging a production incident in a microservice system.
+    return """You are an expert SRE engineer investigating a production incident.
 
-Available services: {svc}
+STRATEGY - follow this exact order:
+1. First check dependencies of api_gateway to find downstream services
+2. Check metrics of ALL downstream services immediately
+3. Find the service with status=down or cpu_usage > 0.9 - that is your root cause
+4. Query logs of ONLY that root cause service
+5. Submit RCA immediately - do not investigate further
 
-You may take ONE action per turn. Respond with a single JSON object (no markdown) matching this schema:
-{{
-  "action_type": one of [
-    "query_metrics",
-    "query_logs",
-    "pull_traces",
-    "query_dependencies",
-    "form_hypothesis",
-    "submit_rca"
-  ],
-  "target_service": "<service name or null>",
-  "hypothesis": "<string or null; required when action_type is form_hypothesis>",
-  "rca_report": null OR {{
-    "root_cause_service": "<string>",
-    "root_cause_type": "<string>",
-    "affected_services": ["<service>", "..."],
-    "causal_chain": ["<root first, then downstream, ...>"],
-    "summary": "<string>",
-    "fix_recommendation": "<string>",
-    "confidence": <float 0.0-1.0>
-  }}
-}}
+RULES:
+- Maximum 5 queries total before submitting
+- root_cause_type must be ONE of: cpu_saturation, memory_leak, network, error_rate, crash, dependency_failure
+- Do not repeat queries on same service
+- Be decisive - submit after 4-5 steps
 
-Rules:
-- For query_metrics, query_logs, pull_traces, query_dependencies: set target_service to a valid service name.
-- Start by investigating api_gateway, then follow dependencies and anomalies.
-- Be strategic: correlate metrics, logs, and traces before forming conclusions.
-- Use form_hypothesis to record intermediate theories.
-- Only use submit_rca when you are confident; rca_report must be complete.
-- Your entire reply MUST be valid JSON parsable as an Action.
-"""
+Your goal is accuracy AND efficiency."""
 
 
 def _parse_action(content: str) -> Action:
@@ -81,40 +59,27 @@ def _parse_action(content: str) -> Action:
     return Action.model_validate(data)
 
 
-def _generate_action(model: Any, messages: list[dict[str, str]], prompt: str) -> str:
-    try:
-        gc = genai.types.GenerationConfig(temperature=0)
-        resp = model.generate_content(prompt, generation_config=gc)
-    except Exception:
-        resp = model.generate_content(prompt)
-    return (resp.text or "").strip()
+def _generate_action(messages: list[dict[str, str]], prompt: str) -> str:
+    return call_llm(
+        prompt,
+        system="You are an expert SRE performing root cause analysis. Respond only with valid JSON.",
+    )
 
 
 def run_baseline(difficulty: str) -> dict[str, Any]:
-    if not os.getenv("GOOGLE_API_KEY"):
+    if not is_llm_configured():
         return {
             "difficulty": difficulty,
             "steps": 0,
             "history": [],
             "report": None,
             "scores": None,
-            "error": "GOOGLE_API_KEY is not set",
-        }
-
-    model = get_baseline_model()
-    if model is None:
-        return {
-            "difficulty": difficulty,
-            "steps": 0,
-            "history": [],
-            "report": None,
-            "scores": None,
-            "error": "Gemini client not configured",
+            "error": "HF_TOKEN is not set",
         }
 
     env = RCAEnvironment(difficulty)
     st = env.reset()
-    services = list(st.services.keys())
+    services = list(st.service_metrics.keys())
 
     messages: list[dict[str, str]] = [
         {"role": "system", "content": _system_prompt(services)},
@@ -132,7 +97,7 @@ def run_baseline(difficulty: str) -> dict[str, Any]:
         steps += 1
         prompt = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])
         try:
-            raw = _generate_action(model, messages, prompt)
+            raw = _generate_action(messages, prompt)
         except Exception as exc:
             return {
                 "difficulty": difficulty,
@@ -140,7 +105,17 @@ def run_baseline(difficulty: str) -> dict[str, Any]:
                 "history": history,
                 "report": None,
                 "scores": None,
-                "error": f"Gemini API error: {exc!s}",
+                "error": f"LLM API error: {exc!s}",
+            }
+
+        if not raw.strip():
+            return {
+                "difficulty": difficulty,
+                "steps": steps,
+                "history": history,
+                "report": None,
+                "scores": None,
+                "error": "LLM returned empty response",
             }
 
         try:
@@ -170,7 +145,7 @@ def run_baseline(difficulty: str) -> dict[str, Any]:
             }
         )
 
-        if action.action_type == ActionType.submit_rca and action.rca_report is not None:
+        if action.action_type == ActionType.SUBMIT_RCA and action.rca_report is not None:
             last_report = action.rca_report
             break
 

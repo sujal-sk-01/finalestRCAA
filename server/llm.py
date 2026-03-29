@@ -1,49 +1,54 @@
-"""Single-flight Gemini client configuration and model handles (startup-friendly)."""
+"""LLM client using OpenAI-compatible interface pointed at Hugging Face router."""
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from openai import OpenAI
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(_ROOT / ".env")
 load_dotenv()
 
-import os
-
-import google.generativeai as genai
-
-GEMINI_MODEL_ID = "gemini-2.0-flash"
-
-_configured: bool = False
-_baseline_model: genai.GenerativeModel | None = None
-_grader_model: genai.GenerativeModel | None = None
+_client: OpenAI | None = None
 
 
-def ensure_gemini_configured() -> bool:
-    global _configured
-    key = os.getenv("GOOGLE_API_KEY")
-    if not key:
-        return False
-    if not _configured:
-        genai.configure(api_key=key)
-        _configured = True
-    return True
+def _get_client() -> OpenAI:
+    global _client
+    if _client is None:
+        _client = OpenAI(
+            base_url=os.environ.get("API_BASE_URL", "https://router.huggingface.co/v1"),
+            api_key=os.environ.get("HF_TOKEN", ""),
+        )
+    return _client
 
 
-def get_baseline_model() -> genai.GenerativeModel | None:
-    global _baseline_model
-    if not ensure_gemini_configured():
-        return None
-    if _baseline_model is None:
-        _baseline_model = genai.GenerativeModel(GEMINI_MODEL_ID)
-    return _baseline_model
+def is_llm_configured() -> bool:
+    return bool(os.environ.get("HF_TOKEN"))
 
 
-def get_grader_model() -> genai.GenerativeModel | None:
-    global _grader_model
-    if not ensure_gemini_configured():
-        return None
-    if _grader_model is None:
-        _grader_model = genai.GenerativeModel(GEMINI_MODEL_ID)
-    return _grader_model
+def call_llm(
+    prompt: str,
+    system: str | None = None,
+    json_mode: bool = False,
+    max_tokens: int = 1000,
+) -> str:
+    try:
+        client = _get_client()
+        model = os.environ.get("MODEL_NAME", "meta-llama/Llama-3.3-70B-Instruct")
+        messages: list[dict[str, str]] = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
+
+        kwargs: dict = dict(model=model, messages=messages, max_tokens=max_tokens, temperature=0)
+        if json_mode:
+            kwargs["response_format"] = {"type": "json_object"}
+
+        response = client.chat.completions.create(**kwargs)
+        return response.choices[0].message.content or ""
+    except Exception as e:
+        print(f"LLM call failed: {e}")
+        return ""

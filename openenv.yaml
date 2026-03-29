@@ -1,47 +1,104 @@
 openenv_version: "1.0"
 
-name: RCAAgent-Env
-version: "1.0.0"
+name: sre-rca-env
+version: "2.0.0"
 description: >
-  OpenEnv-compatible RCA environment: agent investigates simulated microservice
-  incidents via metrics, logs, traces, dependencies; submits structured RCA; graded.
+  A production-grade simulation environment for training AI agents on
+  Site Reliability Engineering (SRE) root cause analysis. Agents investigate
+  realistic microservice incidents using metrics, logs, traces, and dependency
+  graphs, then submit structured postmortems scored against ground truth.
+  Real-world utility: directly applicable to on-call engineer training,
+  automated incident response, and LLM agent evaluation for DevOps tasks.
+
+tags:
+  - openenv
+  - sre
+  - devops
+  - root-cause-analysis
+  - microservices
+
+server:
+  module: server.app:app
+  port: 8000
+  framework: uvicorn
+  health_check: /
+
+endpoints:
+  tasks: GET /tasks
+  reset: POST /reset/{difficulty}
+  step: POST /step/{difficulty}
+  state: GET /state/{difficulty}
+  grade: POST /grader
+  grader: POST /grader
+  baseline: GET /baseline
 
 tasks:
-  - id: INC-001
-    name: RCA INC-001
+  - id: easy_rca
+    name: "Single Service Failure (Easy)"
+    description: >
+      A checkout service has elevated error rates. One service is clearly
+      degraded. Agent must identify root cause within budget.
     difficulty: easy
-    max_steps: 25
-    optimal_steps: 3
-  - id: INC-002
-    name: RCA INC-002
+    max_queries: 25
+    optimal_queries: 3
+    success_threshold: 0.7
+    grader_endpoint: POST /grader
+
+  - id: medium_rca
+    name: "Cache Stampede Cascade (Medium)"
+    description: >
+      A cache service failure has cascaded across multiple services. Agent must
+      trace the dependency chain and identify the origin service.
     difficulty: medium
-    max_steps: 30
-    optimal_steps: 6
-  - id: INC-003
-    name: RCA INC-003
+    max_queries: 30
+    optimal_queries: 6
+    success_threshold: 0.6
+    grader_endpoint: POST /grader
+
+  - id: hard_rca
+    name: "Diffuse Network Degradation (Hard)"
+    description: >
+      Subtle correlated anomalies across many services with no single obvious
+      failure. Requires cross-service trace analysis and dependency mapping.
+      Designed to challenge frontier models.
     difficulty: hard
-    max_steps: 35
-    optimal_steps: 10
+    max_queries: 35
+    optimal_queries: 10
+    success_threshold: 0.5
+    grader_endpoint: POST /grader
 
 action_space:
-  - query_metrics
-  - query_logs
-  - pull_traces
-  - query_dependencies
-  - form_hypothesis
-  - submit_rca
+  type: structured_json
+  schema_endpoint: GET /tasks
+  actions:
+    - query_metrics: "Get CPU, memory, error rate, latency for a service"
+    - query_logs: "Get recent error logs for a service"
+    - pull_traces: "Get distributed traces showing request flows"
+    - query_dependencies: "Get upstream/downstream service dependencies"
+    - form_hypothesis: "Record intermediate reasoning (no budget cost)"
+    - submit_rca: "Submit final structured root cause analysis report"
 
 observation_space:
-  - success
-  - service
-  - metrics
-  - logs
-  - traces
-  - dependencies
-  - anomaly_detected
-  - anomaly_type
-  - queries_remaining
-  - message
+  type: structured_json
+  fields:
+    - success: "bool — action succeeded"
+    - message: "str — human readable result"
+    - data: "dict — action-specific telemetry data"
+    - anomaly_detected: "bool — anomaly signal in returned data"
+    - anomaly_type: "str — type of anomaly if detected"
+    - queries_remaining: "int — remaining query budget"
+    - reward: "Reward — per-step reward breakdown"
+
+reward:
+  type: dense
+  range: [-1.0, 1.0]
+  description: "Per-step signal + terminal bonus at RCA submission"
+  components:
+    root_cause_relevance: "Bonus for querying root cause / affected services"
+    efficiency: "Penalty for redundant queries"
+    hypothesis_bonus: "Small bonus for reasoning steps"
+    budget_pressure: "Increasing penalty as budget depletes"
+    terminal: "Large bonus/penalty at RCA submission based on accuracy"
 
 grader_weights:
   root_cause: 0.40
@@ -49,25 +106,14 @@ grader_weights:
   efficiency: 0.20
   report_quality: 0.15
 
-baseline_api:
-  provider: google_gemini
-  model: gemini-2.0-flash
-  env_key: GOOGLE_API_KEY
-
-endpoints:
-  tasks: GET /tasks
-  reset: POST /reset/{difficulty}
-  step: POST /step/{difficulty}
-  state: GET /state/{difficulty}
-  grader: POST /grader
-  baseline: GET /baseline?difficulty={easy|medium|hard}
-
-server:
-  port: 8000
-  module: server.app:app
-  framework: uvicorn
+baseline:
+  script: inference.py
+  provider: openai_compatible
+  model_env_var: MODEL_NAME
+  api_base_env_var: API_BASE_URL
+  api_key_env_var: HF_TOKEN
 
 notes:
   difficulty_values: [easy, medium, hard]
   session_key: difficulty string (one active session per difficulty after reset)
-  hf_spaces: Set repository secrets GOOGLE_API_KEY; Dockerfile listens on port 8000.
+  hf_spaces: Set repository secrets HF_TOKEN, API_BASE_URL, MODEL_NAME as needed; Dockerfile listens on port 8000.

@@ -1,0 +1,41 @@
+{
+  "id": "INC-004",
+  "name": "DDoS Attack",
+  "difficulty": "hard",
+  "max_steps": 30,
+  "optimal_steps": 4,
+  "services": ["api_gateway", "rate_limiter", "auth_service", "backend_api", "database"],
+  "service_metrics": [
+    {"service_name": "api_gateway", "error_rate": 0.95, "latency_p99_ms": 9999, "requests_per_second": 500000, "cpu_usage": 0.99, "memory_usage": 0.95, "status": "down"},
+    {"service_name": "rate_limiter", "error_rate": 0.80, "latency_p99_ms": 3000, "requests_per_second": 490000, "cpu_usage": 0.97, "memory_usage": 0.90, "status": "degraded"},
+    {"service_name": "auth_service", "error_rate": 0.60, "latency_p99_ms": 2000, "requests_per_second": 10000, "cpu_usage": 0.75, "memory_usage": 0.70, "status": "degraded"},
+    {"service_name": "backend_api", "error_rate": 0.20, "latency_p99_ms": 800, "requests_per_second": 500, "cpu_usage": 0.40, "memory_usage": 0.50, "status": "degraded"},
+    {"service_name": "database", "error_rate": 0.05, "latency_p99_ms": 100, "requests_per_second": 200, "cpu_usage": 0.30, "memory_usage": 0.40, "status": "healthy"}
+  ],
+  "service_logs": {
+    "api_gateway": ["DDoS detected: 500000 requests/sec from 10000 unique IPs", "rate limiting overwhelmed, dropping legitimate traffic"],
+    "rate_limiter": ["threshold exceeded, blacklist full", "dropping 99% of incoming requests"],
+    "auth_service": ["connection pool exhausted due to request flood", "rejecting new connections"],
+    "backend_api": ["upstream errors from auth_service increasing", "degraded mode activated"],
+    "database": ["all queries normal", "no anomalies detected"]
+  },
+  "service_traces": {
+    "api_gateway": [{"trace_id": "t-ddos-001", "span": "GET /api", "duration_ms": 9999, "status": "error"}],
+    "rate_limiter": [{"trace_id": "t-ddos-002", "span": "rate_check", "duration_ms": 3000, "status": "error"}]
+  },
+  "dependencies": {
+    "api_gateway": {"upstream": [], "downstream": ["rate_limiter", "auth_service"]},
+    "rate_limiter": {"upstream": ["api_gateway"], "downstream": ["backend_api"]},
+    "auth_service": {"upstream": ["api_gateway"], "downstream": ["backend_api"]},
+    "backend_api": {"upstream": ["rate_limiter", "auth_service"], "downstream": ["database"]},
+    "database": {"upstream": ["backend_api"], "downstream": []}
+  },
+  "ground_truth": {
+    "root_cause_service": "api_gateway",
+    "root_cause_type": "network",
+    "affected_services": ["rate_limiter", "auth_service", "backend_api"],
+    "causal_chain": ["api_gateway overwhelmed by DDoS", "rate_limiter flooded and blacklist full", "auth_service connection pool exhausted", "backend_api degraded due to upstream failures"],
+    "difficulty_rationale": "DDoS attack is subtle because the root cause is the entry point itself being overwhelmed, not a downstream service",
+    "teaching_points": ["High RPS on api_gateway is the first signal", "rate_limiter being overwhelmed confirms external attack", "database being healthy rules out internal failure"]
+  }
+}
