@@ -1,0 +1,73 @@
+openenv_version: "1.0"
+
+name: RCAAgent-Env
+version: "1.0.0"
+description: >
+  OpenEnv-compatible RCA environment: agent investigates simulated microservice
+  incidents via metrics, logs, traces, dependencies; submits structured RCA; graded.
+
+tasks:
+  - id: INC-001
+    name: RCA INC-001
+    difficulty: easy
+    max_steps: 25
+    optimal_steps: 3
+  - id: INC-002
+    name: RCA INC-002
+    difficulty: medium
+    max_steps: 30
+    optimal_steps: 6
+  - id: INC-003
+    name: RCA INC-003
+    difficulty: hard
+    max_steps: 35
+    optimal_steps: 10
+
+action_space:
+  - query_metrics
+  - query_logs
+  - pull_traces
+  - query_dependencies
+  - form_hypothesis
+  - submit_rca
+
+observation_space:
+  - success
+  - service
+  - metrics
+  - logs
+  - traces
+  - dependencies
+  - anomaly_detected
+  - anomaly_type
+  - queries_remaining
+  - message
+
+grader_weights:
+  root_cause: 0.40
+  causal_path: 0.25
+  efficiency: 0.20
+  report_quality: 0.15
+
+baseline_api:
+  provider: google_gemini
+  model: gemini-2.0-flash
+  env_key: GOOGLE_API_KEY
+
+endpoints:
+  tasks: GET /tasks
+  reset: POST /reset/{difficulty}
+  step: POST /step/{difficulty}
+  state: GET /state/{difficulty}
+  grader: POST /grader
+  baseline: GET /baseline?difficulty={easy|medium|hard}
+
+server:
+  port: 8000
+  module: server.app:app
+  framework: uvicorn
+
+notes:
+  difficulty_values: [easy, medium, hard]
+  session_key: difficulty string (one active session per difficulty after reset)
+  hf_spaces: Set repository secrets GOOGLE_API_KEY; Dockerfile listens on port 8000.
