@@ -96,7 +96,8 @@ def startup_event() -> None:
 @app.get("/")
 def root():
     from fastapi.responses import HTMLResponse
-    html = """<!DOCTYPE html>
+    html = open(_PROJECT_ROOT / "server" / "ui.html", encoding="utf-8").read()
+    ui_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
