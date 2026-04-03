@@ -1,4 +1,4 @@
-"""RCA environment: reset, step, and state for simulated incidents."""
+﻿"""RCA environment: reset, step, and state for simulated incidents."""
 
 from __future__ import annotations
 
@@ -25,6 +25,7 @@ def _scenario_path(difficulty: str) -> Path:
         "hard": "hard.json",
         "data_breach": "data_breach.json",
         "ddos": "ddos.json",
+        "ddos": "ddos.json",
     }.get(difficulty.lower())
     if not name:
         raise ValueError(f"Unknown difficulty: {difficulty}")
@@ -32,7 +33,7 @@ def _scenario_path(difficulty: str) -> Path:
 
 
 def _metrics_row_to_model(name: str, data: dict[str, Any]) -> ServiceMetrics:
-    """Map scenario JSON service_metrics entry → ServiceMetrics (supports legacy + enriched fields)."""
+    """Map scenario JSON service_metrics entry â†’ ServiceMetrics (supports legacy + enriched fields)."""
     cpu_usage = data.get("cpu_usage")
     if cpu_usage is None:
         cpu_usage = float(data.get("cpu_percent", 0.0)) / 100.0
