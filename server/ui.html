@@ -6,13 +6,13 @@
 <title>RCAAgent-Env | SRE Intelligence Platform</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#060608;color:#e2e8f0;font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
+body{background:#04040a;color:#e2e8f0;font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:#0d0d1a}
 ::-webkit-scrollbar-thumb{background:#1e293b}
 
 /* NAV */
-.nav{background:#08080f;border-bottom:1px solid #0f172a;padding:0 40px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav{background:#08080f;border-bottom:1px solid #0f172a;padding:0 60px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .nav-left{display:flex;align-items:center;gap:32px}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-icon{width:28px;height:28px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -26,29 +26,39 @@ body{background:#060608;color:#e2e8f0;font-family:'Courier New',monospace;min-he
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
 /* HERO */
-.hero{padding:48px 40px 36px;border-bottom:1px solid #0f172a;background:linear-gradient(180deg,#08080f 0%,#060608 100%)}
+.hero{padding:80px 60px 60px;border-bottom:1px solid #0f172a;background:linear-gradient(180deg,#08080f 0%,#060608 100%)}
 .hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:20px}
 .hero-tag{background:#0f172a;border:1px solid #1e293b;color:#475569;padding:3px 10px;border-radius:3px;font-size:10px;letter-spacing:2px;text-transform:uppercase}
 .hero-tag.blue{border-color:#1d4ed8;color:#3b82f6;background:#0c1a3a}
-.hero h1{font-size:38px;font-weight:900;color:#f8fafc;line-height:1.1;margin-bottom:12px;letter-spacing:-1px}
+.hero h1{font-size:52px;font-weight:900;color:#f8fafc;line-height:1.1;margin-bottom:12px;letter-spacing:-1px}
 .hero h1 em{font-style:normal;color:#3b82f6}
-.hero-sub{color:#475569;font-size:13px;max-width:580px;line-height:1.9;margin-bottom:28px}
-.hero-stats{display:flex;gap:32px}
+.hero-sub{color:#475569;font-size:15px;max-width:580px;line-height:1.9;margin-bottom:28px}
+.hero-stats{display:flex;gap:48px}
 .hero-stat{text-align:left}
-.hero-stat-val{font-size:22px;font-weight:800;color:#f1f5f9}
+.hero-stat-val{font-size:32px;font-weight:800;color:#f1f5f9}
 .hero-stat-val.b{color:#3b82f6}
 .hero-stat-val.g{color:#4ade80}
 .hero-stat-val.y{color:#fbbf24}
 .hero-stat-label{font-size:10px;color:#334155;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
 
+/* METRICS BAR */
+.metrics-bar{display:flex;border-bottom:1px solid #0f172a;background:#060608}
+.metrics-bar .metric{flex:1;padding:32px 48px;border-right:1px solid #0f172a}
+.metrics-bar .metric:last-child{border-right:none}
+.metrics-bar .metric-label{color:#334155;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.metrics-bar .metric-value{font-size:36px;font-weight:900;color:#f1f5f9}
+.metrics-bar .metric-value.blue{color:#3b82f6}
+.metrics-bar .metric-value.green{color:#4ade80}
+.metrics-bar .metric-value.yellow{color:#fbbf24}
+
 /* LAYOUT */
-.layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 200px)}
+.layout{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 200px)}
 
 /* SIDEBAR */
-.sidebar{background:#08080f;border-right:1px solid #0f172a;padding:24px 16px;overflow-y:auto}
+.sidebar{background:#08080f;border-right:1px solid #0f172a;padding:32px 24px;overflow-y:auto}
 .sidebar-section{margin-bottom:28px}
 .sidebar-label{color:#1e293b;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding:0 8px}
-.scenario-card{width:100%;background:transparent;border:1px solid #0f172a;color:#475569;padding:14px 16px;margin-bottom:6px;border-radius:6px;cursor:pointer;text-align:left;font-family:'Courier New',monospace;transition:all 0.15s}
+.scenario-card{width:100%;background:transparent;border:1px solid #0f172a;color:#475569;padding:18px 20px;margin-bottom:12px;border-radius:6px;cursor:pointer;text-align:left;font-family:'Courier New',monospace;transition:all 0.15s}
 .scenario-card:hover{border-color:#1e293b;color:#94a3b8;background:#0a0a12}
 .scenario-card.selected{border-color:#1d4ed8;background:#080d1f;color:#e2e8f0}
 .scenario-card .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -82,7 +92,7 @@ body{background:#060608;color:#e2e8f0;font-family:'Courier New',monospace;min-he
 .action-btn{background:#0f172a;border:1px solid #1e293b;color:#475569;padding:5px 12px;border-radius:4px;font-family:'Courier New',monospace;font-size:10px;cursor:pointer;transition:all 0.15s;letter-spacing:1px}
 .action-btn:hover{color:#94a3b8;border-color:#334155}
 
-.terminal-body{flex:1;padding:24px;overflow-y:auto;font-size:12px;line-height:1.9}
+.terminal-body{flex:1;padding:32px;overflow-y:auto;font-size:12px;line-height:1.9}
 .placeholder-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#1e293b;text-align:center}
 .placeholder-icon{font-size:48px;margin-bottom:16px;opacity:0.3}
 .placeholder-text{font-size:13px;letter-spacing:1px}
@@ -149,11 +159,24 @@ body{background:#060608;color:#e2e8f0;font-family:'Courier New',monospace;min-he
   </div>
   <h1>SRE Incident <em>Root Cause</em><br>Analysis Benchmark</h1>
   <p class="hero-sub">Drop AI agents into simulated production failures. Watch them investigate microservice dependencies, query metrics and distributed traces, then deliver structured RCA reports — deterministically scored against ground truth causal graphs.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><div class="hero-stat-val b">04</div><div class="hero-stat-label">Scenarios</div></div>
-    <div class="hero-stat"><div class="hero-stat-val g">1.00</div><div class="hero-stat-label">Max Score</div></div>
-    <div class="hero-stat"><div class="hero-stat-val y">Qwen 72B</div><div class="hero-stat-label">Baseline Model</div></div>
-    <div class="hero-stat"><div class="hero-stat-val">v2.0</div><div class="hero-stat-label">Grader Version</div></div>
+</div>
+
+<div class="metrics-bar">
+  <div class="metric">
+    <div class="metric-label">SCENARIOS</div>
+    <div class="metric-value blue">04</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">MAX SCORE</div>
+    <div class="metric-value green">1.00</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">BASELINE MODEL</div>
+    <div class="metric-value">Qwen 72B</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">GRADER VERSION</div>
+    <div class="metric-value yellow">v2.0</div>
   </div>
 </div>
 

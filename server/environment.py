@@ -24,6 +24,7 @@ def _scenario_path(difficulty: str) -> Path:
         "medium": "medium.json",
         "hard": "hard.json",
         "data_breach": "data_breach.json",
+        "ddos": "ddos.json",
     }.get(difficulty.lower())
     if not name:
         raise ValueError(f"Unknown difficulty: {difficulty}")

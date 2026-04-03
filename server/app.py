@@ -44,6 +44,7 @@ def _load_all_scenarios() -> None:
         ("medium", "medium.json"),
         ("hard", "hard.json"),
         ("data_breach", "data_breach.json"),
+        ("ddos", "ddos.json"),
     ):
         with (base / name).open(encoding="utf-8") as f:
             SCENARIOS[key] = json.load(f)
@@ -428,7 +429,7 @@ class GraderRequest(BaseModel):
 @app.get("/tasks", response_model=TasksResponse)
 def list_tasks() -> TasksResponse:
     out: list[TaskMeta] = []
-    for diff in ("easy", "medium", "hard", "data_breach"):
+    for diff in ("easy", "medium", "hard", "data_breach", "ddos"):
         sc = SCENARIOS[diff]
         gt = sc.get("ground_truth", {})
         out.append(

@@ -19,7 +19,7 @@ tags:
 
 server:
   module: server.app:app
-  port: 8000
+  port: 7860
   framework: uvicorn
   health_check: /
 
