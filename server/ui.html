@@ -679,14 +679,43 @@ ${labels}
 html.rca-pro-ui { min-height: 100%; }
 body.rca-pro-ui {
   position: relative;
-  background-color: #050508;
+  background-color: #03050c;
+  /* Fully offline “server aisle” — layered gradients only (no external images) */
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.82)),
-    url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1920&q=80");
-  background-size: cover;
-  background-position: center;
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.78) 100%),
+    radial-gradient(ellipse 110% 70% at 50% 110%, rgba(56, 139, 253, 0.07) 0%, transparent 42%),
+    radial-gradient(ellipse 50% 45% at 15% 25%, rgba(59, 130, 246, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 40% at 85% 35%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
+    repeating-linear-gradient(
+      90deg,
+      #0a0f18 0px,
+      #0a0f18 32px,
+      #030508 32px,
+      #030508 34px,
+      #121c2e 34px,
+      #121c2e 66px,
+      #030508 66px,
+      #030508 68px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 18px,
+      rgba(30, 58, 95, 0.12) 18px,
+      rgba(30, 58, 95, 0.12) 19px
+    ),
+    linear-gradient(165deg, #020308 0%, #0d1524 42%, #04060e 100%);
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    68px 100%,
+    100% 22px,
+    100% 100%;
+  background-position: center, center, center, center, center, center, center;
   background-attachment: fixed;
-  background-repeat: no-repeat;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
 }
 body.rca-pro-ui::before {
   content: "";
