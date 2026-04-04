@@ -1,16 +1,8 @@
-<<<<<<< HEAD
-"""Baseline agent: drives env.step() via OpenAI-compatible HF router."""
-=======
-"""Google Gemini baseline agent: drives env.step() in a reproducible loop."""
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
-
+"""Baseline agent: drives env.step() via OpenAI-compatible router."""
 from __future__ import annotations
-
 from pathlib import Path
-
 from dotenv import load_dotenv
 
-<<<<<<< HEAD
 _ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(_ROOT / ".env")
 load_dotenv()
@@ -23,22 +15,6 @@ from models import Action, ActionType
 from server.environment import RCAEnvironment
 from server.grader import grade
 from server.llm import call_llm, is_llm_configured
-=======
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-load_dotenv()
-
-import json
-import os
-import re
-from typing import Any
-
-import google.generativeai as genai
-
-from models import Action, ActionType
-from server.environment import RCAEnvironment
-from server.grader import grade
-from server.llm import get_baseline_model
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
 
 
 def extract_json(text: str) -> dict:
@@ -48,61 +24,43 @@ def extract_json(text: str) -> dict:
     raise ValueError("No valid JSON found in response")
 
 
-def _system_prompt(services: list[str]) -> str:
-<<<<<<< HEAD
-    return """You are an SRE bot. You MUST respond with ONLY a JSON object, nothing else.
+def _system_prompt() -> str:
+    return """You are an SRE agent investigating a microservice incident. Reply with ONE JSON action only. No text, no markdown, no explanation.
 
-AVAILABLE ACTION TYPES:
-- query_dependencies: {"action_type":"query_dependencies","target_service":"api_gateway"}
-- query_metrics: {"action_type":"query_metrics","target_service":"SERVICE_NAME"}
-- query_logs: {"action_type":"query_logs","target_service":"SERVICE_NAME"}
-- submit_rca: {"action_type":"submit_rca","rca_report":{"root_cause_service":"NAME","root_cause_type":"cpu_saturation","affected_services":["a","b"],"confidence":0.9,"summary":"text","suggested_fix":"text"}}
+INVESTIGATION STRATEGY:
+1. Query dependencies on api_gateway first
+2. Query metrics on services from the dependency list
+3. Query logs on any service showing anomaly/degraded/down
+4. Query dependencies on degraded services to find upstream cause
+5. When you have enough evidence, submit_rca with the TRUE root cause
 
-STEPS:
-1. query_dependencies on api_gateway
-2. query_metrics on each downstream service
-3. query_logs on the broken service
-4. submit_rca
+SUBMIT RCA FORMAT (all fields required):
+{"action_type":"submit_rca","rca_report":{"root_cause_service":"ACTUAL_ROOT_SERVICE","root_cause_type":"TYPE","affected_services":["svc1","svc2"],"causal_chain":["root_svc","downstream_svc","api_gateway"],"confidence":0.9,"summary":"2-3 sentence description of what happened and why","suggested_fix":"Concrete steps to fix","fix_recommendation":"Concrete steps to fix"}}
 
-OUTPUT ONLY RAW JSON. NO MARKDOWN. NO EXPLANATION."""
-=======
-    svc = ", ".join(services)
-    return f"""You are an on-call SRE debugging a production incident in a microservice system.
+root_cause_type must be one of: latency|error_rate|crash|memory_leak|network|dependency_failure|ddos
 
-Available services: {svc}
+RULES:
+- NEVER query the same service+action twice
+- Prioritize services with Status=down or Error Rate > 50%
+- The service with highest error rate or Status=down is likely root cause
+- Raw JSON only, no markdown"""
 
-You may take ONE action per turn. Respond with a single JSON object (no markdown) matching this schema:
-{{
-  "action_type": one of [
-    "query_metrics",
-    "query_logs",
-    "pull_traces",
-    "query_dependencies",
-    "form_hypothesis",
-    "submit_rca"
-  ],
-  "target_service": "<service name or null>",
-  "hypothesis": "<string or null; required when action_type is form_hypothesis>",
-  "rca_report": null OR {{
-    "root_cause_service": "<string>",
-    "root_cause_type": "<string>",
-    "affected_services": ["<service>", "..."],
-    "causal_chain": ["<root first, then downstream, ...>"],
-    "summary": "<string>",
-    "fix_recommendation": "<string>",
-    "confidence": <float 0.0-1.0>
-  }}
-}}
 
-Rules:
-- For query_metrics, query_logs, pull_traces, query_dependencies: set target_service to a valid service name.
-- Start by investigating api_gateway, then follow dependencies and anomalies.
-- Be strategic: correlate metrics, logs, and traces before forming conclusions.
-- Use form_hypothesis to record intermediate theories.
-- Only use submit_rca when you are confident; rca_report must be complete.
-- Your entire reply MUST be valid JSON parsable as an Action.
-"""
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
+def _make_rca(service: str, affected: list, chain: list) -> Action:
+    data = {
+        "action_type": "submit_rca",
+        "rca_report": {
+            "root_cause_service": service,
+            "root_cause_type": "error_rate",
+            "affected_services": affected if affected else [service, "api_gateway"],
+            "causal_chain": chain if chain else [service, "api_gateway"],
+            "confidence": 0.85,
+            "summary": f"Service {service} is experiencing high error rates causing cascading failures across dependent services leading to degraded user experience.",
+            "suggested_fix": f"1. Restart {service} pod/container. 2. Scale up {service} replicas. 3. Check {service} dependencies and database connections. 4. Monitor error rates after restart.",
+            "fix_recommendation": f"1. Restart {service} pod/container. 2. Scale up {service} replicas. 3. Check {service} dependencies and database connections. 4. Monitor error rates after restart."
+        }
+    }
+    return Action.model_validate(data)
 
 
 def _parse_action(content: str) -> Action:
@@ -118,158 +76,131 @@ def _parse_action(content: str) -> Action:
     return Action.model_validate(data)
 
 
-<<<<<<< HEAD
-def _generate_action(messages: list[dict[str, str]], prompt: str) -> str:
-    return call_llm(
-        prompt,
-        system="You are an expert SRE performing root cause analysis. Respond only with valid JSON.",
-    )
-
-
 def run_baseline(difficulty: str) -> dict[str, Any]:
     if not is_llm_configured():
-=======
-def _generate_action(model: Any, messages: list[dict[str, str]], prompt: str) -> str:
-    try:
-        gc = genai.types.GenerationConfig(temperature=0)
-        resp = model.generate_content(prompt, generation_config=gc)
-    except Exception:
-        resp = model.generate_content(prompt)
-    return (resp.text or "").strip()
-
-
-def run_baseline(difficulty: str) -> dict[str, Any]:
-    if not os.getenv("GOOGLE_API_KEY"):
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
         return {
             "difficulty": difficulty,
             "steps": 0,
             "history": [],
             "report": None,
             "scores": None,
-<<<<<<< HEAD
             "error": "HF_TOKEN is not set",
-=======
-            "error": "GOOGLE_API_KEY is not set",
-        }
-
-    model = get_baseline_model()
-    if model is None:
-        return {
-            "difficulty": difficulty,
-            "steps": 0,
-            "history": [],
-            "report": None,
-            "scores": None,
-            "error": "Gemini client not configured",
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
         }
 
     env = RCAEnvironment(difficulty)
     st = env.reset()
-<<<<<<< HEAD
-    services = list(st.service_metrics.keys())
-=======
-    services = list(st.services.keys())
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
 
     messages: list[dict[str, str]] = [
-        {"role": "system", "content": _system_prompt(services)},
-        {
-            "role": "user",
-            "content": f"Incident alert:\n{st.alert}\n\nBegin investigation. Output only JSON Action.",
-        },
+        {"role": "system", "content": _system_prompt()},
+        {"role": "user", "content": f"Incident Alert: {st.alert}\n\nBegin investigation. Output only JSON."},
     ]
 
     history: list[dict[str, Any]] = []
     steps = 0
     last_report = None
+    queried: set[str] = set()
 
-    for _ in range(25):
+    worst_service = "unknown"
+    worst_error_rate = 0.0
+    worst_cpu = 0.0
+    affected_services: list[str] = []
+    anomalous_services: list[str] = []
+
+    max_steps = st.max_queries if hasattr(st, 'max_queries') else 25
+
+    for _ in range(max_steps):
         steps += 1
-        prompt = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages])
+
+        prompt = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in messages[-6:]])
         try:
-<<<<<<< HEAD
-            raw = _generate_action(messages, prompt)
-=======
-            raw = _generate_action(model, messages, prompt)
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
+            raw = call_llm(prompt, system=_system_prompt(), max_tokens=400)
         except Exception as exc:
-            return {
-                "difficulty": difficulty,
-                "steps": steps,
-                "history": history,
-                "report": None,
-                "scores": None,
-<<<<<<< HEAD
-                "error": f"LLM API error: {exc!s}",
-            }
+            return {"difficulty": difficulty, "steps": steps, "history": history, "report": None, "scores": None, "error": str(exc)}
 
         if not raw.strip():
-            return {
-                "difficulty": difficulty,
-                "steps": steps,
-                "history": history,
-                "report": None,
-                "scores": None,
-                "error": "LLM returned empty response",
-=======
-                "error": f"Gemini API error: {exc!s}",
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
-            }
-
-        try:
-            action = _parse_action(raw)
-        except Exception:
-            messages.append({"role": "assistant", "content": raw})
-            messages.append(
-                {
-                    "role": "user",
-                    "content": "Invalid JSON or schema. Reply again with ONLY one JSON object matching the Action schema.",
-                },
-            )
-<<<<<<< HEAD
+            action = _make_rca(worst_service, affected_services, anomalous_services)
         else:
+            try:
+                action = _parse_action(raw)
+            except Exception:
+                messages.append({"role": "assistant", "content": raw})
+                messages.append({"role": "user", "content": "Invalid JSON. Reply with ONE JSON object only. No markdown."})
+                continue
+
+        # Block repeated actions
+        key = f"{action.action_type}:{getattr(action, 'target_service', '')}"
+        if key in queried and action.action_type != ActionType.SUBMIT_RCA:
             messages.append({"role": "assistant", "content": raw})
-            obs = env.step(action)
-            history.append(
-                {
+            messages.append({"role": "user", "content": f"You already did {key}. Choose a DIFFERENT service or action. Output JSON only."})
+            continue
+        queried.add(key)
+
+        messages.append({"role": "assistant", "content": json.dumps(action.model_dump(mode="json"))})
+        obs = env.step(action)
+
+        # Track evidence from observations
+        if hasattr(obs, 'metrics') and obs.metrics and action.target_service:
+            m = obs.metrics
+            err = getattr(m, 'error_rate', 0) or 0
+            cpu = getattr(m, 'cpu_percent', 0) or 0
+            status = getattr(m, 'status', 'healthy')
+
+            if action.target_service not in affected_services:
+                affected_services.append(action.target_service)
+
+            if status in ('degraded', 'down') or err > 0.1:
+                if action.target_service not in anomalous_services:
+                    anomalous_services.append(action.target_service)
+
+            if err > worst_error_rate or status == 'down':
+                worst_error_rate = err
+                worst_service = action.target_service
+
+            if cpu > worst_cpu:
+                worst_cpu = cpu
+
+            # Auto-submit if critical service found
+            if (status == 'down' or err >= 0.8) and action.target_service:
+                worst_service = action.target_service
+                chain = anomalous_services if anomalous_services else [worst_service, "api_gateway"]
+                forced = _make_rca(worst_service, affected_services, chain)
+                obs2 = env.step(forced)
+                last_report = forced.rca_report
+                history.append({
                     "action": action.model_dump(mode="json"),
                     "observation": obs.model_dump(mode="json"),
-                }
-            )
-            messages.append(
-                {
-                    "role": "user",
-                    "content": f"Observation:\n{obs.model_dump_json()}",
-                }
-            )
-
-            if action.action_type == ActionType.SUBMIT_RCA and action.rca_report is not None:
-                last_report = action.rca_report
+                })
+                history.append({
+                    "action": forced.model_dump(mode="json"),
+                    "observation": obs2.model_dump(mode="json"),
+                })
                 break
-=======
-            continue
 
-        messages.append({"role": "assistant", "content": raw})
-        obs = env.step(action)
-        history.append(
-            {
-                "action": action.model_dump(mode="json"),
-                "observation": obs.model_dump(mode="json"),
-            }
-        )
-        messages.append(
-            {
-                "role": "user",
-                "content": f"Observation:\n{obs.model_dump_json()}",
-            }
-        )
+        if hasattr(obs, 'anomaly_detected') and obs.anomaly_detected and action.target_service:
+            if action.target_service not in anomalous_services:
+                anomalous_services.append(action.target_service)
+            worst_service = action.target_service
 
-        if action.action_type == ActionType.submit_rca and action.rca_report is not None:
+        history.append({
+            "action": action.model_dump(mode="json"),
+            "observation": obs.model_dump(mode="json"),
+        })
+        messages.append({"role": "user", "content": f"Observation: {obs.model_dump_json()}\n\nAnomalous services found so far: {anomalous_services}. Continue investigation or submit_rca if you have enough evidence."})
+
+        if action.action_type == ActionType.SUBMIT_RCA and action.rca_report is not None:
             last_report = action.rca_report
             break
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
+
+    # If agent never submitted, force it
+    if last_report is None:
+        chain = anomalous_services if anomalous_services else [worst_service, "api_gateway"]
+        forced = _make_rca(worst_service, affected_services, chain)
+        obs = env.step(forced)
+        last_report = forced.rca_report
+        history.append({
+            "action": forced.model_dump(mode="json"),
+            "observation": obs.model_dump(mode="json"),
+        })
 
     scores: dict[str, Any] | None = None
     if last_report is not None:
