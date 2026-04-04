@@ -7,14 +7,17 @@
 <style>
 html{scroll-behavior:smooth}
 *{margin:0;padding:0;box-sizing:border-box}
+html{background:#080c14}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-body{animation:fadeIn .6s ease both;background:#080c14;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+body{animation:fadeIn .6s ease both;background:transparent;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+#neural-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block}
+body>section,body>div.main{position:relative;z-index:1}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:#0d1117}
 ::-webkit-scrollbar-thumb{background:#1e2d3d;border-radius:3px}
 
 /* NAVBAR */
-.nav{background:#080c14;border-bottom:1px solid #1e2d3d;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.nav{background:rgba(8,12,20,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #1e2d3d;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
 .brand{font-weight:900;letter-spacing:3px;color:#e6edf3;font-size:13px}
 .nav-links{display:flex;gap:22px;align-items:center}
 .nav-links a{color:#7d8590;text-decoration:none;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
@@ -23,7 +26,7 @@ body{animation:fadeIn .6s ease both;background:#080c14;color:#e6edf3;font-family
 .live-dot{width:8px;height:8px;border-radius:50%;background:#3fb950;box-shadow:0 0 0 4px rgba(63,185,80,.2)}
 
 /* HERO */
-.hero{background:#080c14;min-height:320px;display:grid;grid-template-columns:1fr minmax(280px,420px);gap:48px;align-items:center;padding:48px 60px 48px 60px;border-bottom:1px solid #1e2d3d}
+.hero{background:rgba(8,12,20,.84);min-height:320px;display:grid;grid-template-columns:1fr minmax(280px,420px);gap:48px;align-items:center;padding:48px 60px 48px 60px;border-bottom:1px solid #1e2d3d}
 .hero-copy{max-width:640px}
 .hero-title{font-size:64px;font-weight:900;line-height:1.05;color:#e6edf3;margin-bottom:16px}
 .hero-title .line2{display:block}
@@ -35,7 +38,7 @@ body{animation:fadeIn .6s ease both;background:#080c14;color:#e6edf3;font-family
 .hero-term-line{font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#3fb950;min-height:4.2em;white-space:pre-wrap;word-break:break-word}
 
 /* METRICS */
-.metrics-bar{background:#0d1117;border-top:1px solid #1e2d3d;border-bottom:1px solid #1e2d3d;display:flex}
+.metrics-bar{background:rgba(13,17,23,.9);border-top:1px solid #1e2d3d;border-bottom:1px solid #1e2d3d;display:flex}
 .metrics-bar .metric{flex:1;padding:28px 40px;border-right:1px solid #1e2d3d}
 .metrics-bar .metric:last-child{border-right:none}
 .metrics-bar .metric-value{font-size:32px;font-weight:900;color:#e6edf3}
@@ -45,9 +48,9 @@ body{animation:fadeIn .6s ease both;background:#080c14;color:#e6edf3;font-family
 .metrics-bar .metric-label{margin-top:10px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#7d8590}
 
 /* MAIN */
-.main{background:#080c14;display:flex;min-height:calc(100vh - 56px - 320px - 120px)}
-.left-panel{width:280px;border-right:1px solid #1e2d3d;background:#0d1117;padding:18px 14px;display:flex;flex-direction:column}
-.right-panel{flex:1;background:#080c14;display:flex;flex-direction:column}
+.main{background:rgba(8,12,20,.82);display:flex;min-height:calc(100vh - 56px - 320px - 120px)}
+.left-panel{width:280px;border-right:1px solid #1e2d3d;background:rgba(13,17,23,.92);padding:18px 14px;display:flex;flex-direction:column}
+.right-panel{flex:1;background:rgba(8,12,20,.8);display:flex;flex-direction:column}
 
 /* SCENARIO CARDS */
 .scenario-card{width:100%;text-align:left;background:#080c14;border:1px solid #1e2d3d;border-left:3px solid transparent;border-radius:4px;padding:14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;gap:8px}
@@ -80,7 +83,7 @@ body{animation:fadeIn .6s ease both;background:#080c14;color:#e6edf3;font-family
 .tab.active{color:#388bfd;border-bottom-color:#388bfd}
 .action-btn{background:transparent;border:1px solid #1e2d3d;color:#7d8590;border-radius:4px;padding:8px 12px;font-family:'Courier New',monospace;font-size:11px;cursor:pointer}
 .action-btn:hover{border-color:#388bfd;color:#e6edf3}
-.terminal-body{flex:1;height:520px;max-height:520px;padding:24px 28px;overflow-y:auto;font-size:12px;line-height:1.9;font-family:'Courier New',monospace;background:#080c14}
+.terminal-body{flex:1;height:520px;max-height:520px;padding:24px 28px;overflow-y:auto;font-size:12px;line-height:1.9;font-family:'Courier New',monospace;background:rgba(8,12,20,.88)}
 .placeholder-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7d8590;text-align:center}
 .placeholder-icon{font-size:48px;margin-bottom:16px;opacity:.35}
 .placeholder-text{font-size:12px;letter-spacing:1px}
@@ -127,6 +130,7 @@ body{animation:fadeIn .6s ease both;background:#080c14;color:#e6edf3;font-family
 </style>
 </head>
 <body>
+<canvas id="neural-bg" aria-hidden="true"></canvas>
 
 <nav class="nav">
   <div class="brand">RCAAGENT</div>
@@ -2089,6 +2093,7 @@ body.rca-leaderboard-on .main { display: none !important; }
   }
 })();
 </script>
+<script src="/static/neural-bg.js"></script>
 
 </body>
 </html>

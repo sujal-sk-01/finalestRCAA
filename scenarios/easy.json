@@ -18,105 +18,77 @@
       "error_rate": 0.12,
       "cpu_percent": 55.0,
       "memory_percent": 62.0,
-<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.55,
       "memory_usage": 0.62,
       "requests_per_second": 828.0,
       "latency_p99_ms": 1850.0
-=======
-      "status": "degraded"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "auth": {
       "latency_ms": 45.0,
       "error_rate": 0.001,
       "cpu_percent": 22.0,
       "memory_percent": 38.0,
-<<<<<<< HEAD
       "status": "healthy",
       "cpu_usage": 0.22,
       "memory_usage": 0.38,
       "requests_per_second": 957.0,
       "latency_p99_ms": 45.0
-=======
-      "status": "healthy"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "order_service": {
       "latency_ms": 1200.0,
       "error_rate": 0.08,
       "cpu_percent": 48.0,
       "memory_percent": 71.0,
-<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.48,
       "memory_usage": 0.71,
       "requests_per_second": 885.0,
       "latency_p99_ms": 1200.0
-=======
-      "status": "degraded"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "payment": {
       "latency_ms": 120.0,
       "error_rate": 0.002,
       "cpu_percent": 30.0,
       "memory_percent": 44.0,
-<<<<<<< HEAD
       "status": "healthy",
       "cpu_usage": 0.3,
       "memory_usage": 0.44,
       "requests_per_second": 840.0,
       "latency_p99_ms": 120.0
-=======
-      "status": "healthy"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "inventory": {
       "latency_ms": 95.0,
       "error_rate": 0.001,
       "cpu_percent": 28.0,
       "memory_percent": 41.0,
-<<<<<<< HEAD
       "status": "healthy",
       "cpu_usage": 0.28,
       "memory_usage": 0.41,
       "requests_per_second": 909.0,
       "latency_p99_ms": 95.0
-=======
-      "status": "healthy"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "cache": {
       "latency_ms": 8.0,
       "error_rate": 0.0,
       "cpu_percent": 15.0,
       "memory_percent": 35.0,
-<<<<<<< HEAD
       "status": "healthy",
       "cpu_usage": 0.15,
       "memory_usage": 0.35,
       "requests_per_second": 947.0,
       "latency_p99_ms": 8.0
-=======
-      "status": "healthy"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "database": {
       "latency_ms": 890.0,
       "error_rate": 0.04,
       "cpu_percent": 98.0,
       "memory_percent": 88.0,
-<<<<<<< HEAD
       "status": "down",
       "cpu_usage": 0.98,
       "memory_usage": 0.88,
       "requests_per_second": 839.0,
       "latency_p99_ms": 890.0
-=======
-      "status": "down"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     }
   },
   "logs": {
@@ -179,7 +151,6 @@
   "dependencies": {
     "api_gateway": {
       "upstream": [],
-<<<<<<< HEAD
       "downstream": [
         "auth",
         "order_service"
@@ -235,39 +206,12 @@
         "payment",
         "inventory"
       ],
-=======
-      "downstream": ["auth", "order_service"]
-    },
-    "auth": {
-      "upstream": ["api_gateway"],
-      "downstream": ["database"]
-    },
-    "order_service": {
-      "upstream": ["api_gateway"],
-      "downstream": ["payment", "inventory", "database", "cache"]
-    },
-    "payment": {
-      "upstream": ["order_service"],
-      "downstream": ["database"]
-    },
-    "inventory": {
-      "upstream": ["order_service"],
-      "downstream": ["database", "cache"]
-    },
-    "cache": {
-      "upstream": ["order_service", "inventory"],
-      "downstream": []
-    },
-    "database": {
-      "upstream": ["auth", "order_service", "payment", "inventory"],
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
       "downstream": []
     }
   },
   "ground_truth": {
     "root_cause_service": "database",
     "root_cause_type": "cpu_exhaustion",
-<<<<<<< HEAD
     "affected_services": [
       "order_service",
       "api_gateway"
@@ -283,10 +227,5 @@
       "Correlate metrics, logs, and traces before concluding.",
       "Use the dependency graph to understand blast radius."
     ]
-=======
-    "affected_services": ["order_service", "api_gateway"],
-    "causal_chain": ["database", "order_service", "api_gateway"],
-    "optimal_queries": 3
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
   }
 }

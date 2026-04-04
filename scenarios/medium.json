@@ -19,120 +19,88 @@
       "error_rate": 0.06,
       "cpu_percent": 72.0,
       "memory_percent": 68.0,
-<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.72,
       "memory_usage": 0.68,
       "requests_per_second": 1228.0,
       "latency_p99_ms": 920.0
-=======
-      "status": "degraded"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "auth": {
       "latency_ms": 95.0,
       "error_rate": 0.012,
       "cpu_percent": 41.0,
       "memory_percent": 45.0,
-<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.41,
       "memory_usage": 0.45,
       "requests_per_second": 1357.0,
       "latency_p99_ms": 95.0
-=======
-      "status": "degraded"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "order_service": {
       "latency_ms": 680.0,
       "error_rate": 0.05,
       "cpu_percent": 76.0,
       "memory_percent": 74.0,
-<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.76,
       "memory_usage": 0.74,
       "requests_per_second": 1285.0,
       "latency_p99_ms": 680.0
-=======
-      "status": "degraded"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "pricing_service": {
       "latency_ms": 540.0,
       "error_rate": 0.04,
       "cpu_percent": 63.0,
       "memory_percent": 59.0,
-<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.63,
       "memory_usage": 0.59,
       "requests_per_second": 1396.0,
       "latency_p99_ms": 540.0
-=======
-      "status": "degraded"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "payment": {
       "latency_ms": 140.0,
       "error_rate": 0.003,
       "cpu_percent": 33.0,
       "memory_percent": 46.0,
-<<<<<<< HEAD
       "status": "healthy",
       "cpu_usage": 0.33,
       "memory_usage": 0.46,
       "requests_per_second": 1240.0,
       "latency_p99_ms": 140.0
-=======
-      "status": "healthy"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "inventory": {
       "latency_ms": 110.0,
       "error_rate": 0.002,
       "cpu_percent": 31.0,
       "memory_percent": 43.0,
-<<<<<<< HEAD
       "status": "healthy",
       "cpu_usage": 0.31,
       "memory_usage": 0.43,
       "requests_per_second": 1309.0,
       "latency_p99_ms": 110.0
-=======
-      "status": "healthy"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "cache": {
       "latency_ms": 420.0,
       "error_rate": 0.02,
       "cpu_percent": 91.0,
       "memory_percent": 82.0,
-<<<<<<< HEAD
       "status": "down",
       "cpu_usage": 0.91,
       "memory_usage": 0.82,
       "requests_per_second": 1347.0,
       "latency_p99_ms": 420.0
-=======
-      "status": "down"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "database": {
       "latency_ms": 210.0,
       "error_rate": 0.008,
       "cpu_percent": 58.0,
       "memory_percent": 61.0,
-<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.58,
       "memory_usage": 0.61,
       "requests_per_second": 1239.0,
       "latency_p99_ms": 210.0
-=======
-      "status": "degraded"
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     }
   },
   "logs": {
@@ -207,7 +175,6 @@
   "dependencies": {
     "api_gateway": {
       "upstream": [],
-<<<<<<< HEAD
       "downstream": [
         "auth",
         "order_service",
@@ -277,43 +244,12 @@
         "inventory",
         "pricing_service"
       ],
-=======
-      "downstream": ["auth", "order_service", "pricing_service"]
-    },
-    "auth": {
-      "upstream": ["api_gateway"],
-      "downstream": ["database"]
-    },
-    "order_service": {
-      "upstream": ["api_gateway"],
-      "downstream": ["payment", "inventory", "cache", "database", "pricing_service"]
-    },
-    "pricing_service": {
-      "upstream": ["api_gateway", "order_service"],
-      "downstream": ["cache", "database"]
-    },
-    "payment": {
-      "upstream": ["order_service"],
-      "downstream": ["database"]
-    },
-    "inventory": {
-      "upstream": ["order_service"],
-      "downstream": ["database", "cache"]
-    },
-    "cache": {
-      "upstream": ["order_service", "inventory", "pricing_service"],
-      "downstream": []
-    },
-    "database": {
-      "upstream": ["auth", "order_service", "payment", "inventory", "pricing_service"],
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
       "downstream": []
     }
   },
   "ground_truth": {
     "root_cause_service": "cache",
     "root_cause_type": "misconfiguration_ttl_zero_stampede",
-<<<<<<< HEAD
     "affected_services": [
       "pricing_service",
       "order_service",
@@ -331,10 +267,5 @@
       "Correlate metrics, logs, and traces before concluding.",
       "Use the dependency graph to understand blast radius."
     ]
-=======
-    "affected_services": ["pricing_service", "order_service", "api_gateway"],
-    "causal_chain": ["cache", "pricing_service", "order_service", "api_gateway"],
-    "optimal_queries": 6
->>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
   }
 }

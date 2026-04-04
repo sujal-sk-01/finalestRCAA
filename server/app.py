@@ -22,6 +22,7 @@ if sys.platform == "win32":
 logging.basicConfig(level=logging.INFO)
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from models import Action, EnvironmentState, Observation, RCAReport, ServiceMetrics
@@ -79,6 +80,8 @@ def _environment_state_for_grader(
 
 
 app = FastAPI(title="RCAAgent-Env", version="2.0.0")
+
+app.mount("/static", StaticFiles(directory=str(_PROJECT_ROOT / "static")), name="static")
 
 
 @app.on_event("startup")
