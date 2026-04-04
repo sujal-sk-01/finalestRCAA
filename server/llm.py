@@ -19,7 +19,7 @@ def _get_client() -> OpenAI:
     global _client
     if _client is None:
         _client = OpenAI(
-            base_url=os.environ.get("API_BASE_URL", "https://router.huggingface.co/v1"),
+            base_url=os.environ.get("API_BASE_URL", "https://api-inference.huggingface.co/v1"),
             api_key=os.environ.get("HF_TOKEN", ""),
         )
     return _client
@@ -50,5 +50,5 @@ def call_llm(
         response = client.chat.completions.create(**kwargs)
         return response.choices[0].message.content or ""
     except Exception as e:
-        print(f"LLM call failed: {e}")
-        return ""
+        raise Exception(f"LLM call failed: {e}")
+

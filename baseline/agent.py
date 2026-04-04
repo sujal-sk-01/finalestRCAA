@@ -128,26 +128,25 @@ def run_baseline(difficulty: str) -> dict[str, Any]:
                     "content": "Invalid JSON or schema. Reply again with ONLY one JSON object matching the Action schema.",
                 },
             )
-            continue
+        else:
+            messages.append({"role": "assistant", "content": raw})
+            obs = env.step(action)
+            history.append(
+                {
+                    "action": action.model_dump(mode="json"),
+                    "observation": obs.model_dump(mode="json"),
+                }
+            )
+            messages.append(
+                {
+                    "role": "user",
+                    "content": f"Observation:\n{obs.model_dump_json()}",
+                }
+            )
 
-        messages.append({"role": "assistant", "content": raw})
-        obs = env.step(action)
-        history.append(
-            {
-                "action": action.model_dump(mode="json"),
-                "observation": obs.model_dump(mode="json"),
-            }
-        )
-        messages.append(
-            {
-                "role": "user",
-                "content": f"Observation:\n{obs.model_dump_json()}",
-            }
-        )
-
-        if action.action_type == ActionType.SUBMIT_RCA and action.rca_report is not None:
-            last_report = action.rca_report
-            break
+            if action.action_type == ActionType.SUBMIT_RCA and action.rca_report is not None:
+                last_report = action.rca_report
+                break
 
     scores: dict[str, Any] | None = None
     if last_report is not None:

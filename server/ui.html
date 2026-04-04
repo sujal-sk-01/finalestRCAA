@@ -3,247 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RCAAgent-Env | SRE Intelligence Platform</title>
+<title>RCAAGENT | Root Cause Analysis</title>
 <style>
+html{scroll-behavior:smooth}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#04040a;color:#e2e8f0;font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+body{animation:fadeIn .6s ease both;background:#ffffff;color:#0a0a0f;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:#0d0d1a}
-::-webkit-scrollbar-thumb{background:#1e293b}
+::-webkit-scrollbar-track{background:#f3f4f6}
+::-webkit-scrollbar-thumb{background:#e5e7eb}
 
-/* NAV */
-.nav{background:#08080f;border-bottom:1px solid #0f172a;padding:0 60px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.nav-left{display:flex;align-items:center;gap:32px}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.logo-text{font-size:13px;font-weight:700;letter-spacing:3px;color:#f1f5f9;text-transform:uppercase}
-.nav-links{display:flex;gap:24px}
-.nav-links a{color:#334155;font-size:11px;letter-spacing:1px;text-decoration:none;text-transform:uppercase;transition:color 0.2s}
-.nav-links a:hover{color:#94a3b8}
-.nav-right{display:flex;align-items:center;gap:16px}
-.live-badge{display:flex;align-items:center;gap:6px;background:#052e16;border:1px solid #166534;padding:4px 12px;border-radius:20px;font-size:10px;letter-spacing:1px;color:#4ade80}
-.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+/* NAVBAR */
+.nav{background:#ffffff;border-bottom:1px solid #e5e7eb;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.brand{font-weight:900;letter-spacing:2px;color:#0a0a0f;font-size:13px}
+.nav-links{display:flex;gap:22px;align-items:center}
+.nav-links a{color:#0a0a0f;text-decoration:none;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.nav-links a:hover{color:#2563eb}
+.system-live{display:flex;align-items:center;gap:8px;background:#16a34a1a;border:1px solid #16a34a;border-radius:999px;padding:6px 12px;color:#16a34a;font-weight:800;font-size:11px;letter-spacing:.5px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.15)}
 
 /* HERO */
-.hero{padding:80px 60px 60px;border-bottom:1px solid #0f172a;background:linear-gradient(180deg,#08080f 0%,#060608 100%)}
-.hero-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:20px}
-.hero-tag{background:#0f172a;border:1px solid #1e293b;color:#475569;padding:3px 10px;border-radius:3px;font-size:10px;letter-spacing:2px;text-transform:uppercase}
-.hero-tag.blue{border-color:#1d4ed8;color:#3b82f6;background:#0c1a3a}
-.hero h1{font-size:52px;font-weight:900;color:#f8fafc;line-height:1.1;margin-bottom:12px;letter-spacing:-1px}
-.hero h1 em{font-style:normal;color:#3b82f6}
-.hero-sub{color:#475569;font-size:15px;max-width:580px;line-height:1.9;margin-bottom:28px}
-.hero-stats{display:flex;gap:48px}
-.hero-stat{text-align:left}
-.hero-stat-val{font-size:32px;font-weight:800;color:#f1f5f9}
-.hero-stat-val.b{color:#3b82f6}
-.hero-stat-val.g{color:#4ade80}
-.hero-stat-val.y{color:#fbbf24}
-.hero-stat-label{font-size:10px;color:#334155;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.hero{min-height:calc(100vh - 60px);background:#0a0a0f;color:#ffffff;display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 18px}
+.hero-inner{max-width:980px}
+.hero-title{font-family:ui-serif,-apple-system,BlinkMacSystemFont,sans-serif;font-size:80px;font-weight:900;line-height:1.0;margin-bottom:22px}
+.hero-title .highlight{color:#3b82f6}
+.hero-sub{color:#9ca3af;font-size:16px;line-height:1.8;margin:0 auto 22px;max-width:720px}
+.scroll-hint{color:#cbd5e1;font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-top:38px;display:flex;align-items:center;justify-content:center;gap:10px}
+.scroll-arrow{font-size:22px;line-height:1;margin-top:2px}
 
-/* METRICS BAR */
-.metrics-bar{display:flex;border-bottom:1px solid #0f172a;background:#060608}
-.metrics-bar .metric{flex:1;padding:32px 48px;border-right:1px solid #0f172a}
+/* METRICS SECTION */
+.metrics-bar{background:#ffffff;border-bottom:1px solid #e5e7eb;display:flex}
+.metrics-bar .metric{flex:1;padding:32px 48px;border-right:1px solid #e5e7eb}
 .metrics-bar .metric:last-child{border-right:none}
-.metrics-bar .metric-label{color:#334155;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.metrics-bar .metric-value{font-size:36px;font-weight:900;color:#f1f5f9}
+.metrics-bar .metric-value{font-size:34px;font-weight:900;color:#0a0a0f}
 .metrics-bar .metric-value.blue{color:#3b82f6}
-.metrics-bar .metric-value.green{color:#4ade80}
-.metrics-bar .metric-value.yellow{color:#fbbf24}
+.metrics-bar .metric-value.green{color:#16a34a}
+.metrics-bar .metric-value.yellow{color:#f59e0b}
+.metrics-bar .metric-label{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#6b7280}
 
-/* LAYOUT */
-.layout{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 200px)}
+/* MAIN LAYOUT */
+.main{background:#ffffff;display:flex;min-height:calc(100vh - 60px - 130px)}
+.left-panel{width:300px;border-right:1px solid #e5e7eb;background:#ffffff;padding:18px 14px;display:flex;flex-direction:column}
+.right-panel{flex:1;background:#0a0a0f;display:flex;flex-direction:column}
 
-/* SIDEBAR */
-.sidebar{background:#08080f;border-right:1px solid #0f172a;padding:32px 24px;overflow-y:auto}
-.sidebar-section{margin-bottom:28px}
-.sidebar-label{color:#1e293b;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding:0 8px}
-.scenario-card{width:100%;background:transparent;border:1px solid #0f172a;color:#475569;padding:18px 20px;margin-bottom:12px;border-radius:6px;cursor:pointer;text-align:left;font-family:'Courier New',monospace;transition:all 0.15s}
-.scenario-card:hover{border-color:#1e293b;color:#94a3b8;background:#0a0a12}
-.scenario-card.selected{border-color:#1d4ed8;background:#080d1f;color:#e2e8f0}
-.scenario-card .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.scenario-card .card-name{font-size:12px;font-weight:700;letter-spacing:0.5px}
-.badge{padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
-.badge-easy{background:#052e16;color:#4ade80;border:1px solid #166534}
-.badge-medium{background:#431407;color:#fb923c;border:1px solid #9a3412}
-.badge-hard{background:#450a0a;color:#f87171;border:1px solid #991b1b}
-.badge-ddos{background:#1e1b4b;color:#a78bfa;border:1px solid #4c1d95}
-.scenario-card .card-meta{font-size:10px;color:#334155;line-height:1.6}
-.scenario-card.selected .card-meta{color:#1d4ed8}
+/* SCENARIO CARDS */
+.scenario-card{width:100%;text-align:left;background:#ffffff;border:1px solid #e5e7eb;border-left:2px solid transparent;border-radius:6px;padding:14px 14px;margin-bottom:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:8px}
+.scenario-card:hover{border-left-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
+.scenario-card.selected{border-left-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.scenario-title{font-size:13px;font-weight:900;color:#0a0a0f;line-height:1.2}
+.scenario-meta{font-size:11px;color:#6b7280;line-height:1.6}
+.badge{display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;border-radius:999px;padding:4px 10px;border:1px solid transparent;width:max-content}
+.badge-easy{background:#dcfce7;color:#166534;border-color:#16a34a}
+.badge-medium{background:#ffedd5;color:#9a3412;border-color:#f97316}
+.badge-hard{background:#fee2e2;color:#991b1b;border-color:#ef4444}
+.badge-ddos{background:#ede9fe;color:#6d28d9;border-color:#a78bfa}
 
-.divider{height:1px;background:#0f172a;margin:16px 0}
+/* RUN BUTTON */
+.run-btn{width:100%;background:#0a0a0f;color:#ffffff;border:0;border-radius:0;margin-top:8px;padding:16px 12px;cursor:pointer;font-weight:900;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s}
+.run-btn:hover:not(:disabled){background:#3b82f6}
+.run-btn:disabled{opacity:.6;cursor:not-allowed}
+.run-btn.running{background:#7c3aed}
 
-.run-btn{width:100%;background:linear-gradient(135deg,#1d4ed8,#1e40af);border:none;color:#fff;padding:13px;border-radius:6px;cursor:pointer;font-family:'Courier New',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.run-btn:hover{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
-.run-btn:disabled{background:#0f172a;color:#1e293b;cursor:not-allowed}
-.run-btn.running{background:linear-gradient(135deg,#7c3aed,#5b21b6)}
-
-.api-links{margin-top:16px}
-.api-link{display:block;width:100%;background:transparent;border:1px solid #0f172a;color:#334155;padding:9px 16px;border-radius:5px;margin-bottom:6px;font-family:'Courier New',monospace;font-size:11px;text-decoration:none;transition:all 0.15s;cursor:pointer;text-align:left}
-.api-link:hover{border-color:#1e293b;color:#64748b}
-
-/* TERMINAL AREA */
-.terminal-area{display:flex;flex-direction:column;background:#060608}
-.terminal-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid #0f172a;background:#08080f}
-.terminal-tabs{display:flex;gap:0}
-.tab{padding:6px 16px;font-size:11px;letter-spacing:1px;color:#334155;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
-.tab.active{color:#3b82f6;border-bottom-color:#3b82f6}
-.terminal-actions{display:flex;gap:8px}
-.action-btn{background:#0f172a;border:1px solid #1e293b;color:#475569;padding:5px 12px;border-radius:4px;font-family:'Courier New',monospace;font-size:10px;cursor:pointer;transition:all 0.15s;letter-spacing:1px}
-.action-btn:hover{color:#94a3b8;border-color:#334155}
-
-.terminal-body{flex:1;padding:32px;overflow-y:auto;font-size:12px;line-height:1.9}
-.placeholder-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#1e293b;text-align:center}
-.placeholder-icon{font-size:48px;margin-bottom:16px;opacity:0.3}
+/* TERMINAL */
+.terminal-topbar{padding:14px 16px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between}
+.terminal-tabs{display:flex;gap:18px}
+.tab{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#6b7280}
+.tab.active{color:#3b82f6}
+.action-btn{background:transparent;border:1px solid #374151;color:#9ca3af;border-radius:4px;padding:8px 12px;font-family:'Courier New',monospace;font-size:11px;cursor:pointer}
+.action-btn:hover{border-color:#3b82f6;color:#e5e7eb}
+.terminal-body{flex:1;padding:32px;overflow-y:auto;font-size:12px;line-height:1.9;font-family:'Courier New',monospace}
+.placeholder-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#334155;text-align:center}
+.placeholder-icon{font-size:48px;margin-bottom:16px;opacity:.35}
 .placeholder-text{font-size:13px;letter-spacing:1px}
 
-.log-line{display:flex;align-items:flex-start;gap:0;margin-bottom:2px;animation:slideIn 0.2s ease}
-@keyframes slideIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
-.log-ts{color:#1e293b;min-width:72px;font-size:11px;padding-top:1px}
-.log-badge{min-width:100px;font-size:10px;font-weight:700;letter-spacing:1px;padding-top:1px}
-.log-content{flex:1;color:#475569}
+.log-line{display:flex;align-items:flex-start;gap:0;margin-bottom:6px;animation:fadeIn .25s ease}
+.log-ts{color:#94a3b8;min-width:72px;font-size:11px;padding-top:1px}
+.log-badge{min-width:120px;font-size:10px;font-weight:900;letter-spacing:1px;padding-top:1px;text-transform:uppercase}
+.log-content{flex:1;color:#9ca3af}
 .lb-step{color:#3b82f6}
 .lb-action{color:#22c55e}
-.lb-system{color:#475569}
-.lb-anomaly{color:#f87171}
-.lb-success{color:#4ade80}
-.lb-reward{color:#fbbf24}
+.lb-system{color:#a78bfa}
+.lb-anomaly{color:#ef4444}
+.lb-success{color:#22c55e}
+.lb-reward{color:#f59e0b}
 .lb-error{color:#ef4444}
 .lb-info{color:#8b5cf6}
 .highlight-service{color:#fbbf24;font-weight:700}
 .highlight-score{color:#4ade80;font-weight:700}
 
 /* SCORE PANEL */
-.score-panel{border-top:1px solid #0f172a;padding:20px 24px;background:#08080f;display:none}
+.score-panel{background:#ffffff;border-top:1px solid #e5e7eb;display:none;padding:18px 16px}
 .score-panel.show{display:block}
-.score-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.score-title{color:#334155;font-size:10px;letter-spacing:2px;text-transform:uppercase}
-.score-final{font-size:32px;font-weight:900}
-.score-final.green{color:#4ade80}
-.score-final.yellow{color:#fbbf24}
+.score-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.score-title{color:#0f172a;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.score-final{font-size:42px;font-weight:900;color:#0a0a0f}
+.score-final.green{color:#16a34a}
+.score-final.yellow{color:#f59e0b}
 .score-final.red{color:#ef4444}
-.score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.score-item{background:#060608;border:1px solid #0f172a;border-radius:5px;padding:12px;text-align:center}
-.score-item-label{color:#1e293b;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.score-item-val{font-size:18px;font-weight:800}
-.siv-green{color:#4ade80}
-.siv-yellow{color:#fbbf24}
+.score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:10px}
+.score-item{background:#ffffff;border:1px solid #e5e7eb;border-radius:6px;padding:12px;text-align:center}
+.score-item-label{color:#6b7280;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.score-item-val{font-size:18px;font-weight:900}
+.siv-green{color:#16a34a}
+.siv-yellow{color:#f59e0b}
 .siv-red{color:#ef4444}
-.report-box{background:#060608;border:1px solid #0f172a;border-radius:5px;padding:14px;margin-top:12px;font-size:11px;color:#334155;line-height:1.8}
-.report-box span{color:#64748b}
+.report-box{background:#ffffff;border:1px solid #e5e7eb;border-radius:6px;padding:14px;margin-top:12px;font-size:12px;color:#0f172a;line-height:1.8}
+.report-box span{color:#6b7280}
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <div class="nav-left">
-    <div class="logo">
-      <div class="logo-icon">🔍</div>
-      <span class="logo-text">RCAAgent</span>
-    </div>
-    <div class="nav-links">
-      <a href="/docs">API</a>
-      <a href="/tasks">Tasks</a>
-      <a href="/openapi.json">Schema</a>
-    </div>
+  <div class="brand">RCAAGENT</div>
+  <div class="nav-links">
+    <a href="/docs">API DOCS</a>
+    <a href="/tasks">TASKS</a>
+    <a href="/openapi.json">SCHEMA</a>
   </div>
-  <div class="nav-right">
-    <div class="live-badge"><div class="live-dot"></div>SYSTEM LIVE</div>
-  </div>
+  <div class="system-live"><span class="live-dot"></span>SYSTEM LIVE</div>
 </nav>
 
-<div class="hero">
-  <div class="hero-eyebrow">
-    <span class="hero-tag blue">OpenEnv</span>
-    <span class="hero-tag">Meta × HuggingFace Hackathon</span>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-title">AI-Powered Incident <span class="highlight">Root Cause</span> Analysis</div>
+    <div class="hero-sub">Deploy AI agents into simulated production failures. Watch them investigate microservice dependencies, query metrics and distributed traces, then deliver structured RCA reports.</div>
+    <div class="scroll-hint">Scroll to Explore <span class="scroll-arrow">↓</span></div>
   </div>
-  <h1>SRE Incident <em>Root Cause</em><br>Analysis Benchmark</h1>
-  <p class="hero-sub">Drop AI agents into simulated production failures. Watch them investigate microservice dependencies, query metrics and distributed traces, then deliver structured RCA reports — deterministically scored against ground truth causal graphs.</p>
-</div>
+</section>
 
-<div class="metrics-bar">
+<section class="metrics-bar">
   <div class="metric">
-    <div class="metric-label">SCENARIOS</div>
     <div class="metric-value blue">04</div>
+    <div class="metric-label">SCENARIOS</div>
   </div>
   <div class="metric">
-    <div class="metric-label">MAX SCORE</div>
     <div class="metric-value green">1.00</div>
+    <div class="metric-label">MAX SCORE</div>
   </div>
   <div class="metric">
-    <div class="metric-label">BASELINE MODEL</div>
     <div class="metric-value">Qwen 72B</div>
+    <div class="metric-label">BASELINE MODEL</div>
   </div>
   <div class="metric">
-    <div class="metric-label">GRADER VERSION</div>
     <div class="metric-value yellow">v2.0</div>
+    <div class="metric-label">GRADER VERSION</div>
   </div>
-</div>
+</section>
 
-<div class="layout">
-  <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-label">Scenarios</div>
+<div class="main">
+  <aside class="left-panel">
+    <div style="margin:8px 8px 14px;font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;color:#6b7280">Scenarios</div>
 
-      <button class="scenario-card" onclick="select('easy',this)">
-        <div class="card-top">
-          <span class="card-name">INC-001 · Cache Failure</span>
-          <span class="badge badge-easy">EASY</span>
-        </div>
-        <div class="card-meta">Optimal: 3 queries · 1 root service<br>Single point DB cache saturation</div>
-      </button>
+    <button class="scenario-card" onclick="select('easy',this)">
+      <div class="scenario-title">INC-001 · Cache Failure</div>
+      <div class="badge badge-easy">EASY</div>
+      <div class="scenario-meta">Optimal: 3 queries · 1 root service</div>
+    </button>
 
-      <button class="scenario-card" onclick="select('medium',this)">
-        <div class="card-top">
-          <span class="card-name">INC-002 · Config Cascade</span>
-          <span class="badge badge-medium">MEDIUM</span>
-        </div>
-        <div class="card-meta">Optimal: 6 queries · 4 services<br>Bad config deploy cascading failure</div>
-      </button>
+    <button class="scenario-card" onclick="select('medium',this)">
+      <div class="scenario-title">INC-002 · Config Cascade</div>
+      <div class="badge badge-medium">MEDIUM</div>
+      <div class="scenario-meta">Optimal: 6 queries · 4 services</div>
+    </button>
 
-      <button class="scenario-card" onclick="select('hard',this)">
-        <div class="card-top">
-          <span class="card-name">INC-003 · AZ Packet Loss</span>
-          <span class="badge badge-hard">HARD</span>
-        </div>
-        <div class="card-meta">Optimal: 10 queries · 12 services<br>AZ-level network partition + retry storm</div>
-      </button>
+    <button class="scenario-card" onclick="select('hard',this)">
+      <div class="scenario-title">INC-003 · AZ Packet Loss</div>
+      <div class="badge badge-hard">HARD</div>
+      <div class="scenario-meta">Optimal: 10 queries · 12 services</div>
+    </button>
 
-      <button class="scenario-card" onclick="select('ddos',this)">
-        <div class="card-top">
-          <span class="card-name">INC-004 · DDoS Attack</span>
-          <span class="badge badge-ddos">DDOS</span>
-        </div>
-        <div class="card-meta">Optimal: 4 queries · 5 services<br>500k req/sec volumetric attack</div>
-      </button>
-    </div>
-
-    <div class="divider"></div>
+    <button class="scenario-card" onclick="select('ddos',this)">
+      <div class="scenario-title">INC-004 · DDoS Attack</div>
+      <div class="badge badge-ddos">DDOS</div>
+      <div class="scenario-meta">Optimal: 4 queries · 5 services</div>
+    </button>
 
     <button class="run-btn" id="runBtn" onclick="runAgent()" disabled>
       <span id="btnIcon">▶</span>
-      <span id="btnText">SELECT SCENARIO</span>
+      <span id="btnText">RUN AGENT</span>
     </button>
+  </aside>
 
-    <div class="divider"></div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">API Endpoints</div>
-      <div class="api-links">
-        <a class="api-link" href="/docs">📄 /docs — Swagger UI</a>
-        <a class="api-link" href="/tasks">📋 /tasks — List scenarios</a>
-        <a class="api-link" href="/openapi.json">⚙ /openapi.json — Schema</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="terminal-area">
+  <section class="right-panel">
     <div class="terminal-topbar">
       <div class="terminal-tabs">
         <div class="tab active">Investigation Log</div>
-        <div class="tab" style="color:#1e293b">Score Report</div>
+        <div class="tab">Score Report</div>
       </div>
-      <div class="terminal-actions">
+      <div>
         <button class="action-btn" onclick="clearLog()">CLEAR</button>
       </div>
     </div>
@@ -257,13 +204,13 @@ body{background:#04040a;color:#e2e8f0;font-family:'Courier New',monospace;min-he
 
     <div class="score-panel" id="scorePanel">
       <div class="score-header">
-        <span class="score-title">Final Score</span>
-        <span class="score-final" id="scoreFinal">—</span>
+        <div class="score-title">Final Score</div>
+        <div class="score-final" id="scoreFinal">—</div>
       </div>
       <div class="score-grid" id="scoreGrid"></div>
       <div class="report-box" id="reportBox"></div>
     </div>
-  </div>
+  </section>
 </div>
 
 <script>
@@ -313,16 +260,20 @@ async function runAgent() {
   addLog('SYSTEM', 'lb-system', '─────────────────────────────────────────────────');
 
   try {
+    const selectedDifficulty = difficulty;
     const res = await fetch('/baseline', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({difficulty})
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ difficulty: selectedDifficulty }),
+      signal: AbortSignal.timeout(600000)
     });
     const data = await res.json();
+    console.log('API response:', JSON.stringify(data).slice(0, 200));
 
     if (data.error) {
       addLog('ERROR', 'lb-error', data.error);
     } else {
+      console.log('history length:', data.history?.length);
       const history = data.history || [];
       for (let i = 0; i < history.length; i++) {
         const {action, observation: obs} = history[i];
