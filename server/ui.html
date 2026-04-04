@@ -636,5 +636,1022 @@ ${labels}
   heroTypeStep();
 })();
 </script>
+
+<!-- ═══ RCA hackathon UI enhancements (append-only) ═══ -->
+<div id="leaderboard-section" class="rca-lb-section" aria-hidden="true">
+  <div class="rca-lb-head">
+    <h2 class="rca-lb-heading">INVESTIGATION LEADERBOARD</h2>
+    <button type="button" class="action-btn rca-lb-clear-btn" id="rca-btn-clear-leaderboard">CLEAR LEADERBOARD</button>
+  </div>
+  <table class="rca-lb-table" aria-label="Investigation leaderboard">
+    <thead>
+      <tr>
+        <th>SCENARIO</th>
+        <th>DIFFICULTY</th>
+        <th>SCORE</th>
+        <th>STEPS</th>
+        <th>TIMESTAMP</th>
+      </tr>
+    </thead>
+    <tbody id="rca-leaderboard-tbody"></tbody>
+  </table>
+  <div class="rca-run-history-wrap">
+    <h3 class="rca-lb-heading rca-run-history-heading">RUN HISTORY TIMELINE</h3>
+    <div id="rca-run-history-body" class="rca-run-history-body"></div>
+  </div>
+</div>
+
+<div id="rca-score-ticker" class="rca-score-ticker" aria-live="polite" hidden>
+  <button type="button" class="rca-score-ticker-close" id="rca-score-ticker-dismiss" aria-label="Dismiss score panel">✕</button>
+  <div class="rca-score-ticker-inner">
+    <div class="rca-score-ticker-subtitle" id="rca-score-ticker-subtitle"></div>
+    <div class="rca-score-ticker-pct" id="rca-score-ticker-pct"><span id="rca-score-ticker-value">0</span><span class="rca-score-ticker-suffix">%</span></div>
+    <div class="rca-score-ticker-status" id="rca-score-ticker-status">INITIALIZING INVESTIGATION...</div>
+  </div>
+</div>
+
+<div id="rca-export-toolbar" class="rca-export-toolbar" hidden>
+  <button type="button" class="action-btn rca-export-btn rca-share-btn" id="rca-btn-share-result">↗ SHARE RESULT</button>
+  <button type="button" class="action-btn rca-export-btn rca-pdf-btn" id="rca-btn-export-pdf">⬇ EXPORT PDF</button>
+</div>
+
+<style id="rca-hackathon-enhancements-css">
+/* ═══ RCA hackathon UI — additive styles only ═══ */
+.rca-lb-section {
+  display: none;
+  background: #000000;
+  color: #9ca3af;
+  font-family: 'Courier New', Courier, monospace;
+  min-height: calc(100vh - 56px);
+  padding: 32px 24px 48px;
+  border-top: 1px solid #0f172a;
+}
+body.rca-leaderboard-on .rca-lb-section {
+  display: block;
+}
+body.rca-leaderboard-on .metrics-bar,
+body.rca-leaderboard-on .main {
+  display: none !important;
+}
+.rca-lb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.rca-lb-heading {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #e6edf3;
+  margin: 0;
+}
+.rca-lb-clear-btn {
+  font-family: 'Courier New', Courier, monospace;
+}
+.rca-lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.rca-lb-table th,
+.rca-lb-table td {
+  border: 1px solid #0f172a;
+  padding: 12px 14px;
+  text-align: left;
+}
+.rca-lb-table th {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  background: #0d1117;
+}
+.rca-lb-table td {
+  color: #9ca3af;
+}
+.rca-lb-table tbody tr:nth-child(even) {
+  background: #0d1117;
+}
+.rca-run-history-wrap {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid #0f172a;
+}
+.rca-run-history-heading {
+  margin-bottom: 20px;
+}
+.rca-run-history-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.rca-rh-empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: #64748b;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-family: 'Courier New', Courier, monospace;
+}
+.rca-rh-empty .rca-rh-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: #64748b;
+  animation: rca-cursor-blink 1s step-end infinite;
+}
+@keyframes rca-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.rca-rh-row {
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: rca-rh-slide-in 0.5s ease forwards;
+  border-bottom: 1px solid #0f172a;
+  padding: 16px 4px 14px;
+}
+@keyframes rca-rh-slide-in {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.rca-rh-row-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.rca-rh-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+  flex: 0 0 auto;
+}
+.rca-rh-scen {
+  font-size: 11px;
+  font-weight: 800;
+  color: #e6edf3;
+  letter-spacing: 0.5px;
+}
+.rca-rh-badge {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+.rca-rh-badge-easy { background: rgba(63,185,80,.15); color: #3fb950; border-color: #3fb950; }
+.rca-rh-badge-medium { background: rgba(210,153,34,.15); color: #d29922; border-color: #d29922; }
+.rca-rh-badge-hard { background: rgba(248,81,73,.15); color: #f85149; border-color: #f85149; }
+.rca-rh-badge-ddos { background: rgba(249,115,22,.15); color: #fb923c; border-color: #fb923c; }
+.rca-rh-badge-default { background: #1e293b; color: #94a3b8; border-color: #334155; }
+.rca-rh-mid {
+  flex: 1;
+  min-width: 120px;
+}
+.rca-rh-track {
+  height: 10px;
+  background: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid #1e293b;
+}
+.rca-rh-fill {
+  height: 100%;
+  border-radius: 999px;
+  width: 0;
+  transition: width 0.6s ease;
+}
+.rca-rh-fill-green { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.rca-rh-fill-yellow { background: linear-gradient(90deg, #ca8a04, #facc15); }
+.rca-rh-fill-red { background: linear-gradient(90deg, #b91c1c, #f87171); }
+.rca-rh-right {
+  min-width: 72px;
+  text-align: right;
+}
+.rca-rh-pct {
+  font-size: 14px;
+  font-weight: 900;
+  color: #f1f5f9;
+}
+.rca-rh-steps {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 4px;
+}
+.rca-rh-ts {
+  width: 100%;
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 8px;
+  padding-left: 2px;
+}
+
+/* Live score ticker */
+.rca-score-ticker {
+  display: none;
+  position: relative;
+  width: 100%;
+  background: #0a0f1a;
+  border-bottom: 1px solid #1e293b;
+  padding: 20px 48px 22px 24px;
+  font-family: 'Courier New', Courier, monospace;
+  box-sizing: border-box;
+}
+.rca-score-ticker.is-visible {
+  display: block;
+}
+.rca-score-ticker.is-running {
+  animation: rca-ticker-pulse-glow 1.8s ease-in-out infinite;
+}
+.rca-score-ticker-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  z-index: 2;
+}
+.rca-score-ticker-close:hover {
+  border-color: #388bfd;
+  color: #e6edf3;
+}
+.rca-score-ticker-inner {
+  text-align: center;
+}
+.rca-score-ticker-subtitle {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  min-height: 14px;
+}
+.rca-score-ticker-pct {
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1.05;
+  color: #4ade80;
+  text-shadow: 0 0 24px rgba(74, 222, 128, 0.45);
+}
+.rca-score-ticker-suffix {
+  font-size: 0.5em;
+  opacity: 0.9;
+  margin-left: 2px;
+}
+.rca-score-ticker-status {
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+.rca-score-ticker.is-reveal-gold {
+  animation: none;
+  border: 2px solid #d4af37;
+  box-shadow: 0 0 28px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(212, 175, 55, 0.06);
+}
+.rca-score-ticker.is-reveal-gold .rca-score-ticker-pct {
+  color: #fcd34d;
+  text-shadow: 0 0 20px rgba(252, 211, 77, 0.55);
+}
+.rca-score-ticker.is-reveal-yellow {
+  animation: none;
+  border: 2px solid #eab308;
+  box-shadow: 0 0 24px rgba(234, 179, 8, 0.35), inset 0 0 28px rgba(234, 179, 8, 0.05);
+}
+.rca-score-ticker.is-reveal-yellow .rca-score-ticker-pct {
+  color: #facc15;
+  text-shadow: 0 0 16px rgba(250, 204, 21, 0.4);
+}
+.rca-score-ticker.is-reveal-red {
+  animation: none;
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.35), inset 0 0 28px rgba(239, 68, 68, 0.06);
+}
+.rca-score-ticker.is-reveal-red .rca-score-ticker-pct {
+  color: #f87171;
+  text-shadow: 0 0 18px rgba(248, 113, 113, 0.45);
+}
+.rca-score-ticker.is-flash-pct .rca-score-ticker-pct {
+  animation: rca-ticker-num-flash 0.45s ease-in-out 3;
+}
+@keyframes rca-ticker-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35), inset 0 0 18px rgba(34, 197, 94, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 32px 6px rgba(34, 197, 94, 0.22), inset 0 0 26px rgba(34, 197, 94, 0.1);
+  }
+}
+@keyframes rca-ticker-num-flash {
+  0%, 100% { filter: brightness(1); transform: scale(1); }
+  50% { filter: brightness(1.35); transform: scale(1.04); }
+}
+
+/* Share + PDF toolbar */
+.rca-export-toolbar {
+  display: none;
+  padding: 12px 16px;
+  border-top: 1px solid #1e2d3d;
+  background: #0d1117;
+  text-align: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.rca-export-toolbar.is-visible {
+  display: flex;
+}
+.rca-share-btn,
+.rca-pdf-btn {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.rca-share-btn:hover {
+  box-shadow: 0 0 16px rgba(56, 139, 253, 0.35);
+  border-color: #388bfd !important;
+}
+.rca-pdf-btn:hover {
+  box-shadow: 0 0 16px rgba(63, 185, 80, 0.3);
+  border-color: #3fb950 !important;
+}
+</style>
+
+<script id="rca-hackathon-enhancements-js">
+/* ═══ RCA hackathon UI — additive script only ═══ */
+(function () {
+  'use strict';
+
+  var LB_KEY = 'rca_leaderboard';
+
+  var STATUS_ROTATE = [
+    'INITIALIZING INVESTIGATION...',
+    'QUERYING METRICS...',
+    'ANALYZING DISTRIBUTED TRACES...',
+    'CORRELATING SERVICE DEPENDENCIES...',
+    'IDENTIFYING ROOT CAUSE...',
+    'GENERATING RCA REPORT...'
+  ];
+
+  var tickerEl, tickerValEl, tickerStatusEl, tickerSubtitleEl, toolbarEl;
+  var statusInterval = null;
+  var progressRaf = null;
+  var displayedPct = 0;
+  var lastRunPayload = null;
+
+  function el(id) { return document.getElementById(id); }
+
+  function scenarioTitleFromKey(d) {
+    var map = {
+      easy: 'INC-001 · Cache Failure',
+      medium: 'INC-002 · Config Cascade',
+      hard: 'INC-003 · AZ Packet Loss',
+      ddos: 'INC-004 · DDoS Attack'
+    };
+    var k = (d || '').toLowerCase();
+    return map[k] || (d ? String(d).toUpperCase() : 'SCENARIO');
+  }
+
+  function parseLeaderboardList() {
+    try {
+      var raw = localStorage.getItem(LB_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function refreshLeaderboardTable() {
+    var tbody = el('rca-leaderboard-tbody');
+    if (!tbody) return;
+    var list = parseLeaderboardList();
+    tbody.innerHTML = '';
+    var cols = ['scenario', 'difficulty', 'score', 'steps', 'timestamp'];
+    list.forEach(function (entry) {
+      var tr = document.createElement('tr');
+      cols.forEach(function (key) {
+        var td = document.createElement('td');
+        var v = entry[key];
+        td.textContent = v != null ? String(v) : '';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  function parseScorePercent(entry) {
+    if (!entry) return 0;
+    var s = entry.score;
+    if (typeof s === 'number' && !isNaN(s)) {
+      if (s <= 1 && s >= 0) return Math.round(s * 1000) / 10;
+      return Math.min(100, Math.max(0, s));
+    }
+    if (typeof s === 'string') {
+      var m = s.match(/([\d.]+)/);
+      if (m) return Math.min(100, Math.max(0, parseFloat(m[1])));
+    }
+    return 0;
+  }
+
+  function refreshRunHistoryTimeline() {
+    var body = el('rca-run-history-body');
+    if (!body) return;
+    var list = parseLeaderboardList();
+    body.innerHTML = '';
+    if (!list.length) {
+      var empty = document.createElement('div');
+      empty.className = 'rca-rh-empty';
+      empty.innerHTML = 'NO RUNS YET — START YOUR FIRST INVESTIGATION<span class="rca-rh-cursor" aria-hidden="true"></span>';
+      body.appendChild(empty);
+      return;
+    }
+    var reversed = list.slice().reverse();
+    reversed.forEach(function (entry, i) {
+      var pct = parseScorePercent(entry);
+      var row = document.createElement('div');
+      row.className = 'rca-rh-row';
+      row.style.animationDelay = i * 80 + 'ms';
+
+      var inner = document.createElement('div');
+      inner.className = 'rca-rh-row-inner';
+
+      var left = document.createElement('div');
+      left.className = 'rca-rh-left';
+      var scen = document.createElement('span');
+      scen.className = 'rca-rh-scen';
+      scen.textContent = scenarioTitleFromKey(entry.scenario);
+      var badge = document.createElement('span');
+      var diff = (entry.difficulty || entry.scenario || '').toString().toLowerCase();
+      badge.className = 'rca-rh-badge rca-rh-badge-default';
+      if (diff === 'easy') badge.className = 'rca-rh-badge rca-rh-badge-easy';
+      else if (diff === 'medium') badge.className = 'rca-rh-badge rca-rh-badge-medium';
+      else if (diff === 'hard') badge.className = 'rca-rh-badge rca-rh-badge-hard';
+      else if (diff === 'ddos') badge.className = 'rca-rh-badge rca-rh-badge-ddos';
+      badge.textContent = (entry.difficulty || entry.scenario || '—').toString().toUpperCase();
+      left.appendChild(scen);
+      left.appendChild(badge);
+
+      var mid = document.createElement('div');
+      mid.className = 'rca-rh-mid';
+      var track = document.createElement('div');
+      track.className = 'rca-rh-track';
+      var fill = document.createElement('div');
+      var barClass = 'rca-rh-fill-red';
+      if (pct >= 80) barClass = 'rca-rh-fill-green';
+      else if (pct >= 50) barClass = 'rca-rh-fill-yellow';
+      fill.className = 'rca-rh-fill ' + barClass;
+      track.appendChild(fill);
+      mid.appendChild(track);
+
+      var right = document.createElement('div');
+      right.className = 'rca-rh-right';
+      var pctEl = document.createElement('div');
+      pctEl.className = 'rca-rh-pct';
+      pctEl.textContent = pct > 0 ? pct.toFixed(1) + '%' : (entry.score != null && String(entry.score) !== '' ? String(entry.score) : '—');
+      var stepsEl = document.createElement('div');
+      stepsEl.className = 'rca-rh-steps';
+      stepsEl.textContent = 'STEPS: ' + (entry.steps != null ? entry.steps : '—');
+      right.appendChild(pctEl);
+      right.appendChild(stepsEl);
+
+      inner.appendChild(left);
+      inner.appendChild(mid);
+      inner.appendChild(right);
+      row.appendChild(inner);
+
+      var ts = document.createElement('div');
+      ts.className = 'rca-rh-ts';
+      ts.textContent = entry.timestamp || '';
+      row.appendChild(ts);
+
+      body.appendChild(row);
+
+      requestAnimationFrame(function () {
+        fill.style.width = pct + '%';
+      });
+    });
+  }
+
+  function showLeaderboardPage() {
+    document.body.classList.add('rca-leaderboard-on');
+    var sec = el('leaderboard-section');
+    if (sec) sec.setAttribute('aria-hidden', 'false');
+    refreshLeaderboardTable();
+    refreshRunHistoryTimeline();
+    window.scrollTo(0, 0);
+  }
+
+  function hideLeaderboardPage() {
+    document.body.classList.remove('rca-leaderboard-on');
+    var sec = el('leaderboard-section');
+    if (sec) sec.setAttribute('aria-hidden', 'true');
+  }
+
+  function injectNavLeaderboard() {
+    var links = document.querySelector('.nav-links');
+    if (!links) return;
+    var children = links.querySelectorAll('a');
+    var schema = null;
+    for (var i = 0; i < children.length; i++) {
+      var oc = children[i].getAttribute('onclick') || '';
+      if (oc.indexOf('showSchema') !== -1) {
+        schema = children[i];
+        break;
+      }
+    }
+    if (!schema || document.getElementById('rca-nav-leaderboard')) return;
+    var a = document.createElement('a');
+    a.id = 'rca-nav-leaderboard';
+    a.href = '#';
+    a.textContent = 'LEADERBOARD';
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      showLeaderboardPage();
+    });
+    schema.insertAdjacentElement('afterend', a);
+
+    links.querySelectorAll('a').forEach(function (node) {
+      if (node.id === 'rca-nav-leaderboard') return;
+      node.addEventListener('click', function () {
+        hideLeaderboardPage();
+      });
+    });
+  }
+
+  function mountTickerAndToolbar() {
+    var rp = document.querySelector('.right-panel');
+    var topbar = document.querySelector('.right-panel .terminal-topbar');
+    tickerEl = el('rca-score-ticker');
+    tickerValEl = el('rca-score-ticker-value');
+    tickerStatusEl = el('rca-score-ticker-status');
+    tickerSubtitleEl = el('rca-score-ticker-subtitle');
+    toolbarEl = el('rca-export-toolbar');
+    if (rp && topbar && tickerEl && tickerEl.parentNode === document.body) {
+      topbar.insertAdjacentElement('afterend', tickerEl);
+    }
+    var scorePanel = el('scorePanel');
+    if (rp && toolbarEl && scorePanel && toolbarEl.parentNode === document.body) {
+      scorePanel.insertAdjacentElement('afterend', toolbarEl);
+    }
+  }
+
+  function showTickerRunning() {
+    if (!tickerEl) return;
+    toolbarEl = el('rca-export-toolbar');
+    if (toolbarEl) {
+      toolbarEl.hidden = true;
+      toolbarEl.classList.remove('is-visible');
+    }
+    lastRunPayload = null;
+    tickerEl.hidden = false;
+    tickerEl.classList.add('is-visible', 'is-running');
+    tickerEl.classList.remove('is-reveal-gold', 'is-reveal-yellow', 'is-reveal-red', 'is-flash-pct');
+    if (tickerSubtitleEl) tickerSubtitleEl.textContent = '';
+    displayedPct = 0;
+    if (tickerValEl) tickerValEl.textContent = '0';
+    if (tickerStatusEl) tickerStatusEl.textContent = STATUS_ROTATE[0];
+    if (statusInterval) clearInterval(statusInterval);
+    var si = 0;
+    statusInterval = setInterval(function () {
+      si = (si + 1) % STATUS_ROTATE.length;
+      if (tickerStatusEl) tickerStatusEl.textContent = STATUS_ROTATE[si];
+    }, 2000);
+    if (progressRaf) cancelAnimationFrame(progressRaf);
+    var start = performance.now();
+    var duration = 24000;
+    function tick(now) {
+      var t = Math.min(1, (now - start) / duration);
+      var eased = 1 - Math.pow(1 - t, 3);
+      displayedPct = Math.min(92, eased * 92);
+      if (tickerValEl) tickerValEl.textContent = String(Math.round(displayedPct));
+      if (t < 1 && tickerEl.classList.contains('is-running')) {
+        progressRaf = requestAnimationFrame(tick);
+      }
+    }
+    progressRaf = requestAnimationFrame(tick);
+  }
+
+  function stopTickerLoops() {
+    if (statusInterval) {
+      clearInterval(statusInterval);
+      statusInterval = null;
+    }
+    if (progressRaf) {
+      cancelAnimationFrame(progressRaf);
+      progressRaf = null;
+    }
+  }
+
+  function onBaselineComplete(data, ok) {
+    stopTickerLoops();
+    if (!tickerEl) return;
+    tickerEl.classList.remove('is-running');
+
+    if (!ok || !data || data.error) {
+      if (tickerValEl) tickerValEl.textContent = '—';
+      if (tickerStatusEl) tickerStatusEl.textContent = 'INVESTIGATION FAILED';
+      if (tickerSubtitleEl) tickerSubtitleEl.textContent = '';
+      tickerEl.classList.add('is-reveal-red');
+      if (toolbarEl) {
+        toolbarEl.hidden = true;
+        toolbarEl.classList.remove('is-visible');
+      }
+      lastRunPayload = null;
+      return;
+    }
+
+    var f = data.scores && typeof data.scores.final_score === 'number' ? data.scores.final_score : 0;
+    var realPct = Math.round(f * 1000) / 10;
+    var diffKey = (data.difficulty || (typeof difficulty !== 'undefined' ? difficulty : '') || '').toString();
+
+    var from = displayedPct;
+    var rStart = performance.now();
+    var rDur = 700;
+    function snapFrame(now) {
+      var u = Math.min(1, (now - rStart) / rDur);
+      var ease = 1 - Math.pow(1 - u, 2);
+      displayedPct = from + (realPct - from) * ease;
+      if (tickerValEl) tickerValEl.textContent = String(Math.round(displayedPct * 10) / 10);
+      if (u < 1) {
+        requestAnimationFrame(snapFrame);
+      } else {
+        tickerEl.classList.remove('is-reveal-gold', 'is-reveal-yellow', 'is-reveal-red');
+        if (realPct >= 80) tickerEl.classList.add('is-reveal-gold');
+        else if (realPct < 50) tickerEl.classList.add('is-reveal-red');
+        else tickerEl.classList.add('is-reveal-yellow');
+        if (tickerStatusEl) tickerStatusEl.textContent = 'INVESTIGATION COMPLETE';
+        if (tickerSubtitleEl) tickerSubtitleEl.textContent = 'FINAL SCORE';
+        tickerEl.classList.add('is-flash-pct');
+        setTimeout(function () {
+          tickerEl.classList.remove('is-flash-pct');
+        }, 1400);
+
+        if (data.scores || data.report) {
+          lastRunPayload = { data: data, scenarioKey: diffKey };
+          if (toolbarEl) {
+            toolbarEl.hidden = false;
+            toolbarEl.classList.add('is-visible');
+          }
+        }
+      }
+    }
+    requestAnimationFrame(snapFrame);
+  }
+
+  var origFetch = window.fetch;
+  window.fetch = function (input, init) {
+    var url = typeof input === 'string' ? input : (input && input.url) || '';
+    var method = init && init.method ? String(init.method).toUpperCase() : 'GET';
+    var isBaselinePost = url.indexOf('/baseline') !== -1 && method === 'POST';
+    return origFetch.apply(this, arguments).then(function (res) {
+      if (!isBaselinePost) return res;
+      return res
+        .clone()
+        .json()
+        .then(function (json) {
+          try {
+            if (res.ok && json && !json.error && typeof difficulty !== 'undefined' && difficulty) {
+              var list = parseLeaderboardList();
+              var totalScore = json.scores != null && json.scores.total != null ? json.scores.total : 'N/A';
+              list.push({
+                scenario: difficulty,
+                difficulty: json.difficulty,
+                score: totalScore,
+                steps: json.steps,
+                timestamp: new Date().toLocaleString()
+              });
+              localStorage.setItem(LB_KEY, JSON.stringify(list));
+              if (document.body.classList.contains('rca-leaderboard-on')) {
+                refreshLeaderboardTable();
+              }
+              refreshRunHistoryTimeline();
+            }
+          } catch (e) {}
+          onBaselineComplete(json, res.ok);
+          return res;
+        })
+        .catch(function () {
+          onBaselineComplete(null, false);
+          return res;
+        });
+    });
+  };
+
+  var runBtn = el('runBtn');
+  if (runBtn) {
+    runBtn.addEventListener(
+      'click',
+      function () {
+        if (runBtn.disabled) return;
+        if (typeof difficulty === 'undefined' || !difficulty) return;
+        showTickerRunning();
+      },
+      true
+    );
+  }
+
+  var clearLbBtn = el('rca-btn-clear-leaderboard');
+  if (clearLbBtn) {
+    clearLbBtn.addEventListener('click', function () {
+      localStorage.removeItem(LB_KEY);
+      refreshLeaderboardTable();
+      refreshRunHistoryTimeline();
+    });
+  }
+
+  var dismissTicker = el('rca-score-ticker-dismiss');
+  if (dismissTicker) {
+    dismissTicker.addEventListener('click', function () {
+      if (tickerEl) {
+        tickerEl.classList.remove('is-visible');
+        tickerEl.hidden = true;
+      }
+    });
+  }
+
+  function canvasRoundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function drawShareCard() {
+    if (!lastRunPayload || !lastRunPayload.data) return;
+    var data = lastRunPayload.data;
+    var scenKey = lastRunPayload.scenarioKey || '';
+    var f = data.scores && typeof data.scores.final_score === 'number' ? data.scores.final_score : 0;
+    var pct = Math.round(f * 1000) / 10;
+    var W = 800;
+    var H = 450;
+    var canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext('2d');
+    var glow = '#facc15';
+    if (pct >= 80) glow = '#d4af37';
+    if (pct < 50) glow = '#ef4444';
+
+    ctx.fillStyle = '#0a0f1a';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(56,139,253,0.12)';
+    ctx.lineWidth = 1;
+    var gx, gy;
+    for (gx = 0; gx < W; gx += 24) {
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx, H);
+      ctx.stroke();
+    }
+    for (gy = 0; gy < H; gy += 24) {
+      ctx.beginPath();
+      ctx.moveTo(0, gy);
+      ctx.lineTo(W, gy);
+      ctx.stroke();
+    }
+
+    var noise = ctx.createImageData(W, H);
+    var ni;
+    for (ni = 0; ni < noise.data.length; ni += 4) {
+      var v = Math.random() * 42;
+      noise.data[ni] = v;
+      noise.data[ni + 1] = v;
+      noise.data[ni + 2] = v;
+      noise.data[ni + 3] = 16;
+    }
+    ctx.putImageData(noise, 0, 0);
+
+    ctx.shadowColor = glow;
+    ctx.shadowBlur = 22;
+    ctx.strokeStyle = glow;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(14, 14, W - 28, H - 28);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 26px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('RCAAGENT', 40, 48);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '12px "Courier New", monospace';
+    ctx.fillText('AI-Powered Root Cause Analysis', 40, 68);
+
+    var diff = scenKey.toLowerCase();
+    var pillBg = '#14532d';
+    var pillFg = '#bbf7d0';
+    if (diff === 'medium') {
+      pillBg = '#713f12';
+      pillFg = '#fde68a';
+    }
+    if (diff === 'hard') {
+      pillBg = '#7f1d1d';
+      pillFg = '#fecaca';
+    }
+    if (diff === 'ddos') {
+      pillBg = '#9a3412';
+      pillFg = '#ffedd5';
+    }
+    var pillText = (scenKey || '—').toUpperCase();
+    ctx.font = 'bold 12px "Courier New", monospace';
+    var tw = ctx.measureText(pillText).width;
+    var pw = tw + 28;
+    var px = W - 40 - pw;
+    var py = 36;
+    ctx.fillStyle = pillBg;
+    canvasRoundRect(ctx, px, py, pw, 28, 14);
+    ctx.fill();
+    ctx.fillStyle = pillFg;
+    ctx.textAlign = 'center';
+    ctx.fillText(pillText, px + pw / 2, py + 19);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#e6edf3';
+    ctx.font = 'bold 32px "Courier New", monospace';
+    ctx.fillText(scenarioTitleFromKey(scenKey), W / 2, 150);
+
+    ctx.font = 'bold 88px "Courier New", monospace';
+    ctx.fillStyle = pct >= 80 ? '#fcd34d' : pct < 50 ? '#f87171' : '#facc15';
+    ctx.fillText(Math.round(pct) + '%', W / 2, 260);
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '18px "Courier New", monospace';
+    ctx.fillText('STEPS USED: ' + (data.steps != null ? data.steps : '—'), W / 2, 310);
+
+    ctx.font = '11px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(new Date().toLocaleString(), 40, H - 44);
+    ctx.textAlign = 'right';
+    ctx.fillText('sujal-sk-01/rcaFinall', W - 40, H - 44);
+
+    var safeScen = (scenKey || 'run').replace(/[^a-z0-9_-]+/gi, '-').slice(0, 40);
+    var safeScore = String(Math.round(pct)).replace(/[^0-9.-]/g, '');
+    var fname = 'rca-result-' + safeScen + '-' + safeScore + '.png';
+
+    canvas.toBlob(function (blob) {
+      if (!blob) return;
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fname;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function openPrintReport() {
+    if (!lastRunPayload || !lastRunPayload.data) return;
+    var data = lastRunPayload.data;
+    var scen = typeof difficulty !== 'undefined' ? difficulty : lastRunPayload.scenarioKey || '—';
+    var f = data.scores && typeof data.scores.final_score === 'number' ? data.scores.final_score : 0;
+    var pct = Math.round(f * 1000) / 10;
+    var scoreColor = pct >= 80 ? '#16a34a' : pct < 50 ? '#dc2626' : '#ca8a04';
+    var totalDisp = data.scores && data.scores.total != null ? String(data.scores.total) : String(pct) + '%';
+
+    var rep = data.report || {};
+    var summary = rep.summary || '—';
+    var rootLine = rep.root_cause_service
+      ? rep.root_cause_service + ' (' + (rep.root_cause_type || '') + ')'
+      : '—';
+    var rec = rep.suggested_fix || '';
+
+    var timelineHtml = '';
+    var hist = data.history || [];
+    hist.forEach(function (h, i) {
+      var act = h.action || {};
+      var at = act.action_type || 'step';
+      var tgt = act.target_service ? ' → ' + act.target_service : '';
+      timelineHtml +=
+        '<tr><td class="mono">' +
+        (i + 1) +
+        '</td><td class="mono">' +
+        escapeHtml(at) +
+        escapeHtml(tgt) +
+        '</td></tr>';
+    });
+    if (!timelineHtml) {
+      timelineHtml = '<tr><td colspan="2" class="muted">No step history.</td></tr>';
+    }
+
+    var html =
+      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RCA Report</title>' +
+      '<style>' +
+      'body{font-family:Georgia,Times,serif;color:#111;background:#fff;margin:24px;line-height:1.5;}' +
+      '.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:16px;margin-bottom:20px;}' +
+      '.hdr h1{font-size:18px;font-weight:700;margin:0;max-width:70%;}' +
+      '.score-big{font-size:36px;font-weight:900;font-family:ui-monospace,monospace;}' +
+      'table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;}' +
+      'th,td{border:1px solid #ccc;padding:8px;text-align:left;}' +
+      'th{background:#f5f5f5;font-weight:700;}' +
+      '.section{margin-top:24px;}' +
+      '.section h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #ddd;padding-bottom:6px;}' +
+      '.mono{font-family:ui-monospace,Courier,monospace;font-size:11px;}' +
+      '.muted{color:#666;}' +
+      '.footer{margin-top:40px;font-size:10px;color:#666;text-align:center;border-top:1px solid #ddd;padding-top:12px;}' +
+      '@media print{body{margin:16px;}}' +
+      '</style></head><body>' +
+      '<div class="hdr"><h1>RCAAGENT — INCIDENT ROOT CAUSE ANALYSIS REPORT</h1>' +
+      '<div class="score-big" style="color:' +
+      scoreColor +
+      '">' +
+      escapeHtml(String(pct)) +
+      '%</div></div>' +
+      '<table><tr><th>Scenario</th><th>Difficulty</th><th>Score</th><th>Steps</th><th>Timestamp</th></tr>' +
+      '<tr><td class="mono">' +
+      escapeHtml(String(scen)) +
+      '</td><td class="mono">' +
+      escapeHtml(String(data.difficulty || scen)) +
+      '</td><td class="mono">' +
+      escapeHtml(totalDisp) +
+      '</td><td class="mono">' +
+      escapeHtml(String(data.steps != null ? data.steps : '—')) +
+      '</td><td class="mono">' +
+      escapeHtml(new Date().toLocaleString()) +
+      '</td></tr></table>' +
+      '<div class="section"><h2>Executive summary</h2><p>' +
+      escapeHtml(summary) +
+      '</p></div>' +
+      '<div class="section"><h2>Investigation timeline</h2><table><tr><th>#</th><th>Action</th></tr>' +
+      timelineHtml +
+      '</table></div>' +
+      '<div class="section"><h2>Root cause</h2><p class="mono">' +
+      escapeHtml(rootLine) +
+      '</p></div>';
+
+    if (rec) {
+      html +=
+        '<div class="section"><h2>Recommendations</h2><p>' + escapeHtml(rec) + '</p></div>';
+    }
+
+    html +=
+      '<div class="footer">Generated by RCAAGENT | AI-Powered Incident Analysis</div>' +
+      '<script>window.onload=function(){window.print();}<\/script></body></html>';
+
+    var w = window.open('', '_blank');
+    if (!w) return;
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  }
+
+  var shareBtn = el('rca-btn-share-result');
+  if (shareBtn) shareBtn.addEventListener('click', drawShareCard);
+  var pdfBtn = el('rca-btn-export-pdf');
+  if (pdfBtn) pdfBtn.addEventListener('click', openPrintReport);
+
+  function boot() {
+    injectNavLeaderboard();
+    mountTickerAndToolbar();
+    refreshRunHistoryTimeline();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
 </body>
 </html>
