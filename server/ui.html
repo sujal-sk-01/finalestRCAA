@@ -636,8 +636,7 @@ ${labels}
   heroTypeStep();
 })();
 </script>
-
-<!-- ═══ RCA hackathon UI enhancements (append-only) ═══ -->
+<!-- ═══ RCA professional UI (append-only bundle) ═══ -->
 <div id="leaderboard-section" class="rca-lb-section" aria-hidden="true">
   <div class="rca-lb-head">
     <h2 class="rca-lb-heading">INVESTIGATION LEADERBOARD</h2>
@@ -675,24 +674,309 @@ ${labels}
   <button type="button" class="action-btn rca-export-btn rca-pdf-btn" id="rca-btn-export-pdf">⬇ EXPORT PDF</button>
 </div>
 
-<style id="rca-hackathon-enhancements-css">
-/* ═══ RCA hackathon UI — additive styles only ═══ */
+<style id="rca-pro-ui-css">
+/* ═══ Professional RCA UI — additive only (server room, SOC modal, features) ═══ */
+html.rca-pro-ui { min-height: 100%; }
+body.rca-pro-ui {
+  position: relative;
+  background-color: #050508;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.82)),
+    url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1920&q=80");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+body.rca-pro-ui::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.03;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.12) 3px,
+    rgba(255, 255, 255, 0.12) 4px
+  );
+  background-size: 100% 200%;
+  animation: rca-pro-scanlines 14s linear infinite;
+}
+@keyframes rca-pro-scanlines {
+  from { background-position: 0 0; }
+  to { background-position: 0 100%; }
+}
+body.rca-pro-ui .nav {
+  background: rgba(8, 12, 20, 0.92) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: rgba(30, 45, 61, 0.9) !important;
+}
+body.rca-pro-ui .hero {
+  background: rgba(8, 12, 20, 0.88) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom-color: rgba(30, 45, 61, 0.85) !important;
+}
+body.rca-pro-ui .metrics-bar {
+  background: rgba(13, 17, 23, 0.9) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+body.rca-pro-ui .main {
+  background: rgba(8, 12, 20, 0.86) !important;
+}
+body.rca-pro-ui .left-panel {
+  background: rgba(13, 17, 23, 0.92) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+body.rca-pro-ui .right-panel {
+  background: rgba(8, 12, 20, 0.88) !important;
+}
+body.rca-pro-ui .terminal-topbar {
+  background: rgba(13, 17, 23, 0.94) !important;
+}
+body.rca-pro-ui .terminal-body {
+  background: rgba(8, 12, 20, 0.82) !important;
+}
+body.rca-pro-ui .score-panel {
+  background: rgba(13, 17, 23, 0.92) !important;
+}
+body.rca-pro-ui .nav,
+body.rca-pro-ui .hero,
+body.rca-pro-ui .metrics-bar,
+body.rca-pro-ui .main,
+body.rca-pro-ui .terminal-topbar {
+  position: relative;
+  z-index: 6;
+}
+body.rca-pro-ui .left-panel,
+body.rca-pro-ui .right-panel,
+body.rca-pro-ui #networkGraph {
+  position: relative;
+  z-index: 6;
+}
+
+/* SOC incident alarm (injected into #incidentAlarm) */
+#incidentAlarm.rca-soc-enhanced {
+  background: rgba(0, 0, 0, 0.72) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.35s ease !important;
+}
+.rca-soc-card {
+  position: relative;
+  max-width: 520px;
+  width: calc(100% - 48px);
+  margin: 0 auto;
+  padding: 40px 36px 28px;
+  text-align: center;
+  background: rgba(8, 12, 20, 0.97);
+  border: 1px solid rgba(255, 60, 60, 0.6);
+  border-radius: 4px;
+  box-shadow: 0 0 40px rgba(255, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+.rca-soc-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(56, 139, 253, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 139, 253, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+.rca-soc-elapsed {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #94a3b8;
+}
+.rca-soc-icon-wrap {
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: center;
+}
+.rca-soc-icon-wrap svg {
+  filter: drop-shadow(0 0 12px rgba(255, 68, 68, 0.55));
+  animation: rca-soc-icon-pulse 2s ease-in-out infinite;
+}
+@keyframes rca-soc-icon-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 68, 68, 0.45)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 18px rgba(255, 68, 68, 0.85)); transform: scale(1.03); }
+}
+.rca-soc-kicker {
+  color: #ff4444;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.rca-soc-scenario {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 800;
+  font-family: "Courier New", monospace;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.rca-soc-sev-pill {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid rgba(248, 81, 73, 0.55);
+  color: #fca5a5;
+  background: rgba(127, 29, 29, 0.35);
+  margin-bottom: 22px;
+}
+.rca-soc-status {
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  color: #7d8590;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  min-height: 16px;
+  margin-bottom: 20px;
+}
+.rca-soc-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(30, 45, 61, 0.9);
+  overflow: hidden;
+}
+.rca-soc-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #b91c1c, #ff4444);
+  animation: rca-soc-progress-fill 3s linear forwards;
+  position: relative;
+}
+.rca-soc-progress-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  animation: rca-soc-shimmer 1.2s ease-in-out infinite;
+}
+@keyframes rca-soc-progress-fill {
+  to { width: 100%; }
+}
+@keyframes rca-soc-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Investigation failed modal */
+.rca-fail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.25s ease;
+  padding: 24px;
+}
+.rca-fail-card {
+  position: relative;
+  max-width: 480px;
+  width: 100%;
+  padding: 36px 32px 28px;
+  background: rgba(8, 12, 20, 0.98);
+  border: 1px solid rgba(248, 81, 73, 0.65);
+  border-radius: 4px;
+  box-shadow: 0 0 48px rgba(255, 0, 0, 0.2);
+  text-align: center;
+}
+.rca-fail-card svg {
+  filter: drop-shadow(0 0 14px rgba(248, 81, 73, 0.5));
+  margin-bottom: 16px;
+}
+.rca-fail-title {
+  font-family: "Courier New", monospace;
+  color: #f85149;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.rca-fail-msg {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+.rca-fail-elapsed {
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+.rca-fail-close {
+  width: 100%;
+  max-width: 220px;
+  padding: 12px 20px;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: rgba(248, 81, 73, 0.15);
+  border: 1px solid rgba(248, 81, 73, 0.55);
+  color: #fecaca;
+  border-radius: 4px;
+}
+.rca-fail-close:hover {
+  background: rgba(248, 81, 73, 0.28);
+  border-color: #f87171;
+}
+
+/* Leaderboard + history + ticker + toolbar (retained) */
 .rca-lb-section {
   display: none;
-  background: #000000;
+  background: rgba(0, 0, 0, 0.88);
   color: #9ca3af;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   min-height: calc(100vh - 56px);
   padding: 32px 24px 48px;
   border-top: 1px solid #0f172a;
+  position: relative;
+  z-index: 8;
 }
-body.rca-leaderboard-on .rca-lb-section {
-  display: block;
-}
+body.rca-leaderboard-on .rca-lb-section { display: block; }
 body.rca-leaderboard-on .metrics-bar,
-body.rca-leaderboard-on .main {
-  display: none !important;
-}
+body.rca-leaderboard-on .main { display: none !important; }
 .rca-lb-head {
   display: flex;
   align-items: center;
@@ -709,14 +993,8 @@ body.rca-leaderboard-on .main {
   color: #e6edf3;
   margin: 0;
 }
-.rca-lb-clear-btn {
-  font-family: 'Courier New', Courier, monospace;
-}
-.rca-lb-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
+.rca-lb-clear-btn { font-family: "Courier New", Courier, monospace; }
+.rca-lb-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .rca-lb-table th,
 .rca-lb-table td {
   border: 1px solid #0f172a;
@@ -729,34 +1007,24 @@ body.rca-leaderboard-on .main {
   letter-spacing: 1px;
   text-transform: uppercase;
   color: #94a3b8;
-  background: #0d1117;
+  background: rgba(13, 17, 23, 0.95);
 }
-.rca-lb-table td {
-  color: #9ca3af;
-}
-.rca-lb-table tbody tr:nth-child(even) {
-  background: #0d1117;
-}
+.rca-lb-table td { color: #9ca3af; }
+.rca-lb-table tbody tr:nth-child(even) { background: rgba(13, 17, 23, 0.65); }
 .rca-run-history-wrap {
   margin-top: 40px;
   padding-top: 28px;
   border-top: 1px solid #0f172a;
 }
-.rca-run-history-heading {
-  margin-bottom: 20px;
-}
-.rca-run-history-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+.rca-run-history-heading { margin-bottom: 20px; }
+.rca-run-history-body { display: flex; flex-direction: column; gap: 0; }
 .rca-rh-empty {
   text-align: center;
   padding: 48px 16px;
   color: #64748b;
   font-size: 12px;
   letter-spacing: 1px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", monospace;
 }
 .rca-rh-empty .rca-rh-cursor {
   display: inline-block;
@@ -779,10 +1047,7 @@ body.rca-leaderboard-on .main {
   padding: 16px 4px 14px;
 }
 @keyframes rca-rh-slide-in {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  to { opacity: 1; transform: translateX(0); }
 }
 .rca-rh-row-inner {
   display: flex;
@@ -790,19 +1055,8 @@ body.rca-leaderboard-on .main {
   gap: 14px;
   flex-wrap: wrap;
 }
-.rca-rh-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 140px;
-  flex: 0 0 auto;
-}
-.rca-rh-scen {
-  font-size: 11px;
-  font-weight: 800;
-  color: #e6edf3;
-  letter-spacing: 0.5px;
-}
+.rca-rh-left { display: flex; align-items: center; gap: 10px; min-width: 140px; flex: 0 0 auto; }
+.rca-rh-scen { font-size: 11px; font-weight: 800; color: #e6edf3; letter-spacing: 0.5px; }
 .rca-rh-badge {
   font-size: 9px;
   font-weight: 900;
@@ -817,10 +1071,7 @@ body.rca-leaderboard-on .main {
 .rca-rh-badge-hard { background: rgba(248,81,73,.15); color: #f85149; border-color: #f85149; }
 .rca-rh-badge-ddos { background: rgba(249,115,22,.15); color: #fb923c; border-color: #fb923c; }
 .rca-rh-badge-default { background: #1e293b; color: #94a3b8; border-color: #334155; }
-.rca-rh-mid {
-  flex: 1;
-  min-width: 120px;
-}
+.rca-rh-mid { flex: 1; min-width: 120px; }
 .rca-rh-track {
   height: 10px;
   background: #0f172a;
@@ -828,54 +1079,28 @@ body.rca-leaderboard-on .main {
   overflow: hidden;
   border: 1px solid #1e293b;
 }
-.rca-rh-fill {
-  height: 100%;
-  border-radius: 999px;
-  width: 0;
-  transition: width 0.6s ease;
-}
+.rca-rh-fill { height: 100%; border-radius: 999px; width: 0; transition: width 0.6s ease; }
 .rca-rh-fill-green { background: linear-gradient(90deg, #16a34a, #4ade80); }
 .rca-rh-fill-yellow { background: linear-gradient(90deg, #ca8a04, #facc15); }
 .rca-rh-fill-red { background: linear-gradient(90deg, #b91c1c, #f87171); }
-.rca-rh-right {
-  min-width: 72px;
-  text-align: right;
-}
-.rca-rh-pct {
-  font-size: 14px;
-  font-weight: 900;
-  color: #f1f5f9;
-}
-.rca-rh-steps {
-  font-size: 10px;
-  color: #64748b;
-  margin-top: 4px;
-}
-.rca-rh-ts {
-  width: 100%;
-  font-size: 10px;
-  color: #64748b;
-  margin-top: 8px;
-  padding-left: 2px;
-}
+.rca-rh-right { min-width: 72px; text-align: right; }
+.rca-rh-pct { font-size: 14px; font-weight: 900; color: #f1f5f9; }
+.rca-rh-steps { font-size: 10px; color: #64748b; margin-top: 4px; }
+.rca-rh-ts { width: 100%; font-size: 10px; color: #64748b; margin-top: 8px; padding-left: 2px; }
 
-/* Live score ticker */
 .rca-score-ticker {
   display: none;
   position: relative;
   width: 100%;
-  background: #0a0f1a;
+  background: rgba(10, 15, 26, 0.96);
   border-bottom: 1px solid #1e293b;
   padding: 20px 48px 22px 24px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", monospace;
   box-sizing: border-box;
+  z-index: 7;
 }
-.rca-score-ticker.is-visible {
-  display: block;
-}
-.rca-score-ticker.is-running {
-  animation: rca-ticker-pulse-glow 1.8s ease-in-out infinite;
-}
+.rca-score-ticker.is-visible { display: block; }
+.rca-score-ticker.is-running { animation: rca-ticker-pulse-glow 1.8s ease-in-out infinite; }
 .rca-score-ticker-close {
   position: absolute;
   top: 10px;
@@ -891,13 +1116,8 @@ body.rca-leaderboard-on .main {
   line-height: 1;
   z-index: 2;
 }
-.rca-score-ticker-close:hover {
-  border-color: #388bfd;
-  color: #e6edf3;
-}
-.rca-score-ticker-inner {
-  text-align: center;
-}
+.rca-score-ticker-close:hover { border-color: #388bfd; color: #e6edf3; }
+.rca-score-ticker-inner { text-align: center; }
 .rca-score-ticker-subtitle {
   font-size: 11px;
   font-weight: 800;
@@ -914,16 +1134,12 @@ body.rca-leaderboard-on .main {
   color: #4ade80;
   text-shadow: 0 0 24px rgba(74, 222, 128, 0.45);
 }
-.rca-score-ticker-suffix {
-  font-size: 0.5em;
-  opacity: 0.9;
-  margin-left: 2px;
-}
+.rca-score-ticker-suffix { font-size: 0.5em; opacity: 0.9; margin-left: 2px; }
 .rca-score-ticker-status {
   margin-top: 12px;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   color: #94a3b8;
   text-transform: uppercase;
 }
@@ -970,20 +1186,18 @@ body.rca-leaderboard-on .main {
   50% { filter: brightness(1.35); transform: scale(1.04); }
 }
 
-/* Share + PDF toolbar */
 .rca-export-toolbar {
   display: none;
   padding: 12px 16px;
   border-top: 1px solid #1e2d3d;
-  background: #0d1117;
+  background: rgba(13, 17, 23, 0.94);
   text-align: center;
   gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
+  z-index: 7;
 }
-.rca-export-toolbar.is-visible {
-  display: flex;
-}
+.rca-export-toolbar.is-visible { display: flex; }
 .rca-share-btn,
 .rca-pdf-btn {
   font-weight: 800;
@@ -1000,39 +1214,66 @@ body.rca-leaderboard-on .main {
 }
 </style>
 
-<script id="rca-hackathon-enhancements-js">
-/* ═══ RCA hackathon UI — additive script only ═══ */
+<script id="rca-pro-ui-js">
+/* ═══ Professional RCA UI — additive script ═══ */
 (function () {
-  'use strict';
+  "use strict";
 
-  var LB_KEY = 'rca_leaderboard';
-
-  var STATUS_ROTATE = [
-    'INITIALIZING INVESTIGATION...',
-    'QUERYING METRICS...',
-    'ANALYZING DISTRIBUTED TRACES...',
-    'CORRELATING SERVICE DEPENDENCIES...',
-    'IDENTIFYING ROOT CAUSE...',
-    'GENERATING RCA REPORT...'
+  var LB_KEY = "rca_leaderboard";
+  var SOC_STATUSES = [
+    "DEPLOYING AI AGENT...",
+    "ESTABLISHING CONNECTIONS...",
+    "QUERYING TELEMETRY...",
+    "ANALYZING TRACES...",
+    "CORRELATING FAILURES...",
+    "GENERATING REPORT..."
+  ];
+  var TICKER_STATUS = [
+    "INITIALIZING INVESTIGATION...",
+    "QUERYING METRICS...",
+    "ANALYZING DISTRIBUTED TRACES...",
+    "CORRELATING SERVICE DEPENDENCIES...",
+    "IDENTIFYING ROOT CAUSE...",
+    "GENERATING RCA REPORT..."
   ];
 
-  var tickerEl, tickerValEl, tickerStatusEl, tickerSubtitleEl, toolbarEl;
+  var tickerEl,
+    tickerValEl,
+    tickerStatusEl,
+    tickerSubtitleEl,
+    toolbarEl;
   var statusInterval = null;
   var progressRaf = null;
   var displayedPct = 0;
   var lastRunPayload = null;
+  var failModalEl = null;
 
-  function el(id) { return document.getElementById(id); }
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  function pad2(n) {
+    return (n < 10 ? "0" : "") + n;
+  }
+
+  function fmtElapsed(totalSec) {
+    var m = Math.floor(totalSec / 60);
+    var s = totalSec % 60;
+    return pad2(m) + ":" + pad2(s);
+  }
+
+  document.documentElement.classList.add("rca-pro-ui");
+  document.body.classList.add("rca-pro-ui");
 
   function scenarioTitleFromKey(d) {
     var map = {
-      easy: 'INC-001 · Cache Failure',
-      medium: 'INC-002 · Config Cascade',
-      hard: 'INC-003 · AZ Packet Loss',
-      ddos: 'INC-004 · DDoS Attack'
+      easy: "INC-001 · Cache Failure",
+      medium: "INC-002 · Config Cascade",
+      hard: "INC-003 · AZ Packet Loss",
+      ddos: "INC-004 · DDoS Attack"
     };
-    var k = (d || '').toLowerCase();
-    return map[k] || (d ? String(d).toUpperCase() : 'SCENARIO');
+    var k = (d || "").toLowerCase();
+    return map[k] || (d ? String(d).toUpperCase() : "SCENARIO");
   }
 
   function parseLeaderboardList() {
@@ -1046,17 +1287,17 @@ body.rca-leaderboard-on .main {
   }
 
   function refreshLeaderboardTable() {
-    var tbody = el('rca-leaderboard-tbody');
+    var tbody = el("rca-leaderboard-tbody");
     if (!tbody) return;
     var list = parseLeaderboardList();
-    tbody.innerHTML = '';
-    var cols = ['scenario', 'difficulty', 'score', 'steps', 'timestamp'];
+    tbody.innerHTML = "";
+    var cols = ["scenario", "difficulty", "score", "steps", "timestamp"];
     list.forEach(function (entry) {
-      var tr = document.createElement('tr');
+      var tr = document.createElement("tr");
       cols.forEach(function (key) {
-        var td = document.createElement('td');
+        var td = document.createElement("td");
         var v = entry[key];
-        td.textContent = v != null ? String(v) : '';
+        td.textContent = v != null ? String(v) : "";
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
@@ -1066,11 +1307,11 @@ body.rca-leaderboard-on .main {
   function parseScorePercent(entry) {
     if (!entry) return 0;
     var s = entry.score;
-    if (typeof s === 'number' && !isNaN(s)) {
+    if (typeof s === "number" && !isNaN(s)) {
       if (s <= 1 && s >= 0) return Math.round(s * 1000) / 10;
       return Math.min(100, Math.max(0, s));
     }
-    if (typeof s === 'string') {
+    if (typeof s === "string") {
       var m = s.match(/([\d.]+)/);
       if (m) return Math.min(100, Math.max(0, parseFloat(m[1])));
     }
@@ -1078,63 +1319,69 @@ body.rca-leaderboard-on .main {
   }
 
   function refreshRunHistoryTimeline() {
-    var body = el('rca-run-history-body');
+    var body = el("rca-run-history-body");
     if (!body) return;
     var list = parseLeaderboardList();
-    body.innerHTML = '';
+    body.innerHTML = "";
     if (!list.length) {
-      var empty = document.createElement('div');
-      empty.className = 'rca-rh-empty';
-      empty.innerHTML = 'NO RUNS YET — START YOUR FIRST INVESTIGATION<span class="rca-rh-cursor" aria-hidden="true"></span>';
+      var empty = document.createElement("div");
+      empty.className = "rca-rh-empty";
+      empty.innerHTML =
+        "NO RUNS YET — START YOUR FIRST INVESTIGATION<span class=\"rca-rh-cursor\" aria-hidden=\"true\"></span>";
       body.appendChild(empty);
       return;
     }
     var reversed = list.slice().reverse();
     reversed.forEach(function (entry, i) {
       var pct = parseScorePercent(entry);
-      var row = document.createElement('div');
-      row.className = 'rca-rh-row';
-      row.style.animationDelay = i * 80 + 'ms';
+      var row = document.createElement("div");
+      row.className = "rca-rh-row";
+      row.style.animationDelay = i * 80 + "ms";
 
-      var inner = document.createElement('div');
-      inner.className = 'rca-rh-row-inner';
+      var inner = document.createElement("div");
+      inner.className = "rca-rh-row-inner";
 
-      var left = document.createElement('div');
-      left.className = 'rca-rh-left';
-      var scen = document.createElement('span');
-      scen.className = 'rca-rh-scen';
+      var left = document.createElement("div");
+      left.className = "rca-rh-left";
+      var scen = document.createElement("span");
+      scen.className = "rca-rh-scen";
       scen.textContent = scenarioTitleFromKey(entry.scenario);
-      var badge = document.createElement('span');
-      var diff = (entry.difficulty || entry.scenario || '').toString().toLowerCase();
-      badge.className = 'rca-rh-badge rca-rh-badge-default';
-      if (diff === 'easy') badge.className = 'rca-rh-badge rca-rh-badge-easy';
-      else if (diff === 'medium') badge.className = 'rca-rh-badge rca-rh-badge-medium';
-      else if (diff === 'hard') badge.className = 'rca-rh-badge rca-rh-badge-hard';
-      else if (diff === 'ddos') badge.className = 'rca-rh-badge rca-rh-badge-ddos';
-      badge.textContent = (entry.difficulty || entry.scenario || '—').toString().toUpperCase();
+      var badge = document.createElement("span");
+      var diff = (entry.difficulty || entry.scenario || "").toString().toLowerCase();
+      badge.className = "rca-rh-badge rca-rh-badge-default";
+      if (diff === "easy") badge.className = "rca-rh-badge rca-rh-badge-easy";
+      else if (diff === "medium") badge.className = "rca-rh-badge rca-rh-badge-medium";
+      else if (diff === "hard") badge.className = "rca-rh-badge rca-rh-badge-hard";
+      else if (diff === "ddos") badge.className = "rca-rh-badge rca-rh-badge-ddos";
+      badge.textContent = (entry.difficulty || entry.scenario || "—").toString().toUpperCase();
       left.appendChild(scen);
       left.appendChild(badge);
 
-      var mid = document.createElement('div');
-      mid.className = 'rca-rh-mid';
-      var track = document.createElement('div');
-      track.className = 'rca-rh-track';
-      var fill = document.createElement('div');
-      var barClass = 'rca-rh-fill-red';
-      if (pct >= 80) barClass = 'rca-rh-fill-green';
-      else if (pct >= 50) barClass = 'rca-rh-fill-yellow';
-      fill.className = 'rca-rh-fill ' + barClass;
+      var mid = document.createElement("div");
+      mid.className = "rca-rh-mid";
+      var track = document.createElement("div");
+      track.className = "rca-rh-track";
+      var fill = document.createElement("div");
+      var barClass = "rca-rh-fill-red";
+      if (pct >= 80) barClass = "rca-rh-fill-green";
+      else if (pct >= 50) barClass = "rca-rh-fill-yellow";
+      fill.className = "rca-rh-fill " + barClass;
       track.appendChild(fill);
       mid.appendChild(track);
 
-      var right = document.createElement('div');
-      right.className = 'rca-rh-right';
-      var pctEl = document.createElement('div');
-      pctEl.className = 'rca-rh-pct';
-      pctEl.textContent = pct > 0 ? pct.toFixed(1) + '%' : (entry.score != null && String(entry.score) !== '' ? String(entry.score) : '—');
-      var stepsEl = document.createElement('div');
-      stepsEl.className = 'rca-rh-steps';
-      stepsEl.textContent = 'STEPS: ' + (entry.steps != null ? entry.steps : '—');
+      var right = document.createElement("div");
+      right.className = "rca-rh-right";
+      var pctEl = document.createElement("div");
+      pctEl.className = "rca-rh-pct";
+      pctEl.textContent =
+        pct > 0
+          ? pct.toFixed(1) + "%"
+          : entry.score != null && String(entry.score) !== ""
+            ? String(entry.score)
+            : "—";
+      var stepsEl = document.createElement("div");
+      stepsEl.className = "rca-rh-steps";
+      stepsEl.textContent = "STEPS: " + (entry.steps != null ? entry.steps : "—");
       right.appendChild(pctEl);
       right.appendChild(stepsEl);
 
@@ -1143,112 +1390,131 @@ body.rca-leaderboard-on .main {
       inner.appendChild(right);
       row.appendChild(inner);
 
-      var ts = document.createElement('div');
-      ts.className = 'rca-rh-ts';
-      ts.textContent = entry.timestamp || '';
+      var ts = document.createElement("div");
+      ts.className = "rca-rh-ts";
+      ts.textContent = entry.timestamp || "";
       row.appendChild(ts);
 
       body.appendChild(row);
 
       requestAnimationFrame(function () {
-        fill.style.width = pct + '%';
+        fill.style.width = pct + "%";
       });
     });
   }
 
   function showLeaderboardPage() {
-    document.body.classList.add('rca-leaderboard-on');
-    var sec = el('leaderboard-section');
-    if (sec) sec.setAttribute('aria-hidden', 'false');
+    document.body.classList.add("rca-leaderboard-on");
+    var sec = el("leaderboard-section");
+    if (sec) sec.setAttribute("aria-hidden", "false");
     refreshLeaderboardTable();
     refreshRunHistoryTimeline();
     window.scrollTo(0, 0);
   }
 
   function hideLeaderboardPage() {
-    document.body.classList.remove('rca-leaderboard-on');
-    var sec = el('leaderboard-section');
-    if (sec) sec.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove("rca-leaderboard-on");
+    var sec = el("leaderboard-section");
+    if (sec) sec.setAttribute("aria-hidden", "true");
   }
 
   function injectNavLeaderboard() {
-    var links = document.querySelector('.nav-links');
+    var links = document.querySelector(".nav-links");
     if (!links) return;
-    var children = links.querySelectorAll('a');
+    var children = links.querySelectorAll("a");
     var schema = null;
     for (var i = 0; i < children.length; i++) {
-      var oc = children[i].getAttribute('onclick') || '';
-      if (oc.indexOf('showSchema') !== -1) {
+      var oc = children[i].getAttribute("onclick") || "";
+      if (oc.indexOf("showSchema") !== -1) {
         schema = children[i];
         break;
       }
     }
-    if (!schema || document.getElementById('rca-nav-leaderboard')) return;
-    var a = document.createElement('a');
-    a.id = 'rca-nav-leaderboard';
-    a.href = '#';
-    a.textContent = 'LEADERBOARD';
-    a.addEventListener('click', function (e) {
+    if (!schema || document.getElementById("rca-nav-leaderboard")) return;
+    var a = document.createElement("a");
+    a.id = "rca-nav-leaderboard";
+    a.href = "#";
+    a.textContent = "LEADERBOARD";
+    a.addEventListener("click", function (e) {
       e.preventDefault();
       showLeaderboardPage();
     });
-    schema.insertAdjacentElement('afterend', a);
+    schema.insertAdjacentElement("afterend", a);
 
-    links.querySelectorAll('a').forEach(function (node) {
-      if (node.id === 'rca-nav-leaderboard') return;
-      node.addEventListener('click', function () {
+    links.querySelectorAll("a").forEach(function (node) {
+      if (node.id === "rca-nav-leaderboard") return;
+      node.addEventListener("click", function () {
         hideLeaderboardPage();
       });
     });
   }
 
   function mountTickerAndToolbar() {
-    var rp = document.querySelector('.right-panel');
-    var topbar = document.querySelector('.right-panel .terminal-topbar');
-    tickerEl = el('rca-score-ticker');
-    tickerValEl = el('rca-score-ticker-value');
-    tickerStatusEl = el('rca-score-ticker-status');
-    tickerSubtitleEl = el('rca-score-ticker-subtitle');
-    toolbarEl = el('rca-export-toolbar');
+    var rp = document.querySelector(".right-panel");
+    var topbar = document.querySelector(".right-panel .terminal-topbar");
+    tickerEl = el("rca-score-ticker");
+    tickerValEl = el("rca-score-ticker-value");
+    tickerStatusEl = el("rca-score-ticker-status");
+    tickerSubtitleEl = el("rca-score-ticker-subtitle");
+    toolbarEl = el("rca-export-toolbar");
     if (rp && topbar && tickerEl && tickerEl.parentNode === document.body) {
-      topbar.insertAdjacentElement('afterend', tickerEl);
+      topbar.insertAdjacentElement("afterend", tickerEl);
     }
-    var scorePanel = el('scorePanel');
+    var scorePanel = el("scorePanel");
     if (rp && toolbarEl && scorePanel && toolbarEl.parentNode === document.body) {
-      scorePanel.insertAdjacentElement('afterend', toolbarEl);
+      scorePanel.insertAdjacentElement("afterend", toolbarEl);
+    }
+  }
+
+  function hideTickerCompletely() {
+    stopTickerLoops();
+    if (tickerEl) {
+      tickerEl.classList.remove(
+        "is-visible",
+        "is-running",
+        "is-reveal-gold",
+        "is-reveal-yellow",
+        "is-reveal-red",
+        "is-flash-pct"
+      );
+      tickerEl.hidden = true;
+    }
+    if (toolbarEl) {
+      toolbarEl.hidden = true;
+      toolbarEl.classList.remove("is-visible");
     }
   }
 
   function showTickerRunning() {
     if (!tickerEl) return;
-    toolbarEl = el('rca-export-toolbar');
+    toolbarEl = el("rca-export-toolbar");
     if (toolbarEl) {
       toolbarEl.hidden = true;
-      toolbarEl.classList.remove('is-visible');
+      toolbarEl.classList.remove("is-visible");
     }
     lastRunPayload = null;
     tickerEl.hidden = false;
-    tickerEl.classList.add('is-visible', 'is-running');
-    tickerEl.classList.remove('is-reveal-gold', 'is-reveal-yellow', 'is-reveal-red', 'is-flash-pct');
-    if (tickerSubtitleEl) tickerSubtitleEl.textContent = '';
+    tickerEl.classList.add("is-visible", "is-running");
+    tickerEl.classList.remove("is-reveal-gold", "is-reveal-yellow", "is-reveal-red", "is-flash-pct");
+    if (tickerSubtitleEl) tickerSubtitleEl.textContent = "";
     displayedPct = 0;
-    if (tickerValEl) tickerValEl.textContent = '0';
-    if (tickerStatusEl) tickerStatusEl.textContent = STATUS_ROTATE[0];
+    if (tickerValEl) tickerValEl.textContent = "0";
+    if (tickerStatusEl) tickerStatusEl.textContent = TICKER_STATUS[0];
     if (statusInterval) clearInterval(statusInterval);
     var si = 0;
     statusInterval = setInterval(function () {
-      si = (si + 1) % STATUS_ROTATE.length;
-      if (tickerStatusEl) tickerStatusEl.textContent = STATUS_ROTATE[si];
+      si = (si + 1) % TICKER_STATUS.length;
+      if (tickerStatusEl) tickerStatusEl.textContent = TICKER_STATUS[si];
     }, 2000);
     if (progressRaf) cancelAnimationFrame(progressRaf);
     var start = performance.now();
     var duration = 24000;
     function tick(now) {
       var t = Math.min(1, (now - start) / duration);
-      var eased = 1 - Math.pow(1 - t, 3);
-      displayedPct = Math.min(92, eased * 92);
+      var easeOutCubic = 1 - Math.pow(1 - t, 3);
+      displayedPct = Math.min(92, easeOutCubic * 92);
       if (tickerValEl) tickerValEl.textContent = String(Math.round(displayedPct));
-      if (t < 1 && tickerEl.classList.contains('is-running')) {
+      if (t < 1 && tickerEl.classList.contains("is-running")) {
         progressRaf = requestAnimationFrame(tick);
       }
     }
@@ -1266,55 +1532,43 @@ body.rca-leaderboard-on .main {
     }
   }
 
-  function onBaselineComplete(data, ok) {
+  function onBaselineCompleteSuccess(data) {
     stopTickerLoops();
     if (!tickerEl) return;
-    tickerEl.classList.remove('is-running');
+    tickerEl.classList.remove("is-running");
 
-    if (!ok || !data || data.error) {
-      if (tickerValEl) tickerValEl.textContent = '—';
-      if (tickerStatusEl) tickerStatusEl.textContent = 'INVESTIGATION FAILED';
-      if (tickerSubtitleEl) tickerSubtitleEl.textContent = '';
-      tickerEl.classList.add('is-reveal-red');
-      if (toolbarEl) {
-        toolbarEl.hidden = true;
-        toolbarEl.classList.remove('is-visible');
-      }
-      lastRunPayload = null;
-      return;
-    }
-
-    var f = data.scores && typeof data.scores.final_score === 'number' ? data.scores.final_score : 0;
+    var f = data.scores && typeof data.scores.final_score === "number" ? data.scores.final_score : 0;
     var realPct = Math.round(f * 1000) / 10;
-    var diffKey = (data.difficulty || (typeof difficulty !== 'undefined' ? difficulty : '') || '').toString();
+    var diffKey = (data.difficulty || (typeof difficulty !== "undefined" ? difficulty : "") || "").toString();
 
     var from = displayedPct;
     var rStart = performance.now();
-    var rDur = 700;
+    var rDur = 750;
     function snapFrame(now) {
       var u = Math.min(1, (now - rStart) / rDur);
-      var ease = 1 - Math.pow(1 - u, 2);
-      displayedPct = from + (realPct - from) * ease;
+      var easeOutCubic = 1 - Math.pow(1 - u, 3);
+      displayedPct = from + (realPct - from) * easeOutCubic;
       if (tickerValEl) tickerValEl.textContent = String(Math.round(displayedPct * 10) / 10);
       if (u < 1) {
         requestAnimationFrame(snapFrame);
       } else {
-        tickerEl.classList.remove('is-reveal-gold', 'is-reveal-yellow', 'is-reveal-red');
-        if (realPct >= 80) tickerEl.classList.add('is-reveal-gold');
-        else if (realPct < 50) tickerEl.classList.add('is-reveal-red');
-        else tickerEl.classList.add('is-reveal-yellow');
-        if (tickerStatusEl) tickerStatusEl.textContent = 'INVESTIGATION COMPLETE';
-        if (tickerSubtitleEl) tickerSubtitleEl.textContent = 'FINAL SCORE';
-        tickerEl.classList.add('is-flash-pct');
+        tickerEl.classList.remove("is-reveal-gold", "is-reveal-yellow", "is-reveal-red");
+        if (realPct >= 80) tickerEl.classList.add("is-reveal-gold");
+        else if (realPct < 50) tickerEl.classList.add("is-reveal-red");
+        else tickerEl.classList.add("is-reveal-yellow");
+        if (tickerStatusEl) tickerStatusEl.textContent = "INVESTIGATION COMPLETE — SCORE REVEALED";
+        if (tickerSubtitleEl) tickerSubtitleEl.textContent = "FINAL SCORE";
+        tickerEl.classList.add("is-flash-pct");
         setTimeout(function () {
-          tickerEl.classList.remove('is-flash-pct');
-        }, 1400);
+          tickerEl.classList.remove("is-flash-pct");
+        }, 1500);
 
         if (data.scores || data.report) {
           lastRunPayload = { data: data, scenarioKey: diffKey };
+          toolbarEl = el("rca-export-toolbar");
           if (toolbarEl) {
             toolbarEl.hidden = false;
-            toolbarEl.classList.add('is-visible');
+            toolbarEl.classList.add("is-visible");
           }
         }
       }
@@ -1322,21 +1576,156 @@ body.rca-leaderboard-on .main {
     requestAnimationFrame(snapFrame);
   }
 
+  function removeFailModal() {
+    if (failModalEl && failModalEl.parentNode) {
+      failModalEl.parentNode.removeChild(failModalEl);
+    }
+    failModalEl = null;
+  }
+
+  function showFailModal(message, elapsedSec) {
+    removeFailModal();
+    hideTickerCompletely();
+
+    var ov = document.createElement("div");
+    ov.className = "rca-fail-overlay";
+    ov.setAttribute("role", "dialog");
+    ov.setAttribute("aria-modal", "true");
+    ov.innerHTML =
+      "<div class=\"rca-fail-card\">" +
+      "<div style=\"display:flex;justify-content:center\">" +
+      "<svg width=\"56\" height=\"56\" viewBox=\"0 0 64 64\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">" +
+      "<path d=\"M32 4L8 14v18c0 14 10.5 27 24 30 13.5-3 24-16 24-30V14L32 4z\" stroke=\"#f85149\" stroke-width=\"2.5\" fill=\"rgba(248,81,73,0.12)\"/>" +
+      "<path d=\"M24 24l16 16M40 24L24 40\" stroke=\"#f87171\" stroke-width=\"3\" stroke-linecap=\"round\"/>" +
+      "</svg></div>" +
+      "<div class=\"rca-fail-title\">INVESTIGATION FAILED</div>" +
+      "<div class=\"rca-fail-msg\" id=\"rcaFailMsg\"></div>" +
+      "<div class=\"rca-fail-elapsed\" id=\"rcaFailElapsed\"></div>" +
+      "<button type=\"button\" class=\"rca-fail-close\" id=\"rcaFailClose\">CLOSE</button>" +
+      "</div>";
+    document.body.appendChild(ov);
+    failModalEl = ov;
+    el("rcaFailMsg").textContent = message || "An unexpected error occurred.";
+    el("rcaFailElapsed").textContent = "ELAPSED BEFORE FAILURE: " + fmtElapsed(elapsedSec >= 0 ? elapsedSec : 0);
+    el("rcaFailClose").addEventListener("click", function () {
+      removeFailModal();
+      lastRunPayload = null;
+    });
+  }
+
+  function shieldSvg() {
+    return (
+      "<svg width=\"64\" height=\"64\" viewBox=\"0 0 64 64\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">" +
+      "<path d=\"M32 6L10 15.5v17.2c0 12.8 9.2 24.8 22 28.3 12.8-3.5 22-15.5 22-28.3V15.5L32 6z\" " +
+      "stroke=\"#ff4444\" stroke-width=\"2.2\" fill=\"rgba(255,68,68,0.08)\"/>" +
+      "<path d=\"M32 20v14M32 38v2\" stroke=\"#ff6b6b\" stroke-width=\"2.8\" stroke-linecap=\"round\"/>" +
+      "<circle cx=\"32\" cy=\"44\" r=\"2\" fill=\"#ff6b6b\"/>" +
+      "</svg>"
+    );
+  }
+
+  function enhanceIncidentAlarm(alarm) {
+    if (!alarm || alarm.getAttribute("data-rca-soc") === "1") return;
+    alarm.setAttribute("data-rca-soc", "1");
+    alarm.classList.add("rca-soc-enhanced");
+
+    var raw = alarm.textContent || "";
+    var m = raw.match(/([A-Za-z0-9_]+)\s+SCENARIO/i);
+    var diffKey = m ? m[1].toLowerCase() : "unknown";
+    var severities = { easy: "P2", medium: "P1", hard: "P0", ddos: "P0" };
+    var sev = severities[diffKey] || "P1";
+    var scenLine = (m ? m[1] : "UNKNOWN").toUpperCase() + " SCENARIO";
+
+    alarm.innerHTML =
+      "<div class=\"rca-soc-card\">" +
+      "<div class=\"rca-soc-elapsed\" id=\"rcaSocElapsed\">00:00</div>" +
+      "<div class=\"rca-soc-icon-wrap\">" +
+      shieldSvg() +
+      "</div>" +
+      "<div class=\"rca-soc-kicker\">CRITICAL INCIDENT DETECTED</div>" +
+      "<div class=\"rca-soc-scenario\">" +
+      scenLine +
+      "</div>" +
+      "<div class=\"rca-soc-sev-pill\">SEVERITY: " +
+      sev +
+      "</div>" +
+      "<div class=\"rca-soc-status\" id=\"rcaSocStatusLine\">" +
+      SOC_STATUSES[0] +
+      "</div>" +
+      "<div class=\"rca-soc-progress\"><div class=\"rca-soc-progress-bar\"></div></div>" +
+      "</div>";
+
+    var socStart = Date.now();
+    var elapsedEl = el("rcaSocElapsed");
+    var statusEl = el("rcaSocStatusLine");
+    var elapsedTimer = setInterval(function () {
+      var sec = Math.floor((Date.now() - socStart) / 1000);
+      if (elapsedEl) elapsedEl.textContent = fmtElapsed(sec);
+    }, 250);
+
+    var si = 0;
+    var statusTimer = setInterval(function () {
+      si = (si + 1) % SOC_STATUSES.length;
+      if (statusEl) statusEl.textContent = SOC_STATUSES[si];
+    }, 2000);
+
+    var cleanup = function () {
+      clearInterval(elapsedTimer);
+      clearInterval(statusTimer);
+    };
+    var obs = new MutationObserver(function () {
+      if (!document.body.contains(alarm)) {
+        cleanup();
+        obs.disconnect();
+      }
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+  }
+
+  var alarmObserver = new MutationObserver(function (muts) {
+    muts.forEach(function (mu) {
+      for (var i = 0; i < mu.addedNodes.length; i++) {
+        var n = mu.addedNodes[i];
+        if (n.nodeType !== 1) continue;
+        if (n.id === "incidentAlarm") {
+          requestAnimationFrame(function () {
+            enhanceIncidentAlarm(n);
+          });
+        }
+      }
+    });
+  });
+  alarmObserver.observe(document.body, { childList: true });
+
   var origFetch = window.fetch;
   window.fetch = function (input, init) {
-    var url = typeof input === 'string' ? input : (input && input.url) || '';
-    var method = init && init.method ? String(init.method).toUpperCase() : 'GET';
-    var isBaselinePost = url.indexOf('/baseline') !== -1 && method === 'POST';
-    return origFetch.apply(this, arguments).then(function (res) {
+    var url = typeof input === "string" ? input : (input && input.url) || "";
+    var method = init && init.method ? String(init.method).toUpperCase() : "GET";
+    var isBaselinePost = url.indexOf("/baseline") !== -1 && method === "POST";
+    return origFetch
+      .apply(this, arguments)
+      .catch(function (err) {
+        if (isBaselinePost) {
+          var startMs = window.__rcaRunStartMs || Date.now();
+          var elapsedSec = Math.floor((Date.now() - startMs) / 1000);
+          showFailModal(err && err.message ? err.message : "Network request failed", elapsedSec);
+        }
+        return Promise.reject(err);
+      })
+      .then(function (res) {
       if (!isBaselinePost) return res;
       return res
         .clone()
         .json()
         .then(function (json) {
+          var startMs = window.__rcaRunStartMs || Date.now();
+          var elapsedSec = Math.floor((Date.now() - startMs) / 1000);
+
           try {
-            if (res.ok && json && !json.error && typeof difficulty !== 'undefined' && difficulty) {
+            if (res.ok && json && !json.error && typeof difficulty !== "undefined" && difficulty) {
               var list = parseLeaderboardList();
-              var totalScore = json.scores != null && json.scores.total != null ? json.scores.total : 'N/A';
+              var totalScore =
+                json.scores != null && json.scores.total != null ? json.scores.total : "N/A";
               list.push({
                 scenario: difficulty,
                 difficulty: json.difficulty,
@@ -1345,49 +1734,66 @@ body.rca-leaderboard-on .main {
                 timestamp: new Date().toLocaleString()
               });
               localStorage.setItem(LB_KEY, JSON.stringify(list));
-              if (document.body.classList.contains('rca-leaderboard-on')) {
+              if (document.body.classList.contains("rca-leaderboard-on")) {
                 refreshLeaderboardTable();
               }
               refreshRunHistoryTimeline();
             }
           } catch (e) {}
-          onBaselineComplete(json, res.ok);
+
+          var failed = !res.ok || !json || json.error;
+          if (failed) {
+            var msg =
+              json && json.error
+                ? String(json.error)
+                : !res.ok
+                  ? "HTTP " + res.status
+                  : "Investigation failed";
+            showFailModal(msg, elapsedSec);
+            return res;
+          }
+
+          onBaselineCompleteSuccess(json);
           return res;
         })
         .catch(function () {
-          onBaselineComplete(null, false);
+          var startMs = window.__rcaRunStartMs || Date.now();
+          var elapsedSec = Math.floor((Date.now() - startMs) / 1000);
+          showFailModal("Unable to read response from server.", elapsedSec);
           return res;
         });
     });
   };
 
-  var runBtn = el('runBtn');
+  var runBtn = el("runBtn");
   if (runBtn) {
     runBtn.addEventListener(
-      'click',
+      "click",
       function () {
         if (runBtn.disabled) return;
-        if (typeof difficulty === 'undefined' || !difficulty) return;
+        if (typeof difficulty === "undefined" || !difficulty) return;
+        window.__rcaRunStartMs = Date.now();
+        removeFailModal();
         showTickerRunning();
       },
       true
     );
   }
 
-  var clearLbBtn = el('rca-btn-clear-leaderboard');
+  var clearLbBtn = el("rca-btn-clear-leaderboard");
   if (clearLbBtn) {
-    clearLbBtn.addEventListener('click', function () {
+    clearLbBtn.addEventListener("click", function () {
       localStorage.removeItem(LB_KEY);
       refreshLeaderboardTable();
       refreshRunHistoryTimeline();
     });
   }
 
-  var dismissTicker = el('rca-score-ticker-dismiss');
+  var dismissTicker = el("rca-score-ticker-dismiss");
   if (dismissTicker) {
-    dismissTicker.addEventListener('click', function () {
+    dismissTicker.addEventListener("click", function () {
       if (tickerEl) {
-        tickerEl.classList.remove('is-visible');
+        tickerEl.classList.remove("is-visible");
         tickerEl.hidden = true;
       }
     });
@@ -1411,23 +1817,23 @@ body.rca-leaderboard-on .main {
   function drawShareCard() {
     if (!lastRunPayload || !lastRunPayload.data) return;
     var data = lastRunPayload.data;
-    var scenKey = lastRunPayload.scenarioKey || '';
-    var f = data.scores && typeof data.scores.final_score === 'number' ? data.scores.final_score : 0;
+    var scenKey = lastRunPayload.scenarioKey || "";
+    var f = data.scores && typeof data.scores.final_score === "number" ? data.scores.final_score : 0;
     var pct = Math.round(f * 1000) / 10;
     var W = 800;
     var H = 450;
-    var canvas = document.createElement('canvas');
+    var canvas = document.createElement("canvas");
     canvas.width = W;
     canvas.height = H;
-    var ctx = canvas.getContext('2d');
-    var glow = '#facc15';
-    if (pct >= 80) glow = '#d4af37';
-    if (pct < 50) glow = '#ef4444';
+    var ctx = canvas.getContext("2d");
+    var glow = "#facc15";
+    if (pct >= 80) glow = "#d4af37";
+    if (pct < 50) glow = "#ef4444";
 
-    ctx.fillStyle = '#0a0f1a';
+    ctx.fillStyle = "#0a0f1a";
     ctx.fillRect(0, 0, W, H);
 
-    ctx.strokeStyle = 'rgba(56,139,253,0.12)';
+    ctx.strokeStyle = "rgba(56,139,253,0.12)";
     ctx.lineWidth = 1;
     var gx, gy;
     for (gx = 0; gx < W; gx += 24) {
@@ -1461,30 +1867,30 @@ body.rca-leaderboard-on .main {
     ctx.strokeRect(14, 14, W - 28, H - 28);
     ctx.shadowBlur = 0;
 
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = "#ffffff";
     ctx.font = 'bold 26px "Courier New", monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('RCAAGENT', 40, 48);
-    ctx.fillStyle = '#94a3b8';
+    ctx.textAlign = "left";
+    ctx.fillText("RCAAGENT", 40, 48);
+    ctx.fillStyle = "#94a3b8";
     ctx.font = '12px "Courier New", monospace';
-    ctx.fillText('AI-Powered Root Cause Analysis', 40, 68);
+    ctx.fillText("AI-Powered Root Cause Analysis", 40, 68);
 
     var diff = scenKey.toLowerCase();
-    var pillBg = '#14532d';
-    var pillFg = '#bbf7d0';
-    if (diff === 'medium') {
-      pillBg = '#713f12';
-      pillFg = '#fde68a';
+    var pillBg = "#14532d";
+    var pillFg = "#bbf7d0";
+    if (diff === "medium") {
+      pillBg = "#713f12";
+      pillFg = "#fde68a";
     }
-    if (diff === 'hard') {
-      pillBg = '#7f1d1d';
-      pillFg = '#fecaca';
+    if (diff === "hard") {
+      pillBg = "#7f1d1d";
+      pillFg = "#fecaca";
     }
-    if (diff === 'ddos') {
-      pillBg = '#9a3412';
-      pillFg = '#ffedd5';
+    if (diff === "ddos") {
+      pillBg = "#9a3412";
+      pillFg = "#ffedd5";
     }
-    var pillText = (scenKey || '—').toUpperCase();
+    var pillText = (scenKey || "—").toUpperCase();
     ctx.font = 'bold 12px "Courier New", monospace';
     var tw = ctx.measureText(pillText).width;
     var pw = tw + 28;
@@ -1494,151 +1900,152 @@ body.rca-leaderboard-on .main {
     canvasRoundRect(ctx, px, py, pw, 28, 14);
     ctx.fill();
     ctx.fillStyle = pillFg;
-    ctx.textAlign = 'center';
+    ctx.textAlign = "center";
     ctx.fillText(pillText, px + pw / 2, py + 19);
 
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#e6edf3';
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#e6edf3";
     ctx.font = 'bold 32px "Courier New", monospace';
     ctx.fillText(scenarioTitleFromKey(scenKey), W / 2, 150);
 
     ctx.font = 'bold 88px "Courier New", monospace';
-    ctx.fillStyle = pct >= 80 ? '#fcd34d' : pct < 50 ? '#f87171' : '#facc15';
-    ctx.fillText(Math.round(pct) + '%', W / 2, 260);
+    ctx.fillStyle = pct >= 80 ? "#fcd34d" : pct < 50 ? "#f87171" : "#facc15";
+    ctx.fillText(Math.round(pct) + "%", W / 2, 260);
 
-    ctx.fillStyle = '#64748b';
+    ctx.fillStyle = "#64748b";
     ctx.font = '18px "Courier New", monospace';
-    ctx.fillText('STEPS USED: ' + (data.steps != null ? data.steps : '—'), W / 2, 310);
+    ctx.fillText("STEPS USED: " + (data.steps != null ? data.steps : "—"), W / 2, 310);
 
     ctx.font = '11px "Courier New", monospace';
-    ctx.textAlign = 'left';
+    ctx.textAlign = "left";
     ctx.fillText(new Date().toLocaleString(), 40, H - 44);
-    ctx.textAlign = 'right';
-    ctx.fillText('sujal-sk-01/rcaFinall', W - 40, H - 44);
+    ctx.textAlign = "right";
+    ctx.fillText("sujal-sk-01/rcaFinall", W - 40, H - 44);
 
-    var safeScen = (scenKey || 'run').replace(/[^a-z0-9_-]+/gi, '-').slice(0, 40);
-    var safeScore = String(Math.round(pct)).replace(/[^0-9.-]/g, '');
-    var fname = 'rca-result-' + safeScen + '-' + safeScore + '.png';
+    var safeScen = (scenKey || "run").replace(/[^a-z0-9_-]+/gi, "-").slice(0, 40);
+    var safeScore = String(Math.round(pct)).replace(/[^0-9.-]/g, "");
+    var fname = "rca-result-" + safeScen + "-" + safeScore + ".png";
 
     canvas.toBlob(function (blob) {
       if (!blob) return;
-      var a = document.createElement('a');
+      var a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = fname;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
-    }, 'image/png');
+    }, "image/png");
   }
 
   function escapeHtml(s) {
     return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   function openPrintReport() {
     if (!lastRunPayload || !lastRunPayload.data) return;
     var data = lastRunPayload.data;
-    var scen = typeof difficulty !== 'undefined' ? difficulty : lastRunPayload.scenarioKey || '—';
-    var f = data.scores && typeof data.scores.final_score === 'number' ? data.scores.final_score : 0;
+    var scen = typeof difficulty !== "undefined" ? difficulty : lastRunPayload.scenarioKey || "—";
+    var f = data.scores && typeof data.scores.final_score === "number" ? data.scores.final_score : 0;
     var pct = Math.round(f * 1000) / 10;
-    var scoreColor = pct >= 80 ? '#16a34a' : pct < 50 ? '#dc2626' : '#ca8a04';
-    var totalDisp = data.scores && data.scores.total != null ? String(data.scores.total) : String(pct) + '%';
+    var scoreColor = pct >= 80 ? "#16a34a" : pct < 50 ? "#dc2626" : "#ca8a04";
+    var totalDisp =
+      data.scores && data.scores.total != null ? String(data.scores.total) : String(pct) + "%";
 
     var rep = data.report || {};
-    var summary = rep.summary || '—';
+    var summary = rep.summary || "—";
     var rootLine = rep.root_cause_service
-      ? rep.root_cause_service + ' (' + (rep.root_cause_type || '') + ')'
-      : '—';
-    var rec = rep.suggested_fix || '';
+      ? rep.root_cause_service + " (" + (rep.root_cause_type || "") + ")"
+      : "—";
+    var rec = rep.suggested_fix || "";
 
-    var timelineHtml = '';
+    var timelineHtml = "";
     var hist = data.history || [];
     hist.forEach(function (h, i) {
       var act = h.action || {};
-      var at = act.action_type || 'step';
-      var tgt = act.target_service ? ' → ' + act.target_service : '';
+      var at = act.action_type || "step";
+      var tgt = act.target_service ? " → " + act.target_service : "";
       timelineHtml +=
         '<tr><td class="mono">' +
         (i + 1) +
         '</td><td class="mono">' +
         escapeHtml(at) +
         escapeHtml(tgt) +
-        '</td></tr>';
+        "</td></tr>";
     });
     if (!timelineHtml) {
       timelineHtml = '<tr><td colspan="2" class="muted">No step history.</td></tr>';
     }
 
     var html =
-      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RCA Report</title>' +
-      '<style>' +
-      'body{font-family:Georgia,Times,serif;color:#111;background:#fff;margin:24px;line-height:1.5;}' +
-      '.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:16px;margin-bottom:20px;}' +
-      '.hdr h1{font-size:18px;font-weight:700;margin:0;max-width:70%;}' +
-      '.score-big{font-size:36px;font-weight:900;font-family:ui-monospace,monospace;}' +
-      'table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;}' +
-      'th,td{border:1px solid #ccc;padding:8px;text-align:left;}' +
-      'th{background:#f5f5f5;font-weight:700;}' +
-      '.section{margin-top:24px;}' +
-      '.section h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #ddd;padding-bottom:6px;}' +
-      '.mono{font-family:ui-monospace,Courier,monospace;font-size:11px;}' +
-      '.muted{color:#666;}' +
-      '.footer{margin-top:40px;font-size:10px;color:#666;text-align:center;border-top:1px solid #ddd;padding-top:12px;}' +
-      '@media print{body{margin:16px;}}' +
-      '</style></head><body>' +
-      '<div class="hdr"><h1>RCAAGENT — INCIDENT ROOT CAUSE ANALYSIS REPORT</h1>' +
+      "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>RCA Report</title>" +
+      "<style>" +
+      "body{font-family:Georgia,Times,serif;color:#111;background:#fff;margin:24px;line-height:1.5;}" +
+      ".hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:16px;margin-bottom:20px;}" +
+      ".hdr h1{font-size:18px;font-weight:700;margin:0;max-width:68%;}" +
+      ".score-big{font-size:36px;font-weight:900;font-family:ui-monospace,monospace;}" +
+      "table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px;}" +
+      "th,td{border:1px solid #ccc;padding:8px;text-align:left;}" +
+      "th{background:#f5f5f5;font-weight:700;}" +
+      ".section{margin-top:24px;}" +
+      ".section h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #ddd;padding-bottom:6px;}" +
+      ".mono{font-family:ui-monospace,Courier,monospace;font-size:11px;}" +
+      ".muted{color:#666;}" +
+      ".footer{margin-top:40px;font-size:10px;color:#666;text-align:center;border-top:1px solid #ddd;padding-top:12px;}" +
+      "@media print{body{margin:16px;}}" +
+      "</style></head><body>" +
+      '<div class="hdr"><h1>RCAAGENT — INCIDENT RCA REPORT</h1>' +
       '<div class="score-big" style="color:' +
       scoreColor +
       '">' +
       escapeHtml(String(pct)) +
-      '%</div></div>' +
-      '<table><tr><th>Scenario</th><th>Difficulty</th><th>Score</th><th>Steps</th><th>Timestamp</th></tr>' +
-      '<tr><td class="mono">' +
+      "%</div></div>" +
+      "<table><tr><th>Scenario</th><th>Difficulty</th><th>Score</th><th>Steps</th><th>Timestamp</th></tr>" +
+      "<tr><td class=\"mono\">" +
       escapeHtml(String(scen)) +
-      '</td><td class="mono">' +
+      "</td><td class=\"mono\">" +
       escapeHtml(String(data.difficulty || scen)) +
-      '</td><td class="mono">' +
+      "</td><td class=\"mono\">" +
       escapeHtml(totalDisp) +
-      '</td><td class="mono">' +
-      escapeHtml(String(data.steps != null ? data.steps : '—')) +
-      '</td><td class="mono">' +
+      "</td><td class=\"mono\">" +
+      escapeHtml(String(data.steps != null ? data.steps : "—")) +
+      "</td><td class=\"mono\">" +
       escapeHtml(new Date().toLocaleString()) +
-      '</td></tr></table>' +
+      "</td></tr></table>" +
       '<div class="section"><h2>Executive summary</h2><p>' +
       escapeHtml(summary) +
-      '</p></div>' +
+      "</p></div>" +
       '<div class="section"><h2>Investigation timeline</h2><table><tr><th>#</th><th>Action</th></tr>' +
       timelineHtml +
-      '</table></div>' +
+      "</table></div>" +
       '<div class="section"><h2>Root cause</h2><p class="mono">' +
       escapeHtml(rootLine) +
-      '</p></div>';
+      "</p></div>";
 
     if (rec) {
       html +=
-        '<div class="section"><h2>Recommendations</h2><p>' + escapeHtml(rec) + '</p></div>';
+        '<div class="section"><h2>Recommendations</h2><p>' + escapeHtml(rec) + "</p></div>";
     }
 
     html +=
       '<div class="footer">Generated by RCAAGENT | AI-Powered Incident Analysis</div>' +
-      '<script>window.onload=function(){window.print();}<\/script></body></html>';
+      "<script>window.onload=function(){window.print();}<\/script></body></html>";
 
-    var w = window.open('', '_blank');
+    var w = window.open("", "_blank");
     if (!w) return;
     w.document.open();
     w.document.write(html);
     w.document.close();
   }
 
-  var shareBtn = el('rca-btn-share-result');
-  if (shareBtn) shareBtn.addEventListener('click', drawShareCard);
-  var pdfBtn = el('rca-btn-export-pdf');
-  if (pdfBtn) pdfBtn.addEventListener('click', openPrintReport);
+  var shareBtn = el("rca-btn-share-result");
+  if (shareBtn) shareBtn.addEventListener("click", drawShareCard);
+  var pdfBtn = el("rca-btn-export-pdf");
+  if (pdfBtn) pdfBtn.addEventListener("click", openPrintReport);
 
   function boot() {
     injectNavLeaderboard();
@@ -1646,12 +2053,13 @@ body.rca-leaderboard-on .main {
     refreshRunHistoryTimeline();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
   } else {
     boot();
   }
 })();
 </script>
+
 </body>
 </html>
