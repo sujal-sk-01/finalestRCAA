@@ -8,107 +8,122 @@
 html{scroll-behavior:smooth}
 *{margin:0;padding:0;box-sizing:border-box}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-body{animation:fadeIn .6s ease both;background:#ffffff;color:#0a0a0f;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:#f3f4f6}
-::-webkit-scrollbar-thumb{background:#e5e7eb}
+body{animation:fadeIn .6s ease both;background:#080c14;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0d1117}
+::-webkit-scrollbar-thumb{background:#1e2d3d;border-radius:3px}
 
 /* NAVBAR */
-.nav{background:#ffffff;border-bottom:1px solid #e5e7eb;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
-.brand{font-weight:900;letter-spacing:2px;color:#0a0a0f;font-size:13px}
+.nav{background:#080c14;border-bottom:1px solid #1e2d3d;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.brand{font-weight:900;letter-spacing:3px;color:#e6edf3;font-size:13px}
 .nav-links{display:flex;gap:22px;align-items:center}
-.nav-links a{color:#0a0a0f;text-decoration:none;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
-.nav-links a:hover{color:#2563eb}
-.system-live{display:flex;align-items:center;gap:8px;background:#16a34a1a;border:1px solid #16a34a;border-radius:999px;padding:6px 12px;color:#16a34a;font-weight:800;font-size:11px;letter-spacing:.5px}
-.live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.15)}
+.nav-links a{color:#7d8590;text-decoration:none;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.nav-links a:hover{color:#e6edf3}
+.system-live{display:flex;align-items:center;gap:8px;background:rgba(63,185,80,.08);border:1px solid #3fb950;border-radius:999px;padding:6px 12px;color:#3fb950;font-weight:800;font-size:11px;letter-spacing:.5px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#3fb950;box-shadow:0 0 0 4px rgba(63,185,80,.2)}
 
 /* HERO */
-.hero{min-height:calc(100vh - 60px);background:#0a0a0f;color:#ffffff;display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 18px}
-.hero-inner{max-width:980px}
-.hero-title{font-family:ui-serif,-apple-system,BlinkMacSystemFont,sans-serif;font-size:80px;font-weight:900;line-height:1.0;margin-bottom:22px}
-.hero-title .highlight{color:#3b82f6}
-.hero-sub{color:#9ca3af;font-size:16px;line-height:1.8;margin:0 auto 22px;max-width:720px}
-.scroll-hint{color:#cbd5e1;font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-top:38px;display:flex;align-items:center;justify-content:center;gap:10px}
-.scroll-arrow{font-size:22px;line-height:1;margin-top:2px}
+.hero{background:#080c14;min-height:320px;display:grid;grid-template-columns:1fr minmax(280px,420px);gap:48px;align-items:center;padding:48px 60px 48px 60px;border-bottom:1px solid #1e2d3d}
+.hero-copy{max-width:640px}
+.hero-title{font-size:64px;font-weight:900;line-height:1.05;color:#e6edf3;margin-bottom:16px}
+.hero-title .line2{display:block}
+.hero-title .highlight{color:#388bfd}
+.hero-sub{color:#7d8590;font-size:15px;line-height:1.75;margin-bottom:20px;max-width:520px}
+.hero-badge{display:inline-block;font-family:'Courier New',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;color:#7d8590;border:1px solid #1e2d3d;background:#0d1117;padding:6px 12px;border-radius:4px}
+.hero-terminal-wrap{background:#0d1117;border:1px solid #1e2d3d;border-radius:6px;padding:20px;min-height:200px;display:flex;flex-direction:column}
+.hero-terminal-label{font-size:10px;font-weight:900;letter-spacing:2px;color:#7d8590;margin-bottom:12px}
+.hero-term-line{font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#3fb950;min-height:4.2em;white-space:pre-wrap;word-break:break-word}
 
-/* METRICS SECTION */
-.metrics-bar{background:#ffffff;border-bottom:1px solid #e5e7eb;display:flex}
-.metrics-bar .metric{flex:1;padding:32px 48px;border-right:1px solid #e5e7eb}
+/* METRICS */
+.metrics-bar{background:#0d1117;border-top:1px solid #1e2d3d;border-bottom:1px solid #1e2d3d;display:flex}
+.metrics-bar .metric{flex:1;padding:28px 40px;border-right:1px solid #1e2d3d}
 .metrics-bar .metric:last-child{border-right:none}
-.metrics-bar .metric-value{font-size:34px;font-weight:900;color:#0a0a0f}
-.metrics-bar .metric-value.blue{color:#3b82f6}
-.metrics-bar .metric-value.green{color:#16a34a}
-.metrics-bar .metric-value.yellow{color:#f59e0b}
-.metrics-bar .metric-label{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#6b7280}
+.metrics-bar .metric-value{font-size:32px;font-weight:900;color:#e6edf3}
+.metrics-bar .metric-value.blue{color:#388bfd}
+.metrics-bar .metric-value.green{color:#3fb950}
+.metrics-bar .metric-value.yellow{color:#d29922}
+.metrics-bar .metric-label{margin-top:10px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#7d8590}
 
-/* MAIN LAYOUT */
-.main{background:#ffffff;display:flex;min-height:calc(100vh - 60px - 130px)}
-.left-panel{width:300px;border-right:1px solid #e5e7eb;background:#ffffff;padding:18px 14px;display:flex;flex-direction:column}
-.right-panel{flex:1;background:#0a0a0f;display:flex;flex-direction:column}
+/* MAIN */
+.main{background:#080c14;display:flex;min-height:calc(100vh - 56px - 320px - 120px)}
+.left-panel{width:280px;border-right:1px solid #1e2d3d;background:#0d1117;padding:18px 14px;display:flex;flex-direction:column}
+.right-panel{flex:1;background:#080c14;display:flex;flex-direction:column}
 
 /* SCENARIO CARDS */
-.scenario-card{width:100%;text-align:left;background:#ffffff;border:1px solid #e5e7eb;border-left:2px solid transparent;border-radius:6px;padding:14px 14px;margin-bottom:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:8px}
-.scenario-card:hover{border-left-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.08)}
-.scenario-card.selected{border-left-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12)}
-.scenario-title{font-size:13px;font-weight:900;color:#0a0a0f;line-height:1.2}
-.scenario-meta{font-size:11px;color:#6b7280;line-height:1.6}
+.scenario-card{width:100%;text-align:left;background:#080c14;border:1px solid #1e2d3d;border-left:3px solid transparent;border-radius:4px;padding:14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;gap:8px}
+.scenario-card:hover{border-left-color:#388bfd;box-shadow:0 0 0 1px rgba(56,139,253,.15)}
+.scenario-card.selected{border-left-color:#388bfd;box-shadow:0 0 0 1px rgba(56,139,253,.25)}
+.scenario-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.scenario-title{font-size:13px;font-weight:700;color:#e6edf3;line-height:1.2}
+.scenario-meta{font-size:11px;color:#7d8590;line-height:1.6}
 .badge{display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;border-radius:999px;padding:4px 10px;border:1px solid transparent;width:max-content}
-.badge-easy{background:#dcfce7;color:#166534;border-color:#16a34a}
-.badge-medium{background:#ffedd5;color:#9a3412;border-color:#f97316}
-.badge-hard{background:#fee2e2;color:#991b1b;border-color:#ef4444}
-.badge-ddos{background:#ede9fe;color:#6d28d9;border-color:#a78bfa}
+.badge-easy{background:rgba(63,185,80,.12);color:#3fb950;border-color:rgba(63,185,80,.35)}
+.badge-medium{background:rgba(210,153,34,.12);color:#d29922;border-color:rgba(210,153,34,.4)}
+.badge-hard{background:rgba(248,81,73,.12);color:#f85149;border-color:rgba(248,81,73,.35)}
+.badge-ddos{background:rgba(188,140,255,.12);color:#bc8cff;border-color:rgba(188,140,255,.35)}
+.severity-p0{background:#450a0a;color:#f85149;border:1px solid #f85149;border-radius:4px;font-size:9px;font-weight:900;letter-spacing:1px;padding:2px 6px;animation:pulse-red 1.5s infinite}
+.severity-p1{background:#431407;color:#f97316;border:1px solid #f97316;border-radius:4px;font-size:9px;font-weight:900;letter-spacing:1px;padding:2px 6px}
+.severity-p2{background:#1c1917;color:#d29922;border:1px solid #d29922;border-radius:4px;font-size:9px;font-weight:900;letter-spacing:1px;padding:2px 6px}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(248,81,73,0.4)}50%{box-shadow:0 0 0 6px rgba(248,81,73,0)}}
 
 /* RUN BUTTON */
-.run-btn{width:100%;background:#0a0a0f;color:#ffffff;border:0;border-radius:0;margin-top:8px;padding:16px 12px;cursor:pointer;font-weight:900;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s}
-.run-btn:hover:not(:disabled){background:#3b82f6}
-.run-btn:disabled{opacity:.6;cursor:not-allowed}
-.run-btn.running{background:#7c3aed}
+.run-btn{width:100%;background:#388bfd;color:#fff;border:0;border-radius:4px;margin-top:8px;padding:16px 12px;cursor:pointer;font-weight:900;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s}
+.run-btn:hover:not(:disabled){background:#58a6ff}
+.run-btn:disabled{opacity:.4;cursor:not-allowed}
+.run-btn.running{background:#8957e5}
+.run-btn.running:hover:not(:disabled){background:#8957e5}
 
 /* TERMINAL */
-.terminal-topbar{padding:14px 16px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between}
+.terminal-topbar{padding:14px 16px;background:#0d1117;border-bottom:1px solid #1e2d3d;display:flex;align-items:center;justify-content:space-between}
 .terminal-tabs{display:flex;gap:18px}
-.tab{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#6b7280}
-.tab.active{color:#3b82f6}
-.action-btn{background:transparent;border:1px solid #374151;color:#9ca3af;border-radius:4px;padding:8px 12px;font-family:'Courier New',monospace;font-size:11px;cursor:pointer}
-.action-btn:hover{border-color:#3b82f6;color:#e5e7eb}
-.terminal-body{flex:1;padding:32px;overflow-y:auto;font-size:12px;line-height:1.9;font-family:'Courier New',monospace}
-.placeholder-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#334155;text-align:center}
+.tab{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#7d8590;padding-bottom:10px;margin-bottom:-14px;border-bottom:2px solid transparent}
+.tab.active{color:#388bfd;border-bottom-color:#388bfd}
+.action-btn{background:transparent;border:1px solid #1e2d3d;color:#7d8590;border-radius:4px;padding:8px 12px;font-family:'Courier New',monospace;font-size:11px;cursor:pointer}
+.action-btn:hover{border-color:#388bfd;color:#e6edf3}
+.terminal-body{flex:1;height:520px;max-height:520px;padding:24px 28px;overflow-y:auto;font-size:12px;line-height:1.9;font-family:'Courier New',monospace;background:#080c14}
+.placeholder-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7d8590;text-align:center}
 .placeholder-icon{font-size:48px;margin-bottom:16px;opacity:.35}
-.placeholder-text{font-size:13px;letter-spacing:1px}
+.placeholder-text{font-size:12px;letter-spacing:1px}
 
 .log-line{display:flex;align-items:flex-start;gap:0;margin-bottom:6px;animation:fadeIn .25s ease}
-.log-ts{color:#94a3b8;min-width:72px;font-size:11px;padding-top:1px}
+.log-ts{color:#7d8590;min-width:72px;font-size:11px;padding-top:1px}
 .log-badge{min-width:120px;font-size:10px;font-weight:900;letter-spacing:1px;padding-top:1px;text-transform:uppercase}
-.log-content{flex:1;color:#9ca3af}
-.lb-step{color:#3b82f6}
-.lb-action{color:#22c55e}
-.lb-system{color:#a78bfa}
-.lb-anomaly{color:#ef4444}
-.lb-success{color:#22c55e}
-.lb-reward{color:#f59e0b}
-.lb-error{color:#ef4444}
-.lb-info{color:#8b5cf6}
-.highlight-service{color:#fbbf24;font-weight:700}
-.highlight-score{color:#4ade80;font-weight:700}
+.log-content{flex:1;color:#7d8590}
+.lb-step{color:#388bfd}
+.lb-action{color:#3fb950}
+.lb-system{color:#bc8cff}
+.lb-anomaly{color:#f85149}
+.lb-success{color:#3fb950}
+.lb-reward{color:#d29922}
+.lb-error{color:#f85149}
+.lb-info{color:#bc8cff}
+.highlight-service{color:#d29922;font-weight:700}
+.highlight-score{color:#3fb950;font-weight:700}
 
 /* SCORE PANEL */
-.score-panel{background:#ffffff;border-top:1px solid #e5e7eb;display:none;padding:18px 16px}
+.score-panel{background:#0d1117;border-top:1px solid #1e2d3d;display:none;padding:18px 16px}
 .score-panel.show{display:block}
 .score-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.score-title{color:#0f172a;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
-.score-final{font-size:42px;font-weight:900;color:#0a0a0f}
-.score-final.green{color:#16a34a}
-.score-final.yellow{color:#f59e0b}
-.score-final.red{color:#ef4444}
+.score-title{color:#7d8590;font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+.score-final{font-size:42px;font-weight:900;color:#e6edf3}
+.score-final.green{color:#3fb950}
+.score-final.yellow{color:#d29922}
+.score-final.red{color:#f85149}
 .score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:10px}
-.score-item{background:#ffffff;border:1px solid #e5e7eb;border-radius:6px;padding:12px;text-align:center}
-.score-item-label{color:#6b7280;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.score-item{background:#080c14;border:1px solid #1e2d3d;border-radius:6px;padding:12px;text-align:center}
+.score-item-label{color:#7d8590;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
 .score-item-val{font-size:18px;font-weight:900}
-.siv-green{color:#16a34a}
-.siv-yellow{color:#f59e0b}
-.siv-red{color:#ef4444}
-.report-box{background:#ffffff;border:1px solid #e5e7eb;border-radius:6px;padding:14px;margin-top:12px;font-size:12px;color:#0f172a;line-height:1.8}
-.report-box span{color:#6b7280}
+.siv-green{color:#3fb950}
+.siv-yellow{color:#d29922}
+.siv-red{color:#f85149}
+.report-box{background:#080c14;border:1px solid #1e2d3d;border-radius:6px;padding:14px;margin-top:12px;font-size:12px;color:#e6edf3;line-height:1.8}
+.report-box span{color:#7d8590}
+@keyframes networkRootPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(248,81,73,.9));opacity:1}50%{filter:drop-shadow(0 0 16px rgba(248,81,73,.5));opacity:.88}}
+.network-root-pulse{animation:networkRootPulse 2s ease-in-out infinite}
+
+@media (max-width:1024px){
+  .hero{grid-template-columns:1fr;padding:32px 24px}
+}
 </style>
 </head>
 <body>
@@ -116,18 +131,22 @@ body{animation:fadeIn .6s ease both;background:#ffffff;color:#0a0a0f;font-family
 <nav class="nav">
   <div class="brand">RCAAGENT</div>
   <div class="nav-links">
-    <a href="/docs">API DOCS</a>
-    <a href="/tasks">TASKS</a>
-    <a href="/openapi.json">SCHEMA</a>
+    <a href="/docs" target="_blank">API DOCS</a>
+    <a href="#scenarios" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'});return false;">TASKS</a>
+    <a href="#" onclick="showSchema();return false;">SCHEMA</a>
   </div>
-  <div class="system-live"><span class="live-dot"></span>SYSTEM LIVE</div>
+  <div class="system-live"><span class="live-dot"></span>● SYSTEM LIVE</div>
 </nav>
 
 <section class="hero">
-  <div class="hero-inner">
-    <div class="hero-title">AI-Powered Incident <span class="highlight">Root Cause</span> Analysis</div>
+  <div class="hero-copy">
+    <div class="hero-title">AI-Powered<span class="line2"><span class="highlight">Root Cause</span> Analysis</span></div>
     <div class="hero-sub">Deploy AI agents into simulated production failures. Watch them investigate microservice dependencies, query metrics and distributed traces, then deliver structured RCA reports.</div>
-    <div class="scroll-hint">Scroll to Explore <span class="scroll-arrow">↓</span></div>
+    <div class="hero-badge">POWERED BY GROQ + LLAMA 3.3</div>
+  </div>
+  <div class="hero-terminal-wrap">
+    <div class="hero-terminal-label">LIVE AGENT TRACE</div>
+    <pre id="heroTermLine" class="hero-term-line"></pre>
   </div>
 </section>
 
@@ -150,30 +169,42 @@ body{animation:fadeIn .6s ease both;background:#ffffff;color:#0a0a0f;font-family
   </div>
 </section>
 
-<div class="main">
+<div class="main" id="scenarios">
   <aside class="left-panel">
-    <div style="margin:8px 8px 14px;font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;color:#6b7280">Scenarios</div>
+    <div style="margin:8px 8px 14px;font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;color:#7d8590">Scenarios</div>
 
     <button class="scenario-card" onclick="select('easy',this)">
-      <div class="scenario-title">INC-001 · Cache Failure</div>
+      <div class="scenario-title-row">
+        <div class="scenario-title">INC-001 · Cache Failure</div>
+        <span class="severity-p2">P2</span>
+      </div>
       <div class="badge badge-easy">EASY</div>
       <div class="scenario-meta">Optimal: 3 queries · 1 root service</div>
     </button>
 
     <button class="scenario-card" onclick="select('medium',this)">
-      <div class="scenario-title">INC-002 · Config Cascade</div>
+      <div class="scenario-title-row">
+        <div class="scenario-title">INC-002 · Config Cascade</div>
+        <span class="severity-p1">P1</span>
+      </div>
       <div class="badge badge-medium">MEDIUM</div>
       <div class="scenario-meta">Optimal: 6 queries · 4 services</div>
     </button>
 
     <button class="scenario-card" onclick="select('hard',this)">
-      <div class="scenario-title">INC-003 · AZ Packet Loss</div>
+      <div class="scenario-title-row">
+        <div class="scenario-title">INC-003 · AZ Packet Loss</div>
+        <span class="severity-p0">P0</span>
+      </div>
       <div class="badge badge-hard">HARD</div>
       <div class="scenario-meta">Optimal: 10 queries · 12 services</div>
     </button>
 
     <button class="scenario-card" onclick="select('ddos',this)">
-      <div class="scenario-title">INC-004 · DDoS Attack</div>
+      <div class="scenario-title-row">
+        <div class="scenario-title">INC-004 · DDoS Attack</div>
+        <span class="severity-p0">P0</span>
+      </div>
       <div class="badge badge-ddos">DDOS</div>
       <div class="scenario-meta">Optimal: 4 queries · 5 services</div>
     </button>
@@ -210,6 +241,7 @@ body{animation:fadeIn .6s ease both;background:#ffffff;color:#0a0a0f;font-family
       <div class="score-grid" id="scoreGrid"></div>
       <div class="report-box" id="reportBox"></div>
     </div>
+    <div id="networkGraph" style="display:none;background:#080c14;border-top:1px solid #1e2d3d;padding:32px"></div>
   </section>
 </div>
 
@@ -245,14 +277,83 @@ function addLog(badge, badgeClass, content) {
   tb.scrollTop = tb.scrollHeight;
 }
 
+function showIncidentAlarm(difficulty) {
+  const severities = {easy:'P2',medium:'P1',hard:'P0',ddos:'P0'};
+  const sev = severities[difficulty] || 'P1';
+  const alarm = document.createElement('div');
+  alarm.id = 'incidentAlarm';
+  alarm.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.3s ease';
+  alarm.innerHTML = `
+    <div style="border:2px solid #ef4444;padding:48px 64px;text-align:center;background:#0a0a0f;max-width:500px;animation:pulse-red 0.8s infinite">
+      <div style="font-size:48px;margin-bottom:16px">🚨</div>
+      <div style="color:#ef4444;font-size:11px;font-weight:900;letter-spacing:4px;margin-bottom:12px">CRITICAL INCIDENT DETECTED</div>
+      <div style="color:#ffffff;font-size:28px;font-weight:900;margin-bottom:8px">${difficulty.toUpperCase()} SCENARIO</div>
+      <div style="color:#ef4444;font-size:13px;font-weight:900;letter-spacing:2px;margin-bottom:24px">SEVERITY: ${sev}</div>
+      <div style="color:#6b7280;font-size:11px;font-family:Courier New,monospace">Deploying AI Agent in 3 seconds...</div>
+      <div style="margin-top:16px;height:3px;background:#1f2937;border-radius:2px;overflow:hidden">
+        <div id="alarmProgress" style="height:100%;background:#ef4444;width:0%;transition:width 3s linear"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(alarm);
+  setTimeout(() => { document.getElementById('alarmProgress').style.width = '100%'; }, 100);
+  return new Promise(resolve => setTimeout(() => { alarm.remove(); resolve(); }, 3000));
+}
+
+function showSchema() {
+  const existing = document.getElementById('schemaModal');
+  if(existing) { existing.remove(); return; }
+  const modal = document.createElement('div');
+  modal.id = 'schemaModal';
+  modal.style = 'position:fixed;top:56px;right:0;width:420px;height:calc(100vh - 56px);background:#0a0a0f;border-left:1px solid #1f2937;z-index:999;overflow-y:auto;padding:24px;font-family:Courier New,monospace';
+  modal.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="color:#fff;font-size:11px;font-weight:900;letter-spacing:2px">API SCHEMA</div>
+      <button onclick="document.getElementById('schemaModal').remove()" style="background:transparent;border:1px solid #374151;color:#9ca3af;padding:4px 8px;cursor:pointer;font-size:11px">✕ CLOSE</button>
+    </div>
+    <div style="color:#4ade80;font-size:11px;margin-bottom:8px">POST /baseline</div>
+    <div style="background:#111827;border:1px solid #1f2937;padding:12px;border-radius:4px;color:#e5e7eb;font-size:11px;line-height:1.8;margin-bottom:16px">
+      { "difficulty": "easy" | "medium" | "hard" | "ddos" }
+    </div>
+    <div style="color:#4ade80;font-size:11px;margin-bottom:8px">GET /tasks</div>
+    <div style="background:#111827;border:1px solid #1f2937;padding:12px;border-radius:4px;color:#e5e7eb;font-size:11px;line-height:1.8;margin-bottom:16px">
+      Returns list of all available scenarios
+    </div>
+    <div style="color:#4ade80;font-size:11px;margin-bottom:8px">RESPONSE</div>
+    <div style="background:#111827;border:1px solid #1f2937;padding:12px;border-radius:4px;color:#e5e7eb;font-size:11px;line-height:1.8">
+      {<br>
+      &nbsp;"difficulty": string,<br>
+      &nbsp;"steps": number,<br>
+      &nbsp;"history": Action[],<br>
+      &nbsp;"report": RCAReport,<br>
+      &nbsp;"scores": {<br>
+      &nbsp;&nbsp;"root_cause_score": 0-1,<br>
+      &nbsp;&nbsp;"causal_path_score": 0-1,<br>
+      &nbsp;&nbsp;"efficiency_score": 0-1,<br>
+      &nbsp;&nbsp;"report_quality_score": 0-1,<br>
+      &nbsp;&nbsp;"final_score": 0-1<br>
+      &nbsp;}<br>
+      }
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
 async function runAgent() {
   if (!difficulty) return;
+  await showIncidentAlarm(difficulty);
   const btn = document.getElementById('runBtn');
   btn.disabled = true;
   btn.classList.add('running');
   document.getElementById('btnIcon').textContent = '◉';
   document.getElementById('btnText').textContent = 'RUNNING...';
   document.getElementById('scorePanel').classList.remove('show');
+  const networkGraphEl = document.getElementById('networkGraph');
+  if (networkGraphEl) {
+    networkGraphEl.style.display = 'none';
+    networkGraphEl.innerHTML = '';
+  }
+  document.querySelectorAll('.agent-decision-tree').forEach((el) => el.remove());
   document.getElementById('termBody').innerHTML = '';
 
   addLog('SYSTEM', 'lb-system', `Initializing agent for scenario: <span class="highlight-service">${difficulty.toUpperCase()}</span>`);
@@ -261,6 +362,45 @@ async function runAgent() {
 
   try {
     const selectedDifficulty = difficulty;
+    document.getElementById('termBody').insertAdjacentHTML('beforeend', `<div id="thinkingBlock" style="margin-top:12px">
+  <div id="thinkDots" style="color:#a78bfa;font-family:'Courier New',monospace;font-size:12px"></div>
+  <div id="elapsedTimer" style="color:#94a3b8;font-family:'Courier New',monospace;font-size:11px;margin-top:6px"></div>
+</div>`);
+    const thinkDotsEl = document.getElementById('thinkDots');
+    const elapsedTimerEl = document.getElementById('elapsedTimer');
+    const frames = [
+      '◉ Agent scanning dependencies...',
+      '◉ Agent querying metrics...',
+      '◉ Agent analyzing logs...',
+      '◉ Agent forming hypothesis...',
+      '◉ Agent cross-referencing anomalies...',
+      '◉ Agent validating root cause...',
+    ];
+    let frameIdx = 0;
+    thinkDotsEl.textContent = frames[0];
+    const thinkStart = Date.now();
+    elapsedTimerEl.textContent = '⏱ Elapsed: 0s';
+    var dotsInterval = setInterval(() => {
+      frameIdx = (frameIdx + 1) % frames.length;
+      thinkDotsEl.textContent = frames[frameIdx];
+    }, 400);
+    var timerInterval = setInterval(() => {
+      elapsedTimerEl.textContent = '⏱ Elapsed: ' + Math.floor((Date.now() - thinkStart) / 1000) + 's';
+    }, 1000);
+    const slaSeconds = {easy:120, medium:240, hard:480, ddos:300};
+    let slaRemaining = slaSeconds[difficulty] || 240;
+    const slaEl = document.createElement('div');
+    slaEl.id = 'slaTimer';
+    slaEl.style = 'margin-top:8px;font-family:Courier New,monospace;font-size:12px';
+    document.getElementById('thinkingBlock').appendChild(slaEl);
+    var slaInterval = setInterval(() => {
+      slaRemaining--;
+      const mins = Math.floor(slaRemaining/60);
+      const secs = slaRemaining%60;
+      const color = slaRemaining < 30 ? '#ef4444' : slaRemaining < 60 ? '#f59e0b' : '#22c55e';
+      if(slaEl) slaEl.innerHTML = `<span style="color:${color};font-weight:900">⚠ SLA BREACH IN: ${mins}:${secs.toString().padStart(2,'0')}</span>`;
+      if(slaRemaining <= 0) clearInterval(slaInterval);
+    }, 1000);
     const res = await fetch('/baseline', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -268,6 +408,10 @@ async function runAgent() {
       signal: AbortSignal.timeout(600000)
     });
     const data = await res.json();
+    clearInterval(dotsInterval);
+    clearInterval(timerInterval);
+    clearInterval(slaInterval);
+    document.getElementById('thinkingBlock')?.remove();
     console.log('API response:', JSON.stringify(data).slice(0, 200));
 
     if (data.error) {
@@ -288,17 +432,20 @@ async function runAgent() {
         }
 
         if (obs.anomaly_detected) {
+          await new Promise(r => setTimeout(r, 200));
           addLog('', 'lb-anomaly', `  ⚠ ANOMALY DETECTED: ${obs.anomaly_type}`);
         }
         if (obs.data && obs.data.metrics) {
+          await new Promise(r => setTimeout(r, 200));
           const m = obs.data.metrics;
           addLog('', 'lb-system', `  ↳ CPU: ${(m.cpu_usage*100).toFixed(0)}% | Error Rate: ${(m.error_rate*100).toFixed(0)}% | Status: ${m.status}`);
         }
         if (obs.reward) {
+          await new Promise(r => setTimeout(r, 200));
           addLog('', 'lb-reward', `  ↳ +${obs.reward.step_reward.toFixed(3)} reward | cumulative: ${obs.reward.cumulative_reward.toFixed(3)}`);
         }
 
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 400));
       }
 
       addLog('SYSTEM', 'lb-system', '─────────────────────────────────────────────────');
@@ -341,9 +488,118 @@ async function runAgent() {
         }
 
         document.getElementById('scorePanel').classList.add('show');
+
+        if (data.report && networkGraphEl) {
+          const r = data.report;
+          const esc = (t) => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          const root = r.root_cause_service || '';
+          const affList = r.affected_services || [];
+          const affectedSet = new Set(affList);
+          const extraHealthy = Array.isArray(r.healthy_services) ? r.healthy_services : [];
+          const allNames = [...new Set([root, ...affList, ...extraHealthy].filter(Boolean))];
+          const rootX = 620, rootY = 150, rootR = 28;
+          const cx = 280, cy = 150, arcR = 210;
+          const others = allNames.filter((n) => n !== root);
+          const positions = {};
+          positions[root] = { x: rootX, y: rootY, r: rootR, kind: 'root' };
+          others.forEach((name, i) => {
+            const t = others.length <= 1 ? 0.5 : i / (others.length - 1);
+            const angle = Math.PI * 0.95 - t * Math.PI * 0.9;
+            const isAff = affectedSet.has(name);
+            positions[name] = {
+              x: cx + arcR * Math.cos(angle),
+              y: cy + arcR * Math.sin(angle),
+              r: isAff ? 20 : 16,
+              kind: isAff ? 'affected' : 'other',
+            };
+          });
+          let lines = '';
+          let circles = '';
+          let labels = '';
+          const strokeCol = '#374151';
+          allNames.forEach((name) => {
+            const p = positions[name];
+            if (!p) return;
+            if (p.kind !== 'root') {
+              lines += `<line x1="${p.x}" y1="${p.y}" x2="${rootX}" y2="${rootY}" stroke="${strokeCol}" stroke-width="2" opacity="0.85"/>`;
+            }
+          });
+          allNames.forEach((name) => {
+            const p = positions[name];
+            if (!p) return;
+            let fill = '#374151';
+            if (p.kind === 'root') fill = '#ef4444';
+            else if (p.kind === 'affected') fill = '#f97316';
+            const cls = p.kind === 'root' ? ' class="network-root-pulse"' : '';
+            circles += `<circle cx="${p.x}" cy="${p.y}" r="${p.r}" fill="${fill}" stroke="#1f2937" stroke-width="2"${cls}/>`;
+            labels += `<text x="${p.x}" y="${p.y + p.r + 14}" fill="#ffffff" font-family="Courier New,monospace" font-size="11" text-anchor="middle">${esc(name)}</text>`;
+          });
+          const svg = `<svg width="100%" height="300" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" style="display:block">
+<text x="400" y="22" fill="#ffffff" font-family="Courier New,monospace" font-size="13" font-weight="700" text-anchor="middle" style="font-variant:small-caps;letter-spacing:3px">SERVICE DEPENDENCY GRAPH</text>
+<defs><marker id="arrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#fca5a5"/></marker></defs>
+${lines}
+${circles}
+${labels}
+<text x="${rootX - 120}" y="${rootY - 42}" fill="#fca5a5" font-family="Courier New,monospace" font-size="10" font-weight="700">ROOT CAUSE</text>
+<path d="M ${rootX - 38} ${rootY - 38} L ${rootX - rootR - 4} ${rootY - 8}" stroke="#fca5a5" stroke-width="1.5" fill="none" marker-end="url(#arrowHead)"/>
+<g transform="translate(24,248)">
+<circle cx="10" cy="0" r="8" fill="#ef4444"/><text x="26" y="4" fill="#e5e7eb" font-family="Courier New,monospace" font-size="10">Root Cause</text>
+<circle cx="120" cy="0" r="8" fill="#f97316"/><text x="136" y="4" fill="#e5e7eb" font-family="Courier New,monospace" font-size="10">Affected</text>
+<circle cx="230" cy="0" r="8" fill="#374151"/><text x="246" y="4" fill="#e5e7eb" font-family="Courier New,monospace" font-size="10">Healthy</text>
+</g>
+</svg>`;
+          networkGraphEl.innerHTML = svg;
+          networkGraphEl.style.display = 'block';
+        }
+
+        if(data.report && data.history && data.history.length > 0) {
+          const treeDiv = document.createElement('div');
+          treeDiv.className = 'agent-decision-tree';
+          treeDiv.style = 'background:#0a0a0f;border-top:1px solid #1f2937;padding:32px';
+          treeDiv.innerHTML = '<div style="color:#6b7280;font-size:10px;font-weight:900;letter-spacing:2px;margin-bottom:20px">AGENT DECISION TREE</div>';
+          const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+          svg.setAttribute('width','100%');
+          svg.setAttribute('height', Math.max(200, data.history.length * 60) + 'px');
+          svg.style.fontFamily = 'Courier New,monospace';
+          data.history.forEach((h, i) => {
+            const x = 40 + (i * 180);
+            const y = 80;
+            const isRoot = h.action.action_type === 'submit_rca';
+            const color = isRoot ? '#4ade80' : h.observation?.anomaly_detected ? '#ef4444' : '#3b82f6';
+            if(i > 0) {
+              const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+              line.setAttribute('x1', x-140); line.setAttribute('y1', y);
+              line.setAttribute('x2', x-20); line.setAttribute('y2', y);
+              line.setAttribute('stroke','#374151'); line.setAttribute('stroke-width','1');
+              svg.appendChild(line);
+            }
+            const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+            circle.setAttribute('cx', x); circle.setAttribute('cy', y);
+            circle.setAttribute('r', '20'); circle.setAttribute('fill', '#0a0a0f');
+            circle.setAttribute('stroke', color); circle.setAttribute('stroke-width','2');
+            svg.appendChild(circle);
+            const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+            text.setAttribute('x', x); text.setAttribute('y', y+4);
+            text.setAttribute('text-anchor','middle'); text.setAttribute('fill', color);
+            text.setAttribute('font-size','10'); text.textContent = i+1;
+            svg.appendChild(text);
+            const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+            label.setAttribute('x', x); label.setAttribute('y', y+36);
+            label.setAttribute('text-anchor','middle'); label.setAttribute('fill','#6b7280');
+            label.setAttribute('font-size','9');
+            label.textContent = (h.action.action_type||'').replace('_',' ').substring(0,12).toUpperCase();
+            svg.appendChild(label);
+          });
+          treeDiv.appendChild(svg);
+          document.querySelector('.right-panel').appendChild(treeDiv);
+        }
       }
     }
   } catch(e) {
+    clearInterval(dotsInterval);
+    clearInterval(timerInterval);
+    clearInterval(slaInterval);
+    document.getElementById('thinkingBlock')?.remove();
     addLog('ERROR', 'lb-error', e.message);
   }
 
@@ -352,6 +608,33 @@ async function runAgent() {
   document.getElementById('btnIcon').textContent = '▶';
   document.getElementById('btnText').textContent = 'RUN AGENT';
 }
+
+(function(){
+  const lines = [
+    '[AGENT] Scanning service dependencies...',
+    '[AGENT] Anomaly detected in cache_service',
+    '[AGENT] Root cause identified: cpu_saturation',
+    '[AGENT] Generating RCA report...',
+  ];
+  const el = document.getElementById('heroTermLine');
+  if (!el) return;
+  let li = 0, ci = 0;
+  function heroTypeStep() {
+    const t = lines[li];
+    if (ci < t.length) {
+      el.textContent = t.slice(0, ++ci);
+      setTimeout(heroTypeStep, 45);
+    } else {
+      setTimeout(function () {
+        ci = 0;
+        li = (li + 1) % lines.length;
+        el.textContent = '';
+        heroTypeStep();
+      }, 800);
+    }
+  }
+  heroTypeStep();
+})();
 </script>
 </body>
 </html>

@@ -28,22 +28,21 @@ def extract_json(text: str) -> dict:
 
 
 def _system_prompt(services: list[str]) -> str:
-    return """You are an expert SRE engineer investigating a production incident.
+    return """You are an SRE bot. You MUST respond with ONLY a JSON object, nothing else.
 
-STRATEGY - follow this exact order:
-1. First check dependencies of api_gateway to find downstream services
-2. Check metrics of ALL downstream services immediately
-3. Find the service with status=down or cpu_usage > 0.9 - that is your root cause
-4. Query logs of ONLY that root cause service
-5. Submit RCA immediately - do not investigate further
+AVAILABLE ACTION TYPES:
+- query_dependencies: {"action_type":"query_dependencies","target_service":"api_gateway"}
+- query_metrics: {"action_type":"query_metrics","target_service":"SERVICE_NAME"}
+- query_logs: {"action_type":"query_logs","target_service":"SERVICE_NAME"}
+- submit_rca: {"action_type":"submit_rca","rca_report":{"root_cause_service":"NAME","root_cause_type":"cpu_saturation","affected_services":["a","b"],"confidence":0.9,"summary":"text","suggested_fix":"text"}}
 
-RULES:
-- Maximum 5 queries total before submitting
-- root_cause_type must be ONE of: cpu_saturation, memory_leak, network, error_rate, crash, dependency_failure
-- Do not repeat queries on same service
-- Be decisive - submit after 4-5 steps
+STEPS:
+1. query_dependencies on api_gateway
+2. query_metrics on each downstream service
+3. query_logs on the broken service
+4. submit_rca
 
-Your goal is accuracy AND efficiency."""
+OUTPUT ONLY RAW JSON. NO MARKDOWN. NO EXPLANATION."""
 
 
 def _parse_action(content: str) -> Action:
