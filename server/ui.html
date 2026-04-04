@@ -124,6 +124,52 @@ body.leaderboard-mode .layout{display:none!important}
 .leaderboard-table tbody tr:nth-child(even){background:#0a0a0f}
 .leaderboard-clear{font-family:'Courier New',monospace}
 </style>
+<style id="demo-features-styles">
+/* Demo features (additive only) — live ticker, timeline, share card */
+#score-ticker{display:none;background:#050508;border-bottom:1px solid #1f2937;padding:18px 20px;font-family:'Courier New',monospace;text-align:center;position:relative;overflow:hidden}
+#score-ticker.is-visible{display:block}
+#score-ticker.is-running{animation:st-pulse-glow 1.6s ease-in-out infinite}
+#score-ticker.is-reveal{animation:st-reveal-flash 0.85s ease-out}
+#score-ticker.reveal-gold{border:2px solid #d4af37;box-shadow:0 0 28px rgba(212,175,55,0.45),inset 0 0 40px rgba(212,175,55,0.08)}
+#score-ticker.reveal-yellow{border:2px solid #eab308;box-shadow:0 0 24px rgba(234,179,8,0.35),inset 0 0 30px rgba(234,179,8,0.06)}
+#score-ticker.reveal-red{border:2px solid #ef4444;box-shadow:0 0 24px rgba(239,68,68,0.4),inset 0 0 30px rgba(239,68,68,0.08)}
+.score-ticker-pct{font-size:52px;font-weight:900;color:#4ade80;line-height:1.1;text-shadow:0 0 20px rgba(74,222,128,0.5)}
+#score-ticker.is-reveal .score-ticker-pct{animation:st-number-pop 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+.score-ticker-pct .ticker-suffix{font-size:0.55em;opacity:0.9;margin-left:2px}
+.score-ticker-status{margin-top:10px;font-size:11px;font-weight:800;letter-spacing:2px;color:#94a3b8;text-transform:uppercase}
+#score-ticker.reveal-gold .score-ticker-pct{color:#fcd34d;text-shadow:0 0 24px rgba(252,211,77,0.6)}
+#score-ticker.reveal-yellow .score-ticker-pct{color:#facc15}
+#score-ticker.reveal-red .score-ticker-pct{color:#f87171}
+@keyframes st-pulse-glow{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.35),inset 0 0 20px rgba(34,197,94,0.06)}50%{box-shadow:0 0 32px 6px rgba(34,197,94,0.25),inset 0 0 28px rgba(34,197,94,0.12)}}
+@keyframes st-reveal-flash{0%{filter:brightness(1.4)}40%{filter:brightness(1.15) scale(1.02)}100%{filter:brightness(1) scale(1)}}
+@keyframes st-number-pop{0%{transform:scale(0.88);opacity:0.7}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.share-result-bar{display:none;padding:12px 16px;border-top:1px solid #e5e7eb;background:#ffffff;text-align:center}
+.share-result-bar.is-visible{display:block}
+.share-result-btn{font-weight:800;letter-spacing:0.5px}
+.run-history-timeline{margin-top:36px;padding-top:28px;border-top:1px solid #0f172a}
+.run-history-title{font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#e5e7eb;margin-bottom:20px}
+.run-history-body{display:flex;flex-direction:column;gap:14px}
+.run-history-empty{color:#64748b;font-size:12px;letter-spacing:1px;text-align:center;padding:28px 12px}
+.run-history-row{opacity:0;animation:rh-slide-in 0.55s ease forwards}
+@keyframes rh-slide-in{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+.run-history-row-inner{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.run-history-left{display:flex;align-items:center;gap:10px;min-width:140px;flex:0 0 auto}
+.run-history-scen{font-size:11px;font-weight:800;color:#e2e8f0;letter-spacing:0.5px}
+.rh-badge{font-size:9px;font-weight:900;letter-spacing:1px;padding:3px 8px;border-radius:999px;border:1px solid}
+.rh-badge-easy{background:#14532d;color:#bbf7d0;border-color:#16a34a}
+.rh-badge-medium{background:#713f12;color:#fde68a;border-color:#ca8a04}
+.rh-badge-hard{background:#7f1d1d;color:#fecaca;border-color:#dc2626}
+.rh-badge-ddos{background:#5b21b6;color:#e9d5ff;border-color:#a78bfa}
+.rh-badge-default{background:#1e293b;color:#94a3b8;border-color:#334155}
+.run-history-mid{flex:1;min-width:120px}
+.rh-track{height:10px;background:#0f172a;border-radius:999px;overflow:hidden;border:1px solid #1e293b}
+.rh-fill{height:100%;border-radius:999px;transition:width 0.6s cubic-bezier(0.22,1,0.36,1)}
+.rh-bar-green{background:linear-gradient(90deg,#16a34a,#4ade80)}
+.rh-bar-yellow{background:linear-gradient(90deg,#ca8a04,#facc15)}
+.rh-bar-red{background:linear-gradient(90deg,#b91c1c,#f87171)}
+.run-history-pct{font-size:14px;font-weight:900;color:#f1f5f9;min-width:56px;text-align:right}
+.run-history-ts{width:100%;font-size:10px;color:#64748b;margin-top:4px;padding-left:2px}
+</style>
 </head>
 <body>
 
@@ -211,6 +257,11 @@ body.leaderboard-mode .layout{display:none!important}
       </div>
     </div>
 
+    <div id="score-ticker" class="score-ticker-wrap" aria-hidden="true">
+      <div class="score-ticker-pct"><span id="score-ticker-value">0</span><span class="ticker-suffix">%</span></div>
+      <div class="score-ticker-status" id="score-ticker-status">INVESTIGATING...</div>
+    </div>
+
     <div class="terminal-body" id="termBody">
       <div class="placeholder-state">
         <div class="placeholder-icon">⬡</div>
@@ -225,6 +276,9 @@ body.leaderboard-mode .layout{display:none!important}
       </div>
       <div class="score-grid" id="scoreGrid"></div>
       <div class="report-box" id="reportBox"></div>
+    </div>
+    <div id="share-result-bar" class="share-result-bar" hidden>
+      <button type="button" id="btn-share-result" class="action-btn share-result-btn" style="background:#0a0a0f;color:#e5e7eb;border-color:#374151">↗ SHARE RESULT</button>
     </div>
   </section>
 </div>
@@ -247,6 +301,10 @@ body.leaderboard-mode .layout{display:none!important}
     </thead>
     <tbody id="leaderboard-tbody"></tbody>
   </table>
+  <div class="run-history-timeline" id="run-history-timeline-section">
+    <h3 class="run-history-title">RUN HISTORY TIMELINE</h3>
+    <div id="run-history-timeline-body" class="run-history-body"></div>
+  </div>
 </div>
 
 <script>
@@ -442,6 +500,419 @@ async function runAgent() {
   document.getElementById('btnIcon').textContent = '▶';
   document.getElementById('btnText').textContent = 'RUN AGENT';
 }
+</script>
+<script>
+(function () {
+  'use strict';
+
+  var STATUS_MESSAGES = ['INVESTIGATING...', 'ANALYZING TRACES...', 'CORRELATING METRICS...', 'FINALIZING REPORT...'];
+  var statusInterval = null;
+  var progressRaf = null;
+  var hideTickerTimer = null;
+  var displayedPct = 0;
+  var lastRunForShare = null;
+
+  function scenarioTitleFromKey(d) {
+    var map = { easy: 'INC-001 · Cache Failure', medium: 'INC-002 · Config Cascade', hard: 'INC-003 · AZ Packet Loss', ddos: 'INC-004 · DDoS Attack' };
+    var k = (d || '').toLowerCase();
+    return map[k] || (d ? String(d).toUpperCase() : 'SCENARIO');
+  }
+
+  function el(id) { return document.getElementById(id); }
+
+  function showTickerRunning() {
+    var ticker = el('score-ticker');
+    var valEl = el('score-ticker-value');
+    var stEl = el('score-ticker-status');
+    var shareBar = el('share-result-bar');
+    if (shareBar) {
+      shareBar.hidden = true;
+      shareBar.classList.remove('is-visible');
+    }
+    lastRunForShare = null;
+    if (hideTickerTimer) {
+      clearTimeout(hideTickerTimer);
+      hideTickerTimer = null;
+    }
+    if (!ticker) return;
+    ticker.classList.remove('is-reveal', 'reveal-gold', 'reveal-yellow', 'reveal-red');
+    ticker.classList.add('is-visible', 'is-running');
+    ticker.setAttribute('aria-hidden', 'false');
+    displayedPct = 0;
+    if (valEl) valEl.textContent = '0';
+    if (stEl) stEl.textContent = STATUS_MESSAGES[0];
+    if (statusInterval) clearInterval(statusInterval);
+    var si = 0;
+    statusInterval = setInterval(function () {
+      si = (si + 1) % STATUS_MESSAGES.length;
+      if (stEl) stEl.textContent = STATUS_MESSAGES[si];
+    }, 2500);
+    if (progressRaf) cancelAnimationFrame(progressRaf);
+    var start = performance.now();
+    var duration = 24000;
+    function tick(now) {
+      var t = Math.min(1, (now - start) / duration);
+      var eased = 1 - Math.pow(1 - t, 3);
+      displayedPct = Math.min(92, eased * 92);
+      if (valEl) valEl.textContent = String(Math.round(displayedPct));
+      if (t < 1 && ticker.classList.contains('is-running')) {
+        progressRaf = requestAnimationFrame(tick);
+      }
+    }
+    progressRaf = requestAnimationFrame(tick);
+  }
+
+  function stopTickerLoops() {
+    if (statusInterval) {
+      clearInterval(statusInterval);
+      statusInterval = null;
+    }
+    if (progressRaf) {
+      cancelAnimationFrame(progressRaf);
+      progressRaf = null;
+    }
+  }
+
+  function scheduleHideTicker() {
+    if (hideTickerTimer) clearTimeout(hideTickerTimer);
+    hideTickerTimer = setTimeout(function () {
+      var ticker = el('score-ticker');
+      if (ticker) {
+        ticker.classList.remove('is-visible', 'is-reveal', 'reveal-gold', 'reveal-yellow', 'reveal-red', 'is-running');
+        ticker.setAttribute('aria-hidden', 'true');
+      }
+      hideTickerTimer = null;
+    }, 8500);
+  }
+
+  function onBaselineComplete(data, ok) {
+    stopTickerLoops();
+    var ticker = el('score-ticker');
+    var valEl = el('score-ticker-value');
+    var stEl = el('score-ticker-status');
+    var shareBar = el('share-result-bar');
+    if (!ticker) return;
+
+    ticker.classList.remove('is-running', 'reveal-gold', 'reveal-yellow', 'reveal-red');
+
+    if (!ok || !data || data.error) {
+      if (valEl) valEl.textContent = '—';
+      if (stEl) stEl.textContent = 'RUN FAILED';
+      ticker.classList.add('is-visible', 'is-reveal', 'reveal-red');
+      if (shareBar) {
+        shareBar.hidden = true;
+        shareBar.classList.remove('is-visible');
+      }
+      lastRunForShare = null;
+      scheduleHideTicker();
+      return;
+    }
+
+    var f = data.scores && typeof data.scores.final_score === 'number' ? data.scores.final_score : 0;
+    var realPct = Math.round(f * 1000) / 10;
+    var diffKey = (data.difficulty || (typeof difficulty !== 'undefined' ? difficulty : '') || '').toString();
+
+    ticker.classList.add('is-reveal');
+    var from = displayedPct;
+    var rStart = performance.now();
+    var rDur = 900;
+
+    function revealFrame(now) {
+      var u = Math.min(1, (now - rStart) / rDur);
+      var ease = 1 - Math.pow(1 - u, 2);
+      displayedPct = from + (realPct - from) * ease;
+      if (valEl) valEl.textContent = String(Math.round(displayedPct * 10) / 10);
+      if (u < 1) {
+        requestAnimationFrame(revealFrame);
+      } else {
+        ticker.classList.remove('reveal-gold', 'reveal-yellow', 'reveal-red');
+        if (realPct > 80) ticker.classList.add('reveal-gold');
+        else if (realPct < 50) ticker.classList.add('reveal-red');
+        else ticker.classList.add('reveal-yellow');
+        if (stEl) stEl.textContent = 'SCORE FINALIZED';
+        if (data.scores) {
+          lastRunForShare = {
+            scenarioLabel: scenarioTitleFromKey(diffKey),
+            difficulty: diffKey,
+            scorePct: realPct,
+            steps: data.steps != null ? data.steps : '—',
+            ts: new Date().toLocaleString()
+          };
+          if (shareBar) {
+            shareBar.hidden = false;
+            shareBar.classList.add('is-visible');
+          }
+        }
+        scheduleHideTicker();
+      }
+    }
+    requestAnimationFrame(revealFrame);
+  }
+
+  var origFetch = window.fetch;
+  window.fetch = function (input, init) {
+    var url = typeof input === 'string' ? input : (input && input.url) || '';
+    var method = init && init.method ? String(init.method).toUpperCase() : 'GET';
+    var isBaselinePost = url.indexOf('/baseline') !== -1 && method === 'POST';
+    if (isBaselinePost) showTickerRunning();
+    return origFetch.apply(this, arguments).then(function (res) {
+      if (!isBaselinePost) return res;
+      return res
+        .clone()
+        .json()
+        .then(function (json) {
+          onBaselineComplete(json, res.ok);
+          return res;
+        })
+        .catch(function () {
+          onBaselineComplete(null, false);
+          return res;
+        });
+    });
+  };
+
+  function parseScorePct(entry) {
+    if (!entry) return 0;
+    var s = entry.score;
+    if (typeof s === 'number' && !isNaN(s)) return Math.min(100, Math.max(0, s));
+    if (typeof s === 'string') {
+      var m = s.match(/([\d.]+)/);
+      if (m) return Math.min(100, Math.max(0, parseFloat(m[1])));
+    }
+    return 0;
+  }
+
+  function renderRunHistoryTimeline() {
+    var body = el('run-history-timeline-body');
+    if (!body) return;
+    var list = [];
+    try {
+      list = JSON.parse(localStorage.getItem('rca_leaderboard') || '[]');
+    } catch (e) {
+      list = [];
+    }
+    if (!Array.isArray(list)) list = [];
+    body.innerHTML = '';
+    if (!list.length) {
+      var empty = document.createElement('div');
+      empty.className = 'run-history-empty';
+      empty.textContent = 'NO RUNS YET — START AN INVESTIGATION';
+      body.appendChild(empty);
+      return;
+    }
+    var reversed = list.slice().reverse();
+    reversed.forEach(function (entry, i) {
+      var pct = parseScorePct(entry);
+      var row = document.createElement('div');
+      row.className = 'run-history-row';
+      row.style.animationDelay = i * 100 + 'ms';
+
+      var inner = document.createElement('div');
+      inner.className = 'run-history-row-inner';
+
+      var left = document.createElement('div');
+      left.className = 'run-history-left';
+      var scen = document.createElement('span');
+      scen.className = 'run-history-scen';
+      scen.textContent = (entry.scenario || '—').toString().toUpperCase();
+      var badge = document.createElement('span');
+      var diff = (entry.difficulty || entry.scenario || '').toString().toLowerCase();
+      badge.className = 'rh-badge rh-badge-default';
+      if (diff === 'easy') badge.className = 'rh-badge rh-badge-easy';
+      else if (diff === 'medium') badge.className = 'rh-badge rh-badge-medium';
+      else if (diff === 'hard') badge.className = 'rh-badge rh-badge-hard';
+      else if (diff === 'ddos') badge.className = 'rh-badge rh-badge-ddos';
+      badge.textContent = (entry.difficulty || entry.scenario || '—').toString().toUpperCase();
+      left.appendChild(scen);
+      left.appendChild(badge);
+
+      var mid = document.createElement('div');
+      mid.className = 'run-history-mid';
+      var track = document.createElement('div');
+      track.className = 'rh-track';
+      var fill = document.createElement('div');
+      var barClass = 'rh-bar-red';
+      if (pct > 80) barClass = 'rh-bar-green';
+      else if (pct > 50) barClass = 'rh-bar-yellow';
+      fill.className = 'rh-fill ' + barClass;
+      fill.style.width = pct + '%';
+      track.appendChild(fill);
+      mid.appendChild(track);
+
+      var pctEl = document.createElement('div');
+      pctEl.className = 'run-history-pct';
+      pctEl.textContent = pct > 0 ? pct.toFixed(1) + '%' : entry.score != null && String(entry.score) !== '' ? String(entry.score) : '—';
+
+      inner.appendChild(left);
+      inner.appendChild(mid);
+      inner.appendChild(pctEl);
+      row.appendChild(inner);
+
+      var ts = document.createElement('div');
+      ts.className = 'run-history-ts';
+      ts.textContent = entry.timestamp || '';
+      row.appendChild(ts);
+
+      body.appendChild(row);
+    });
+  }
+
+  var origRefresh = window.refreshLeaderboard;
+  var origClear = window.clearLeaderboard;
+  if (typeof origRefresh === 'function') {
+    window.refreshLeaderboard = function () {
+      origRefresh.apply(this, arguments);
+      renderRunHistoryTimeline();
+    };
+  }
+  if (typeof origClear === 'function') {
+    window.clearLeaderboard = function () {
+      origClear.apply(this, arguments);
+      renderRunHistoryTimeline();
+    };
+  }
+
+  function roundRectPath(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function generateShareCard() {
+    if (!lastRunForShare) return;
+    var W = 800;
+    var H = 450;
+    var canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext('2d');
+    var lr = lastRunForShare;
+    var scorePct = lr.scorePct;
+    var glow = '#f59e0b';
+    if (scorePct > 80) glow = '#d4af37';
+    if (scorePct < 50) glow = '#ef4444';
+
+    ctx.fillStyle = '#0a0f1a';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.strokeStyle = 'rgba(59,130,246,0.12)';
+    ctx.lineWidth = 1;
+    var gx;
+    for (gx = 0; gx < W; gx += 32) {
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx, H);
+      ctx.stroke();
+    }
+    var gy;
+    for (gy = 0; gy < H; gy += 32) {
+      ctx.beginPath();
+      ctx.moveTo(0, gy);
+      ctx.lineTo(W, gy);
+      ctx.stroke();
+    }
+
+    var noise = ctx.createImageData(W, H);
+    var ni;
+    for (ni = 0; ni < noise.data.length; ni += 4) {
+      var v = Math.random() * 40;
+      noise.data[ni] = v;
+      noise.data[ni + 1] = v;
+      noise.data[ni + 2] = v;
+      noise.data[ni + 3] = 18;
+    }
+    ctx.putImageData(noise, 0, 0);
+
+    ctx.shadowColor = glow;
+    ctx.shadowBlur = 24;
+    ctx.strokeStyle = glow;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(12, 12, W - 24, H - 24);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 28px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('RCAAGENT', 40, 52);
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 36px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(lr.scenarioLabel || 'SCENARIO', W / 2, 140);
+
+    var diff = (lr.difficulty || '').toLowerCase();
+    var pillBg = '#166534';
+    var pillFg = '#dcfce7';
+    if (diff === 'medium') {
+      pillBg = '#a16207';
+      pillFg = '#fef08a';
+    }
+    if (diff === 'hard') {
+      pillBg = '#991b1b';
+      pillFg = '#fee2e2';
+    }
+    if (diff === 'ddos') {
+      pillBg = '#6d28d9';
+      pillFg = '#ede9fe';
+    }
+    var pillText = (lr.difficulty || '—').toString().toUpperCase();
+    ctx.font = 'bold 14px "Courier New", monospace';
+    var tw = ctx.measureText(pillText).width;
+    var pw = tw + 32;
+    var px = W / 2 - pw / 2;
+    var py = 160;
+    ctx.fillStyle = pillBg;
+    roundRectPath(ctx, px, py, pw, 32, 16);
+    ctx.fill();
+    ctx.fillStyle = pillFg;
+    ctx.textAlign = 'center';
+    ctx.fillText(pillText, W / 2, py + 22);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = scorePct > 80 ? '#fcd34d' : scorePct < 50 ? '#f87171' : '#facc15';
+    ctx.font = 'bold 96px "Courier New", monospace';
+    ctx.fillText(Math.round(scorePct) + '%', W / 2, 290);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '20px "Courier New", monospace';
+    ctx.fillText('STEPS USED: ' + lr.steps, W / 2, 340);
+
+    ctx.font = '12px "Courier New", monospace';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText(lr.ts, W / 2, H - 56);
+    ctx.fillStyle = '#3b82f6';
+    ctx.fillText('AI-Powered Root Cause Analysis', W / 2, H - 32);
+
+    canvas.toBlob(function (blob) {
+      if (!blob) return;
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'rca-result.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+  }
+
+  var shareBtn = el('btn-share-result');
+  if (shareBtn) shareBtn.addEventListener('click', generateShareCard);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderRunHistoryTimeline);
+  } else {
+    renderRunHistoryTimeline();
+  }
+})();
 </script>
 </body>
 </html>
