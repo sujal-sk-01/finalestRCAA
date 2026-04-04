@@ -4,7 +4,10 @@
   "alert": "SRE: diffuse elevation in tail latency and intermittent timeouts across all production tiers. No single service dominates error budget; pattern started after a network maintenance window.",
   "services": [
     "api_gateway",
+<<<<<<< HEAD
     "service_mesh_proxy",
+=======
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     "auth",
     "order_service",
     "payment",
@@ -19,72 +22,97 @@
       "error_rate": 0.018,
       "cpu_percent": 48.0,
       "memory_percent": 52.0,
+<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.48,
       "memory_usage": 0.52,
       "requests_per_second": 978.0,
       "latency_p99_ms": 280.0
+=======
+      "status": "degraded"
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "auth": {
       "latency_ms": 210.0,
       "error_rate": 0.015,
       "cpu_percent": 44.0,
       "memory_percent": 49.0,
+<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.44,
       "memory_usage": 0.49,
       "requests_per_second": 1107.0,
       "latency_p99_ms": 210.0
+=======
+      "status": "degraded"
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "order_service": {
       "latency_ms": 265.0,
       "error_rate": 0.017,
       "cpu_percent": 46.0,
       "memory_percent": 51.0,
+<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.46,
       "memory_usage": 0.51,
       "requests_per_second": 1035.0,
       "latency_p99_ms": 265.0
+=======
+      "status": "degraded"
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "payment": {
       "latency_ms": 240.0,
       "error_rate": 0.016,
       "cpu_percent": 43.0,
       "memory_percent": 50.0,
+<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.43,
       "memory_usage": 0.5,
       "requests_per_second": 990.0,
       "latency_p99_ms": 240.0
+=======
+      "status": "degraded"
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "inventory": {
       "latency_ms": 255.0,
       "error_rate": 0.016,
       "cpu_percent": 45.0,
       "memory_percent": 48.0,
+<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.45,
       "memory_usage": 0.48,
       "requests_per_second": 1059.0,
       "latency_p99_ms": 255.0
+=======
+      "status": "degraded"
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "cache": {
       "latency_ms": 95.0,
       "error_rate": 0.014,
       "cpu_percent": 42.0,
       "memory_percent": 47.0,
+<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.42,
       "memory_usage": 0.47,
       "requests_per_second": 1097.0,
       "latency_p99_ms": 95.0
+=======
+      "status": "degraded"
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     },
     "database": {
       "latency_ms": 320.0,
       "error_rate": 0.019,
       "cpu_percent": 52.0,
       "memory_percent": 55.0,
+<<<<<<< HEAD
       "status": "degraded",
       "cpu_usage": 0.52,
       "memory_usage": 0.55,
@@ -101,6 +129,9 @@
       "memory_usage": 0.44,
       "requests_per_second": 15200.0,
       "latency_p99_ms": 118.0
+=======
+      "status": "degraded"
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     }
   },
   "logs": {
@@ -131,11 +162,14 @@
     "database": [
       "tcp_retransmits_detected rate=0.3%",
       "replica_lag_ms jitter stddev high; not disk bound"
+<<<<<<< HEAD
     ],
     "service_mesh_proxy": [
       "sidecar: cross_az_rtt_variance p99 +18ms subtle_not_outlier",
       "mesh_control_plane: no local endpoint failures; synthetic probes OK",
       "packet_loss_estimate_from_counters=0.35pct aggregated east-west paths"
+=======
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     ]
   },
   "traces": {
@@ -194,6 +228,7 @@
         "duration_ms": 315.0,
         "status": "degraded"
       }
+<<<<<<< HEAD
     ],
     "service_mesh_proxy": [
       {
@@ -208,11 +243,14 @@
         "duration_ms": 88.0,
         "status": "degraded"
       }
+=======
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     ]
   },
   "dependencies": {
     "api_gateway": {
       "upstream": [],
+<<<<<<< HEAD
       "downstream": [
         "service_mesh_proxy"
       ]
@@ -277,6 +315,33 @@
         "auth",
         "order_service"
       ]
+=======
+      "downstream": ["auth", "order_service"]
+    },
+    "auth": {
+      "upstream": ["api_gateway"],
+      "downstream": ["database"]
+    },
+    "order_service": {
+      "upstream": ["api_gateway"],
+      "downstream": ["payment", "inventory", "database", "cache"]
+    },
+    "payment": {
+      "upstream": ["order_service"],
+      "downstream": ["database"]
+    },
+    "inventory": {
+      "upstream": ["order_service"],
+      "downstream": ["database", "cache"]
+    },
+    "cache": {
+      "upstream": ["order_service", "inventory"],
+      "downstream": []
+    },
+    "database": {
+      "upstream": ["auth", "order_service", "payment", "inventory"],
+      "downstream": []
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
     }
   },
   "ground_truth": {
@@ -284,7 +349,10 @@
     "root_cause_type": "packet_loss",
     "affected_services": [
       "api_gateway",
+<<<<<<< HEAD
       "service_mesh_proxy",
+=======
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
       "auth",
       "order_service",
       "payment",
@@ -294,7 +362,10 @@
     ],
     "causal_chain": [
       "network",
+<<<<<<< HEAD
       "service_mesh_proxy",
+=======
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
       "api_gateway",
       "auth",
       "order_service",
@@ -303,11 +374,15 @@
       "cache",
       "database"
     ],
+<<<<<<< HEAD
     "optimal_queries": 10,
     "difficulty_rationale": "Diffuse packet loss after maintenance; per-service metrics are subtly elevated. service_mesh_proxy east-west traces and tcp logs expose correlation \u2014 not visible from a single service dashboard.",
     "teaching_points": [
       "Compare trace degradation across multiple hops; metrics alone look like minor noise.",
       "Mesh/sidecar paths often surface east-west loss before app-tier SLO burn shows a single culprit."
     ]
+=======
+    "optimal_queries": 10
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
   }
 }

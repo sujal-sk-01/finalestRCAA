@@ -1,5 +1,6 @@
 openenv_version: "1.0"
 
+<<<<<<< HEAD
 name: sre-rca-env
 version: "2.0.0"
 description: >
@@ -99,6 +100,50 @@ reward:
     hypothesis_bonus: "Small bonus for reasoning steps"
     budget_pressure: "Increasing penalty as budget depletes"
     terminal: "Large bonus/penalty at RCA submission based on accuracy"
+=======
+name: RCAAgent-Env
+version: "1.0.0"
+description: >
+  OpenEnv-compatible RCA environment: agent investigates simulated microservice
+  incidents via metrics, logs, traces, dependencies; submits structured RCA; graded.
+
+tasks:
+  - id: INC-001
+    name: RCA INC-001
+    difficulty: easy
+    max_steps: 25
+    optimal_steps: 3
+  - id: INC-002
+    name: RCA INC-002
+    difficulty: medium
+    max_steps: 30
+    optimal_steps: 6
+  - id: INC-003
+    name: RCA INC-003
+    difficulty: hard
+    max_steps: 35
+    optimal_steps: 10
+
+action_space:
+  - query_metrics
+  - query_logs
+  - pull_traces
+  - query_dependencies
+  - form_hypothesis
+  - submit_rca
+
+observation_space:
+  - success
+  - service
+  - metrics
+  - logs
+  - traces
+  - dependencies
+  - anomaly_detected
+  - anomaly_type
+  - queries_remaining
+  - message
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
 
 grader_weights:
   root_cause: 0.40
@@ -106,14 +151,38 @@ grader_weights:
   efficiency: 0.20
   report_quality: 0.15
 
+<<<<<<< HEAD
 baseline:
   script: inference.py
   provider: openai_compatible
   model_env_var: MODEL_NAME
   api_base_env_var: API_BASE_URL
   api_key_env_var: HF_TOKEN
+=======
+baseline_api:
+  provider: google_gemini
+  model: gemini-2.0-flash
+  env_key: GOOGLE_API_KEY
+
+endpoints:
+  tasks: GET /tasks
+  reset: POST /reset/{difficulty}
+  step: POST /step/{difficulty}
+  state: GET /state/{difficulty}
+  grader: POST /grader
+  baseline: GET /baseline?difficulty={easy|medium|hard}
+
+server:
+  port: 8000
+  module: server.app:app
+  framework: uvicorn
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
 
 notes:
   difficulty_values: [easy, medium, hard]
   session_key: difficulty string (one active session per difficulty after reset)
+<<<<<<< HEAD
   hf_spaces: Set repository secrets HF_TOKEN, API_BASE_URL, MODEL_NAME as needed; Dockerfile listens on port 8000.
+=======
+  hf_spaces: Set repository secrets GOOGLE_API_KEY; Dockerfile listens on port 8000.
+>>>>>>> 1e0c61bd756a3c13d37981bdfb8d422f6cc010d6
