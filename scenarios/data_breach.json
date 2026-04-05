@@ -1,136 +1,72 @@
 {
-  "scenario_id": "INC-005",
+  "scenario_id": "data_breach",
   "difficulty": "data_breach",
-  "alert": "Security: spike in unauthorized API responses containing PII; audit_logger firing data-exfiltration rules. auth_service error budget burning; user_service seeing abnormal egress patterns.",
-  "services": [
-    "api_gateway",
-    "auth_service",
-    "user_service",
-    "audit_logger"
-  ],
-  "max_queries": 28,
-  "service_metrics": {
+  "alert": "CRITICAL: Unusual data exfiltration detected. Auth service showing 500% increase in token generation. Database query volumes spiked 800%. Possible credential compromise detected by security monitoring.",
+  "services": {
     "api_gateway": {
-      "latency_ms": 890.0,
-      "error_rate": 0.22,
-      "cpu_percent": 71.0,
-      "memory_percent": 58.0,
-      "status": "degraded",
-      "cpu_usage": 0.71,
-      "memory_usage": 0.58,
-      "requests_per_second": 4200.0,
-      "latency_p99_ms": 890.0
+      "latency_ms": 250,
+      "error_rate": 0.15,
+      "cpu_percent": 45,
+      "memory_percent": 60,
+      "status": "degraded"
     },
     "auth_service": {
-      "latency_ms": 2100.0,
-      "error_rate": 0.45,
-      "cpu_percent": 93.0,
-      "memory_percent": 78.0,
-      "status": "degraded",
-      "cpu_usage": 0.93,
-      "memory_usage": 0.78,
-      "requests_per_second": 2100.0,
-      "latency_p99_ms": 2100.0
+      "latency_ms": 800,
+      "error_rate": 0.75,
+      "cpu_percent": 92,
+      "memory_percent": 88,
+      "status": "degraded"
     },
-    "user_service": {
-      "latency_ms": 650.0,
-      "error_rate": 0.18,
-      "cpu_percent": 68.0,
-      "memory_percent": 72.0,
-      "status": "degraded",
-      "cpu_usage": 0.68,
-      "memory_usage": 0.72,
-      "requests_per_second": 950.0,
-      "latency_p99_ms": 650.0
+    "database": {
+      "latency_ms": 1200,
+      "error_rate": 0.60,
+      "cpu_percent": 89,
+      "memory_percent": 95,
+      "status": "degraded"
     },
     "audit_logger": {
-      "latency_ms": 120.0,
-      "error_rate": 0.01,
-      "cpu_percent": 44.0,
-      "memory_percent": 51.0,
-      "status": "healthy",
-      "cpu_usage": 0.44,
-      "memory_usage": 0.51,
-      "requests_per_second": 880.0,
-      "latency_p99_ms": 120.0
+      "latency_ms": 3000,
+      "error_rate": 0.90,
+      "cpu_percent": 40,
+      "memory_percent": 45,
+      "status": "down"
+    },
+    "encryption_service": {
+      "latency_ms": 200,
+      "error_rate": 0.05,
+      "cpu_percent": 30,
+      "memory_percent": 35,
+      "status": "healthy"
     }
   },
-  "logs": {
-    "api_gateway": [
-      "tls_handshake_errors_to_auth_service rate=12% peer=auth_service:443",
-      "jwt_validation_failures elevated; upstream auth_service returning 502/SSL handshake failure"
-    ],
-    "auth_service": [
-      "CRITICAL: server certificate EXPIRED for auth_service internal TLS (notAfter in the past)",
-      "openssl: certificate verify failed: certificate has expired",
-      "SSL_ERROR_SSL: session renegotiation failing; clients falling back to degraded cipher negotiation",
-      "connection_pool_saturation waiting on stalled TLS handshakes cpu=93%"
-    ],
-    "user_service": [
-      "unauthorized_access: user profile endpoint returning 200 with foreign tenant_id (policy violation)",
-      "data_exfiltration_heuristic: large JSON payloads to unusual client fingerprints",
-      "warning: authorization bypass suspected — auth tokens validated against failing auth_service"
-    ],
-    "audit_logger": [
-      "alert_rule=DATA_EXFIL_BURST fired source=user_service",
-      "SIEM: correlation unauthorized_access + ssl_errors auth_service within 15m window"
-    ]
-  },
-  "traces": {
-    "api_gateway": [
-      {
-        "trace_id": "t-breach-001",
-        "span": "GET /v1/users/{id}",
-        "duration_ms": 920.0,
-        "status": "error"
-      }
-    ],
-    "auth_service": [
-      {
-        "trace_id": "t-breach-002",
-        "span": "validate_token",
-        "duration_ms": 2050.0,
-        "status": "error"
-      }
-    ],
-    "user_service": [
-      {
-        "trace_id": "t-breach-003",
-        "span": "fetch_profile",
-        "duration_ms": 680.0,
-        "status": "degraded"
-      }
-    ],
-    "audit_logger": []
-  },
   "dependencies": {
-    "api_gateway": {
-      "upstream": [],
-      "downstream": ["auth_service", "user_service"]
-    },
+    "api_gateway": ["auth_service", "database"],
+    "auth_service": ["database", "audit_logger"],
+    "database": ["audit_logger"],
+    "audit_logger": [],
+    "encryption_service": []
+  },
+  "anomalies": {
     "auth_service": {
-      "upstream": ["api_gateway"],
-      "downstream": ["user_service", "audit_logger"]
+      "type": "dependency_failure",
+      "description": "Auth service generating excessive tokens due to compromised credentials. Audit logger down preventing security event recording."
     },
-    "user_service": {
-      "upstream": ["api_gateway", "auth_service"],
-      "downstream": ["audit_logger"]
+    "database": {
+      "type": "error_rate",
+      "description": "Database receiving massive unauthorized query volume from compromised auth tokens."
     },
     "audit_logger": {
-      "upstream": ["auth_service", "user_service"],
-      "downstream": []
+      "type": "crash",
+      "description": "Audit logger overwhelmed and crashed, unable to record security events."
     }
   },
   "ground_truth": {
     "root_cause_service": "auth_service",
-    "root_cause_type": "network",
-    "affected_services": ["user_service", "api_gateway", "audit_logger"],
-    "causal_chain": ["auth_service", "user_service", "api_gateway", "audit_logger"],
+    "root_cause_type": "dependency_failure",
+    "causal_chain": ["audit_logger", "auth_service", "database", "api_gateway"],
+    "affected_services": ["auth_service", "database", "audit_logger", "api_gateway"],
     "optimal_queries": 5,
-    "difficulty_rationale": "Medium-hard: SSL/TLS expiry on auth appears as scattered 502s and auth errors; PII leakage in user_service misdirects toward app bugs until logs show certificate expiry.",
-    "teaching_points": [
-      "Correlate SSL/certificate errors on auth with downstream unauthorized data access",
-      "Audit and security alerts may surface the blast radius before a single service metric tells the full story"
-    ]
+    "max_queries": 30,
+    "summary": "Credential compromise caused auth_service to generate excessive tokens. Audit logger crashed under load preventing security event recording. Database overwhelmed with unauthorized queries."
   }
 }

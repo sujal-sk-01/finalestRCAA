@@ -146,7 +146,7 @@ body>section,body>div.main{position:relative;z-index:1}
   <div class="hero-copy">
     <div class="hero-title">AI-Powered<span class="line2"><span class="highlight">Root Cause</span> Analysis</span></div>
     <div class="hero-sub">Deploy AI agents into simulated production failures. Watch them investigate microservice dependencies, query metrics and distributed traces, then deliver structured RCA reports.</div>
-    <div class="hero-badge">POWERED BY GROQ + LLAMA 3.3</div>
+    <div class="hero-badge">POWERED BY QWEN-3-235b + LLAMA 3.1</div>
   </div>
   <div class="hero-terminal-wrap">
     <div class="hero-terminal-label">LIVE AGENT TRACE</div>
@@ -164,7 +164,7 @@ body>section,body>div.main{position:relative;z-index:1}
     <div class="metric-label">MAX SCORE</div>
   </div>
   <div class="metric">
-    <div class="metric-value">Qwen 72B</div>
+    <div class="metric-value">LLAMA 3.1</div>
     <div class="metric-label">BASELINE MODEL</div>
   </div>
   <div class="metric">
@@ -211,6 +211,14 @@ body>section,body>div.main{position:relative;z-index:1}
       </div>
       <div class="badge badge-ddos">DDOS</div>
       <div class="scenario-meta">Optimal: 4 queries · 5 services</div>
+    </button>
+<button class="scenario-card" onclick="select('data_breach',this)">
+      <div class="scenario-title-row">
+        <div class="scenario-title">INC-005 · Data Breach</div>
+        <span class="severity-p0">P0</span>
+      </div>
+      <div class="badge badge-hard">DATA BREACH</div>
+      <div class="scenario-meta">Optimal: 5 queries · 5 services</div>
     </button>
 
     <button class="run-btn" id="runBtn" onclick="runAgent()" disabled>
@@ -1545,7 +1553,7 @@ body.rca-leaderboard-on .main { display: none !important; }
     function tick(now) {
       var t = Math.min(1, (now - start) / duration);
       var easeOutCubic = 1 - Math.pow(1 - t, 3);
-      displayedPct = Math.min(92, easeOutCubic * 92);
+      displayedPct = Math.min(99, easeOutCubic * 99);
       if (tickerValEl) tickerValEl.textContent = String(Math.round(displayedPct));
       if (t < 1 && tickerEl.classList.contains("is-running")) {
         progressRaf = requestAnimationFrame(tick);
