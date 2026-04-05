@@ -33,9 +33,6 @@ body>section,body>div.main{position:relative;z-index:1}
 .hero-title .highlight{color:#388bfd}
 .hero-sub{color:#7d8590;font-size:15px;line-height:1.75;margin-bottom:20px;max-width:520px}
 .hero-badge{display:inline-block;font-family:'Courier New',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;color:#7d8590;border:1px solid #1e2d3d;background:#0d1117;padding:6px 12px;border-radius:4px}
-.hero-terminal-wrap{background:#0d1117;border:1px solid #1e2d3d;border-radius:6px;padding:20px;min-height:200px;display:flex;flex-direction:column}
-.hero-terminal-label{font-size:10px;font-weight:900;letter-spacing:2px;color:#7d8590;margin-bottom:12px}
-.hero-term-line{font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#3fb950;min-height:4.2em;white-space:pre-wrap;word-break:break-word}
 
 /* METRICS */
 .metrics-bar{background:rgba(13,17,23,.9);border-top:1px solid #1e2d3d;border-bottom:1px solid #1e2d3d;display:flex}
@@ -144,13 +141,9 @@ body>section,body>div.main{position:relative;z-index:1}
 
 <section class="hero">
   <div class="hero-copy">
-    <div class="hero-title">AI-Powered<span class="line2"><span class="highlight">Root Cause</span> Analysis</span></div>
+    <div class="hero-title"><span class="hero-line1">AI-Powered</span><span class="hero-line2"><span class="highlight">Root Cause Analysis</span></span></div>
     <div class="hero-sub">Deploy AI agents into simulated production failures. Watch them investigate microservice dependencies, query metrics and distributed traces, then deliver structured RCA reports.</div>
     <div class="hero-badge">POWERED BY QWEN-3-235b + LLAMA 3.1</div>
-  </div>
-  <div class="hero-terminal-wrap">
-    <div class="hero-terminal-label">LIVE AGENT TRACE</div>
-    <pre id="heroTermLine" class="hero-term-line"></pre>
   </div>
 </section>
 
@@ -255,6 +248,78 @@ body>section,body>div.main{position:relative;z-index:1}
     </div>
     <div id="networkGraph" style="display:none;background:#080c14;border-top:1px solid #1e2d3d;padding:32px"></div>
   </section>
+</div>
+
+<div id="rca-rich-sections-root">
+  <section class="rca-rs-how rca-rs-io" id="rca-section-how" aria-labelledby="rca-how-heading">
+    <h2 id="rca-how-heading" class="rca-rs-h2 rca-rs-child">HOW IT WORKS</h2>
+    <div class="rca-rs-how-grid">
+      <article class="rca-rs-card rca-rs-child" data-rca-stagger="0">
+        <div class="rca-rs-step">01 / DETECT</div>
+        <div class="rca-rs-icon">⚡</div>
+        <h3 class="rca-rs-card-title">Anomaly Detection</h3>
+        <p class="rca-rs-card-text">AI monitors real-time metrics, traces, and logs across your entire microservice mesh to detect incidents the moment they occur.</p>
+      </article>
+      <article class="rca-rs-card rca-rs-child" data-rca-stagger="1">
+        <div class="rca-rs-step">02 / INVESTIGATE</div>
+        <div class="rca-rs-icon">🧠</div>
+        <h3 class="rca-rs-card-title">Cognitive Reasoning</h3>
+        <p class="rca-rs-card-text">The agent autonomously queries telemetry data, correlates service dependencies, and traces the failure cascade to its origin point.</p>
+      </article>
+      <article class="rca-rs-card rca-rs-child" data-rca-stagger="2">
+        <div class="rca-rs-step">03 / RESOLVE</div>
+        <div class="rca-rs-icon">🛡</div>
+        <h3 class="rca-rs-card-title">Root Cause Report</h3>
+        <p class="rca-rs-card-text">Delivers a structured RCA report with root cause, affected services, timeline, and actionable remediation steps in seconds.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="rca-rs-stats rca-rs-io" id="rca-section-stats" aria-label="Live statistics">
+    <div class="rca-rs-stats-inner">
+      <div class="rca-rs-stat rca-rs-child" data-rca-stagger="0">
+        <div class="rca-rs-stat-num" data-rca-target="2.3" data-rca-suffix="s" data-rca-decimals="1">0</div>
+        <div class="rca-rs-stat-label">MEAN TIME TO DETECT</div>
+      </div>
+      <div class="rca-rs-stat-div" aria-hidden="true"></div>
+      <div class="rca-rs-stat rca-rs-child" data-rca-stagger="1">
+        <div class="rca-rs-stat-num" data-rca-target="847" data-rca-suffix="" data-rca-decimals="0">0</div>
+        <div class="rca-rs-stat-label">INCIDENTS ANALYZED</div>
+      </div>
+      <div class="rca-rs-stat-div" aria-hidden="true"></div>
+      <div class="rca-rs-stat rca-rs-child" data-rca-stagger="2">
+        <div class="rca-rs-stat-num" data-rca-target="99.2" data-rca-suffix="%" data-rca-decimals="1">0</div>
+        <div class="rca-rs-stat-label">DETECTION ACCURACY</div>
+      </div>
+      <div class="rca-rs-stat-div" aria-hidden="true"></div>
+      <div class="rca-rs-stat rca-rs-child" data-rca-stagger="3">
+        <div class="rca-rs-stat-num" data-rca-target="73" data-rca-suffix="%" data-rca-decimals="0">0</div>
+        <div class="rca-rs-stat-label">MTTR REDUCTION</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rca-rs-scenarios rca-rs-io" id="rca-section-scenarios-breakdown" aria-labelledby="rca-scen-head">
+    <h2 id="rca-scen-head" class="rca-rs-h2 rca-rs-child">INVESTIGATION SCENARIOS</h2>
+    <div class="rca-rs-scen-grid">
+      <article class="rca-rs-scen rca-rs-scen-easy rca-rs-child" data-rca-stagger="0">
+        <h3 class="rca-rs-scen-title">EASY</h3>
+        <p class="rca-rs-scen-body">Cache Failure, Config Issues</p>
+        <p class="rca-rs-scen-meta">Optimal: 3-6 queries · 1-4 services</p>
+      </article>
+      <article class="rca-rs-scen rca-rs-scen-medium rca-rs-child" data-rca-stagger="1">
+        <h3 class="rca-rs-scen-title">MEDIUM</h3>
+        <p class="rca-rs-scen-body">Network Cascades, Auth Failures</p>
+        <p class="rca-rs-scen-meta">Optimal: 6-8 queries · 4-8 services</p>
+      </article>
+      <article class="rca-rs-scen rca-rs-scen-hard rca-rs-child" data-rca-stagger="2">
+        <h3 class="rca-rs-scen-title">HARD</h3>
+        <p class="rca-rs-scen-body">DDoS, Data Breach, AZ Failures</p>
+        <p class="rca-rs-scen-meta">Optimal: 8-12 queries · 8-15 services</p>
+      </article>
+    </div>
+  </section>
+
 </div>
 
 <script>
@@ -1451,12 +1516,20 @@ body.rca-leaderboard-on .main { display: none !important; }
     refreshLeaderboardTable();
     refreshRunHistoryTimeline();
     window.scrollTo(0, 0);
+    var richRoot = document.getElementById("rca-rich-sections-root");
+    var heroSec = document.querySelector("section.hero");
+    if (richRoot) richRoot.style.display = "none";
+    if (heroSec) heroSec.style.display = "none";
   }
 
   function hideLeaderboardPage() {
     document.body.classList.remove("rca-leaderboard-on");
     var sec = el("leaderboard-section");
     if (sec) sec.setAttribute("aria-hidden", "true");
+    var richRoot = document.getElementById("rca-rich-sections-root");
+    var heroSec = document.querySelector("section.hero");
+    if (richRoot) richRoot.style.display = "";
+    if (heroSec) heroSec.style.display = "";
   }
 
   function injectNavLeaderboard() {
@@ -2101,6 +2174,2746 @@ body.rca-leaderboard-on .main { display: none !important; }
   }
 })();
 </script>
+
+<!-- ═══ Meta hackathon layer — append-only (CSS + JS) ═══ -->
+<style id="rca-meta-hackathon-css">
+/* ═══ Server room backdrop (Unsplash) + global scanlines ═══ */
+body.rca-pro-ui {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)),
+    url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1920&q=80") !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+  background-attachment: fixed, fixed !important;
+  background-repeat: no-repeat, no-repeat !important;
+}
+body.rca-pro-ui::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.025;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.5) 2px,
+    rgba(255, 255, 255, 0.5) 3px
+  );
+  background-size: 100% 200%;
+  animation: rca-meta-scan-drift 8s linear infinite;
+}
+@keyframes rca-meta-scan-drift {
+  from { background-position: 0 0; }
+  to { background-position: 0 100%; }
+}
+
+/* ═══ Metric cards — glass, hover glow ═══ */
+body.rca-meta-hackathon .metrics-bar .metric {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: box-shadow 0.22s ease, border-color 0.22s ease;
+  border-radius: 2px;
+}
+body.rca-meta-hackathon .metrics-bar .metric:hover {
+  box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.45), 0 0 22px rgba(0, 212, 255, 0.18);
+}
+
+/* ═══ Scenario cards — difficulty glow + scale ═══ */
+body.rca-meta-hackathon .scenario-card {
+  transition: transform 0.2s ease, border-left-color 0.2s ease, box-shadow 0.2s ease;
+}
+body.rca-meta-hackathon .scenario-card:hover {
+  transform: scale(1.01);
+}
+body.rca-meta-hackathon .scenario-card:has(.badge-easy):hover {
+  box-shadow: -6px 0 18px rgba(63, 185, 80, 0.35), 0 0 0 1px rgba(63, 185, 80, 0.2);
+  border-left-color: #3fb950;
+}
+body.rca-meta-hackathon .scenario-card:has(.badge-medium):hover {
+  box-shadow: -6px 0 18px rgba(210, 153, 34, 0.4), 0 0 0 1px rgba(210, 153, 34, 0.22);
+  border-left-color: #d29922;
+}
+body.rca-meta-hackathon .scenario-card:has(.badge-hard):hover {
+  box-shadow: -6px 0 18px rgba(248, 81, 73, 0.4), 0 0 0 1px rgba(248, 81, 73, 0.22);
+  border-left-color: #f85149;
+}
+body.rca-meta-hackathon .scenario-card:has(.badge-ddos):hover {
+  box-shadow: -6px 0 18px rgba(249, 115, 22, 0.4), 0 0 0 1px rgba(249, 115, 22, 0.22);
+  border-left-color: #fb923c;
+}
+
+/* ═══ Navbar — cyan edge + active link glow ═══ */
+body.rca-meta-hackathon .nav {
+  box-shadow: 0 1px 0 rgba(0, 212, 255, 0.15), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+body.rca-meta-hackathon .nav-links a.rca-nav-link-active {
+  color: #e6edf3 !important;
+  position: relative;
+}
+body.rca-meta-hackathon .nav-links a.rca-nav-link-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.85);
+  animation: rca-nav-underline-pulse 2.2s ease-in-out infinite;
+}
+@keyframes rca-nav-underline-pulse {
+  0%, 100% { opacity: 0.75; filter: brightness(1); }
+  50% { opacity: 1; filter: brightness(1.25); }
+}
+
+/* ═══ Right panel tab modes ═══ */
+body.rca-meta-hackathon .right-panel.rca-tab-cognitive .terminal-body {
+  display: none !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-cognitive #scorePanel {
+  display: none !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-cognitive #cognitive-reasoning-panel {
+  display: flex !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-score .terminal-body {
+  display: none !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-score #cognitive-reasoning-panel {
+  display: none !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-score #scorePanel {
+  display: block !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-score #scorePanel:not(.show) .rca-score-tab-empty {
+  display: flex;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-score #scorePanel.show .rca-score-tab-empty {
+  display: none !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-log .terminal-body {
+  display: block !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-log #cognitive-reasoning-panel {
+  display: none !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-log #scorePanel {
+  display: none !important;
+}
+body.rca-meta-hackathon .right-panel.rca-tab-log #scorePanel.show {
+  display: none !important;
+}
+
+/* ═══ Cognitive reasoning terminal ═══ */
+#cognitive-reasoning-panel {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 520px;
+  max-height: 520px;
+  border-top: 1px solid #1e2d3d;
+  background: #060a10;
+  position: relative;
+  font-family: "Courier New", Courier, monospace;
+}
+.rca-cog-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid #1e2d3d;
+  flex-shrink: 0;
+}
+.rca-cog-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #00ff88;
+  text-transform: uppercase;
+}
+.rca-cog-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rca-cog-live {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #ff4444;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 68, 68, 0.5);
+  border-radius: 4px;
+  animation: rca-cog-live-blink 1s step-end infinite;
+}
+.rca-cog-live[hidden],
+.rca-cog-complete[hidden] {
+  display: none !important;
+}
+@keyframes rca-cog-live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.rca-cog-complete {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #00ff88;
+  padding: 4px 10px;
+  border: 1px solid rgba(0, 255, 136, 0.45);
+  border-radius: 4px;
+}
+.rca-cog-clear {
+  background: transparent;
+  border: 1px solid #1e2d3d;
+  color: #8892a4;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.rca-cog-clear:hover {
+  border-color: #00d4ff;
+  color: #e6edf3;
+}
+.rca-cog-body-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.rca-cog-scan-overlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.06;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 136, 0.15) 2px,
+    rgba(0, 255, 136, 0.15) 3px
+  );
+  animation: rca-cog-scan-move 6s linear infinite;
+}
+@keyframes rca-cog-scan-move {
+  from { transform: translateY(0); }
+  to { transform: translateY(24px); }
+}
+.rca-cog-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 20px;
+  position: relative;
+  z-index: 1;
+}
+.rca-cog-line {
+  font-size: 12px;
+  line-height: 1.65;
+  margin-bottom: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rca-cog-line.prefix-thought { color: #00ff88; }
+.rca-cog-line.prefix-action { color: #00d4ff; }
+.rca-cog-line.prefix-observation { color: #ffd700; }
+.rca-cog-line.prefix-conclusion { color: #ff8c00; }
+.rca-cog-line.prefix-error { color: #ff4444; }
+.rca-cog-line.prefix-muted { color: #8892a4; }
+.rca-cog-cursor-line {
+  font-size: 12px;
+  line-height: 1.65;
+  color: #00ff88;
+  margin-top: 2px;
+}
+.rca-cog-cursor {
+  display: inline;
+  margin-left: 1px;
+}
+.rca-cog-cursor.is-blink {
+  animation: rca-cog-cursor-blink 0.85s step-end infinite;
+}
+@keyframes rca-cog-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ═══ Score tab empty state ═══ */
+.rca-score-tab-empty {
+  display: none;
+  min-height: 200px;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  border-top: 1px solid #1e2d3d;
+}
+
+/* ═══ Confidence gauge ═══ */
+.rca-score-gauge-cluster {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.rca-confidence-wrap {
+  opacity: 0;
+  animation: rca-conf-fade 0.8s ease 0.15s forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+@keyframes rca-conf-fade {
+  to { opacity: 1; }
+}
+.rca-confidence-svg {
+  transform: rotate(-90deg);
+}
+.rca-confidence-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #7d8590;
+  text-transform: uppercase;
+}
+
+/* ═══ Voice + toolbar ═══ */
+.rca-voice-btn:hover {
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
+  border-color: #a855f7 !important;
+}
+
+/* ═══ Leaderboard row stagger entrance ═══ */
+@keyframes rca-lb-row-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rca-lb-table tbody tr.rca-lb-stagger {
+  opacity: 0;
+  animation: rca-lb-row-fade-in 0.45s ease forwards;
+}
+</style>
+
+<script id="rca-meta-hackathon-js">
+/* ═══ Meta hackathon layer — additive behavior only ═══ */
+(function () {
+  "use strict";
+
+  document.documentElement.classList.add("rca-meta-hackathon");
+  document.body.classList.add("rca-meta-hackathon");
+
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  function scenarioTitleFromKey(d) {
+    var map = {
+      easy: "INC-001 · Cache Failure",
+      medium: "INC-002 · Config Cascade",
+      hard: "INC-003 · AZ Packet Loss",
+      ddos: "INC-004 · DDoS Attack"
+    };
+    var k = (d || "").toLowerCase();
+    return map[k] || (d ? String(d).toUpperCase() : "SCENARIO");
+  }
+
+  /* ─── Metric counters (easeOutCubic) ─── */
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function runMetricCounters() {
+    var metrics = document.querySelectorAll(".metrics-bar .metric");
+    if (!metrics.length) return;
+    for (var mi = 0; mi < metrics.length; mi++) {
+      var lj = metrics[mi].querySelector(".metric-label");
+      var vj = metrics[mi].querySelector(".metric-value");
+      if (lj && vj && lj.textContent.indexOf("BASELINE MODEL") !== -1) vj.style.opacity = "0";
+    }
+    var targets = [
+      { end: 4, fmt: function (v) { return String(Math.round(v)).padStart(2, "0"); } },
+      { end: 100, fmt: function (v) { return (v / 100).toFixed(2); } },
+      null,
+      null
+    ];
+    var labels = ["SCENARIOS", "MAX SCORE", "BASELINE MODEL", "GRADER VERSION"];
+    var start = performance.now();
+    var dur = 1400;
+    function frame(now) {
+      var u = Math.min(1, (now - start) / dur);
+      var e = easeOutCubic(u);
+      for (var i = 0; i < metrics.length; i++) {
+        var valEl = metrics[i].querySelector(".metric-value");
+        var labEl = metrics[i].querySelector(".metric-label");
+        if (!valEl) continue;
+        var lab = labEl ? labEl.textContent.trim() : "";
+        if (lab === labels[0] && targets[0]) {
+          valEl.textContent = targets[0].fmt(targets[0].end * e);
+        } else if (lab === labels[1] && targets[1]) {
+          valEl.textContent = targets[1].fmt(targets[1].end * e);
+        } else if (lab === labels[2]) {
+          valEl.style.opacity = String(Math.min(1, u * 1.4));
+        } else if (lab === labels[3]) {
+          var ver = 2 * e;
+          valEl.textContent = "v" + ver.toFixed(1);
+        }
+      }
+      if (u < 1) requestAnimationFrame(frame);
+      else {
+        var j;
+        for (j = 0; j < metrics.length; j++) {
+          var vj = metrics[j].querySelector(".metric-value");
+          var lj = metrics[j].querySelector(".metric-label");
+          if (!vj || !lj) continue;
+          if (lj.textContent.trim() === labels[2]) vj.textContent = "Qwen 72B";
+          if (lj.textContent.trim() === labels[3]) vj.textContent = "v2.0";
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runMetricCounters);
+  } else {
+    runMetricCounters();
+  }
+
+  /* ─── Nav active underline ─── */
+  function setupNavActiveGlow() {
+    var links = document.querySelectorAll(".nav-links a");
+    links.forEach(function (a) {
+      a.addEventListener("click", function () {
+        links.forEach(function (x) {
+          x.classList.remove("rca-nav-link-active");
+        });
+        a.classList.add("rca-nav-link-active");
+      });
+    });
+  }
+  setupNavActiveGlow();
+
+  /* ─── Leaderboard tbody stagger (observe mutations) ─── */
+  function staggerLeaderboardRows() {
+    var tbody = el("rca-leaderboard-tbody");
+    if (!tbody || tbody.getAttribute("data-rca-stagger-obs") === "1") return;
+    tbody.setAttribute("data-rca-stagger-obs", "1");
+    var obs = new MutationObserver(function () {
+      var rows = tbody.querySelectorAll("tr");
+      rows.forEach(function (tr, i) {
+        tr.classList.add("rca-lb-stagger");
+        tr.style.animationDelay = i * 60 + "ms";
+      });
+    });
+    obs.observe(tbody, { childList: true });
+  }
+  staggerLeaderboardRows();
+
+  /* ─── Outer fetch wrapper → custom events (additive) ─── */
+  var innerFetch = window.fetch;
+  window.fetch = function (input, init) {
+    var url = typeof input === "string" ? input : input && input.url ? input.url : "";
+    var method = init && init.method ? String(init.method).toUpperCase() : "GET";
+    var isBaseline = url.indexOf("/baseline") !== -1 && method === "POST";
+    return innerFetch.apply(this, arguments).then(function (res) {
+      if (!isBaseline) return res;
+      return res
+        .clone()
+        .json()
+        .then(function (json) {
+          try {
+            if (res.ok && json && !json.error) {
+              document.dispatchEvent(new CustomEvent("rca-meta-baseline-ok", { detail: json }));
+            } else {
+              document.dispatchEvent(
+                new CustomEvent("rca-meta-baseline-fail", {
+                  detail: { json: json, ok: res.ok, status: res.status }
+                })
+              );
+            }
+          } catch (e) {}
+          return res;
+        })
+        .catch(function () {
+          return res;
+        });
+    });
+  };
+
+  /* ─── Cognitive reasoning tab + panel injection ─── */
+  var cogState = {
+    timers: [],
+    lineTimeouts: [],
+    charTimeouts: [],
+    running: false,
+    currentLineEl: null,
+    cursorEl: null,
+    scrollEl: null,
+    liveEl: null,
+    completeEl: null,
+    simStop: false
+  };
+
+  function prefixClassForLine(text) {
+    if (/^\[THOUGHT\]/i.test(text)) return "prefix-thought";
+    if (/^\[ACTION\]/i.test(text)) return "prefix-action";
+    if (/^\[OBSERVATION\]/i.test(text)) return "prefix-observation";
+    if (/^\[CONCLUSION\]/i.test(text)) return "prefix-conclusion";
+    if (/^\[ERROR\]/i.test(text)) return "prefix-error";
+    return "prefix-muted";
+  }
+
+  function clearCognitiveTimers() {
+    cogState.timers.forEach(function (t) {
+      clearTimeout(t);
+    });
+    cogState.timers = [];
+    cogState.lineTimeouts.forEach(function (t) {
+      clearTimeout(t);
+    });
+    cogState.lineTimeouts = [];
+    cogState.charTimeouts.forEach(function (t) {
+      clearTimeout(t);
+    });
+    cogState.charTimeouts = [];
+  }
+
+  function setRightTab(mode) {
+    var rp = document.querySelector(".right-panel");
+    if (!rp) return;
+    rp.classList.remove("rca-tab-log", "rca-tab-score", "rca-tab-cognitive");
+    rp.classList.add("rca-tab-" + mode);
+  }
+
+  function setTabActiveIndex(idx) {
+    var tabs = document.querySelectorAll(".terminal-tabs .tab");
+    tabs.forEach(function (t, i) {
+      t.classList.toggle("active", i === idx);
+    });
+  }
+
+  function injectCognitiveUI() {
+    var tabsWrap = document.querySelector(".terminal-tabs");
+    var termBody = el("termBody");
+    var scorePanel = el("scorePanel");
+    if (!tabsWrap || !termBody || document.getElementById("cognitive-reasoning-panel")) return;
+
+    var t0 = tabsWrap.querySelectorAll(".tab");
+    if (t0.length < 2) return;
+    var tabCog = document.createElement("div");
+    tabCog.className = "tab";
+    tabCog.textContent = "Cognitive Reasoning";
+    tabCog.setAttribute("data-rca-tab", "cognitive");
+    t0[1].insertAdjacentElement("afterend", tabCog);
+
+    t0[0].setAttribute("data-rca-tab", "log");
+    t0[1].setAttribute("data-rca-tab", "score");
+
+    var emptyScore = document.createElement("div");
+    emptyScore.className = "rca-score-tab-empty";
+    emptyScore.textContent = "RUN AGENT TO VIEW SCORE REPORT";
+    if (scorePanel && !scorePanel.querySelector(".rca-score-tab-empty")) {
+      scorePanel.insertBefore(emptyScore, scorePanel.firstChild);
+    }
+
+    var panel = document.createElement("div");
+    panel.id = "cognitive-reasoning-panel";
+    panel.setAttribute("hidden", "hidden");
+    panel.innerHTML =
+      '<div class="rca-cog-topbar">' +
+      '<span class="rca-cog-title">● COGNITIVE REASONING ENGINE</span>' +
+      '<div class="rca-cog-topbar-right">' +
+      '<span class="rca-cog-live" id="rca-cog-live" hidden>LIVE</span>' +
+      '<span class="rca-cog-complete" id="rca-cog-complete" hidden>COMPLETE</span>' +
+      '<button type="button" class="rca-cog-clear" id="rca-cog-clear">CLEAR</button>' +
+      "</div></div>" +
+      '<div class="rca-cog-body-wrap">' +
+      '<div class="rca-cog-scan-overlay" aria-hidden="true"></div>' +
+      '<div class="rca-cog-scroll" id="rca-cog-scroll">' +
+      '<div id="rca-cog-lines"></div>' +
+      '<div class="rca-cog-cursor-line" id="rca-cog-cursor-line"><span id="rca-cog-typed"></span><span class="rca-cog-cursor is-blink" id="rca-cog-cursor">█</span></div>' +
+      "</div></div>";
+
+    termBody.parentNode.insertBefore(panel, termBody.nextSibling);
+
+    cogState.scrollEl = el("rca-cog-scroll");
+    cogState.cursorEl = el("rca-cog-cursor");
+    cogState.liveEl = el("rca-cog-live");
+    cogState.completeEl = el("rca-cog-complete");
+
+    function bindTabClicks() {
+      var tabs = document.querySelectorAll(".terminal-tabs .tab");
+      tabs.forEach(function (tab, i) {
+        tab.style.cursor = "pointer";
+        tab.addEventListener("click", function () {
+          setTabActiveIndex(i);
+          if (i === 0) setRightTab("log");
+          else if (i === 1) setRightTab("score");
+          else setRightTab("cognitive");
+        });
+      });
+    }
+    bindTabClicks();
+
+    el("rca-cog-clear").addEventListener("click", function () {
+      el("rca-cog-lines").innerHTML = "";
+      el("rca-cog-typed").textContent = "";
+    });
+
+    setRightTab("log");
+  }
+
+  injectCognitiveUI();
+
+  function scrollCogBottom() {
+    if (cogState.scrollEl) cogState.scrollEl.scrollTop = cogState.scrollEl.scrollHeight;
+  }
+
+  function typeLine(fullText, done) {
+    var typed = el("rca-cog-typed");
+    var linesHost = el("rca-cog-lines");
+    if (!typed || !linesHost) {
+      if (done) done();
+      return;
+    }
+    var cls = prefixClassForLine(fullText);
+    var i = 0;
+    function tick() {
+      if (cogState.simStop) {
+        if (done) done();
+        return;
+      }
+      typed.textContent = fullText.slice(0, i);
+      scrollCogBottom();
+      i++;
+      if (i <= fullText.length) {
+        var tid = setTimeout(tick, 18);
+        cogState.charTimeouts.push(tid);
+      } else {
+        var div = document.createElement("div");
+        div.className = "rca-cog-line " + cls;
+        div.textContent = fullText;
+        linesHost.appendChild(div);
+        typed.textContent = "";
+        scrollCogBottom();
+        var pause = setTimeout(function () {
+          if (done) done();
+        }, 400);
+        cogState.lineTimeouts.push(pause);
+      }
+    }
+    tick();
+  }
+
+  function randBetween(a, b) {
+    return a + Math.random() * (b - a);
+  }
+
+  function startCognitiveSimulation(scenarioKey) {
+    clearCognitiveTimers();
+    cogState.simStop = false;
+    cogState.running = true;
+    var scenName = scenarioTitleFromKey(scenarioKey);
+    var lines = [
+      "[THOUGHT] Initializing cognitive reasoning engine for " + scenName + "...",
+      "[ACTION] Connecting to telemetry pipeline...",
+      "[OBSERVATION] Detected anomaly in service mesh",
+      "[THOUGHT] Analyzing error rate spikes across microservices...",
+      "[ACTION] Querying distributed trace logs for last 15 minutes",
+      "[OBSERVATION] Found 847 failed requests in auth-service",
+      "[THOUGHT] Correlating failures with deployment timeline...",
+      "[ACTION] Checking service dependency graph",
+      "[OBSERVATION] auth-service depends on cache-service (Redis)",
+      "[THOUGHT] Redis cache miss rate elevated to 94%...",
+      "[ACTION] Querying infrastructure metrics for cache-service",
+      "[OBSERVATION] Cache-service memory usage at 98%, OOM events detected",
+      "[THOUGHT] Root cause hypothesis: cache exhaustion cascading failure",
+      "[ACTION] Cross-referencing with incident history database",
+      "[OBSERVATION] Similar pattern found in INC-089 three weeks ago",
+      "[THOUGHT] Confidence level: HIGH — preparing final RCA report...",
+      "[CONCLUSION] Root cause identified: Redis cache exhaustion triggered cascading auth failures"
+    ];
+    if (cogState.liveEl) cogState.liveEl.hidden = false;
+    if (cogState.completeEl) cogState.completeEl.hidden = true;
+    if (cogState.cursorEl) cogState.cursorEl.classList.add("is-blink");
+
+    var idx = 0;
+    function next() {
+      if (cogState.simStop || idx >= lines.length) return;
+      typeLine(lines[idx], function () {
+        idx++;
+        if (cogState.simStop || idx >= lines.length) return;
+        var wait = randBetween(1200, 2800);
+        var t = setTimeout(next, wait);
+        cogState.timers.push(t);
+      });
+    }
+    next();
+  }
+
+  function stopCognitiveSimulation() {
+    cogState.simStop = true;
+    clearCognitiveTimers();
+    cogState.running = false;
+  }
+
+  function onBaselineOk(detail) {
+    clearCognitiveTimers();
+    cogState.running = false;
+    cogState.simStop = false;
+    var f = detail.scores && typeof detail.scores.final_score === "number" ? detail.scores.final_score : 0;
+    var pct = Math.round(f * 1000) / 10;
+    var line =
+      "[CONCLUSION] Investigation complete. Score: " +
+      (detail.scores && detail.scores.total != null ? detail.scores.total : pct + "%");
+    typeLine(line, function () {});
+    if (cogState.liveEl) cogState.liveEl.hidden = true;
+    if (cogState.completeEl) cogState.completeEl.hidden = false;
+    if (cogState.cursorEl) cogState.cursorEl.classList.remove("is-blink");
+
+    mountConfidenceGauge(pct);
+    setupVoiceForLastRun(detail);
+  }
+
+  var runBtn = el("runBtn");
+  if (runBtn) {
+    runBtn.addEventListener(
+      "click",
+      function () {
+        if (runBtn.disabled) return;
+        if (typeof difficulty === "undefined" || !difficulty) return;
+        setRightTab("cognitive");
+        var tabs = document.querySelectorAll(".terminal-tabs .tab");
+        setTabActiveIndex(tabs.length >= 3 ? 2 : 0);
+        var cogP = el("cognitive-reasoning-panel");
+        if (cogP) cogP.removeAttribute("hidden");
+        startCognitiveSimulation(difficulty);
+      },
+      true
+    );
+  }
+
+  document.addEventListener("rca-meta-baseline-ok", function (ev) {
+    onBaselineOk(ev.detail || {});
+  });
+
+  document.addEventListener("rca-meta-baseline-fail", function () {
+    stopCognitiveSimulation();
+    if (cogState.liveEl) cogState.liveEl.hidden = true;
+    if (cogState.completeEl) cogState.completeEl.hidden = true;
+    if (cogState.cursorEl) cogState.cursorEl.classList.remove("is-blink");
+  });
+
+  /* ─── Confidence gauge (SVG) ─── */
+  function mountConfidenceGauge(scorePct) {
+    var sh = document.querySelector(".score-header");
+    var sf = el("scoreFinal");
+    if (!sh || !sf || document.getElementById("rca-confidence-root")) return;
+    var conf = Math.min(100, Math.max(0, scorePct * 0.95));
+    var wrap = document.createElement("div");
+    wrap.className = "rca-score-gauge-cluster";
+    sh.insertBefore(wrap, sf);
+    wrap.appendChild(sf);
+    var cluster = document.createElement("div");
+    cluster.id = "rca-confidence-root";
+    cluster.className = "rca-confidence-wrap";
+    var R = 44;
+    var C = 2 * Math.PI * (R - 6);
+    var col = conf >= 80 ? "#3fb950" : conf >= 50 ? "#d29922" : "#f85149";
+    cluster.innerHTML =
+      '<svg class="rca-confidence-svg" width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">' +
+      '<circle cx="50" cy="50" r="' +
+      (R - 6) +
+      '" fill="none" stroke="#1e2d3d" stroke-width="8"/>' +
+      '<circle id="rca-conf-arc" cx="50" cy="50" r="' +
+      (R - 6) +
+      '" fill="none" stroke="' +
+      col +
+      '" stroke-width="8" stroke-dasharray="' +
+      C +
+      '" stroke-dashoffset="' +
+      C +
+      '" stroke-linecap="round"/>' +
+      "</svg>" +
+      '<div class="rca-confidence-label">AI CONFIDENCE</div>';
+    wrap.appendChild(cluster);
+    var arc = el("rca-conf-arc");
+    var start = performance.now();
+    var dur = 1500;
+    function anim(now) {
+      var u = Math.min(1, (now - start) / dur);
+      var e = easeOutCubic(u);
+      var off = C * (1 - (conf / 100) * e);
+      if (arc) arc.style.strokeDashoffset = String(off);
+      if (u < 1) requestAnimationFrame(anim);
+    }
+    requestAnimationFrame(anim);
+  }
+
+  /* ─── Voice briefing ─── */
+  var voiceUtter = null;
+  var voiceToolbarObs = null;
+  function setupVoiceForLastRun(data) {
+    var tb = el("rca-export-toolbar");
+    if (!tb || !("speechSynthesis" in window)) return;
+    var btn = el("rca-btn-voice-briefing");
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = "rca-btn-voice-briefing";
+      btn.className = "action-btn rca-export-btn rca-voice-btn";
+      btn.textContent = "🔊 PLAY BRIEFING";
+      btn.style.display = "none";
+      tb.appendChild(btn);
+    }
+    var scen =
+      typeof difficulty !== "undefined" && difficulty
+        ? scenarioTitleFromKey(difficulty)
+        : "selected scenario";
+    var diff = (data.difficulty || difficulty || "—").toString();
+    var f = data.scores && typeof data.scores.final_score === "number" ? data.scores.final_score : 0;
+    var pct = Math.round(f * 1000) / 10;
+    var text =
+      "Investigation complete. Scenario: " +
+      scen +
+      ". Difficulty: " +
+      diff +
+      ". Final score: " +
+      pct +
+      " out of 100. Root cause identified. Report ready for review.";
+
+    btn.onclick = function () {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        btn.textContent = "🔊 PLAY BRIEFING";
+        return;
+      }
+      voiceUtter = new SpeechSynthesisUtterance(text);
+      btn.textContent = "⏹ STOP";
+      voiceUtter.onend = function () {
+        btn.textContent = "🔊 PLAY BRIEFING";
+      };
+      window.speechSynthesis.speak(voiceUtter);
+    };
+
+    var showVoice = function () {
+      if (tb.classList.contains("is-visible") && !tb.hidden) btn.style.display = "inline-flex";
+      else btn.style.display = "none";
+    };
+    showVoice();
+    if (!voiceToolbarObs) {
+      voiceToolbarObs = new MutationObserver(showVoice);
+      voiceToolbarObs.observe(tb, { attributes: true, attributeFilter: ["class", "hidden"] });
+    }
+  }
+
+  /* ─── Remove old confidence + unwrap score on new run ─── */
+  var runObs = new MutationObserver(function () {
+    var b = el("runBtn");
+    if (b && b.classList.contains("running")) {
+      var old = el("rca-confidence-root");
+      if (old) {
+        var w = old.parentNode;
+        var sh = document.querySelector(".score-header");
+        var sf = el("scoreFinal");
+        if (w && w.classList.contains("rca-score-gauge-cluster") && sh && sf) {
+          sh.insertBefore(sf, w);
+          w.remove();
+        } else old.remove();
+      }
+    }
+  });
+  if (runBtn) runObs.observe(runBtn, { attributes: true, attributeFilter: ["class", "disabled"] });
+})();
+</script>
+
+<!-- ═══ RCA topology + theme + motion layer (append-only) ═══ -->
+<canvas id="rca-topology-canvas" aria-hidden="true"></canvas>
+<div id="rca-viz-overlay" aria-hidden="true"></div>
+<div id="rca-scroll-progress-line" role="presentation"></div>
+<div id="rca-cursor-glow" aria-hidden="true"></div>
+
+<style id="rca-topology-theme-motion-css">
+/* ═══ Topology canvas + hide legacy neural canvas ═══ */
+#neural-bg {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+#rca-topology-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  display: block;
+}
+html.rca-topology-html {
+  background: transparent !important;
+}
+#rca-viz-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(8, 10, 18, 0.88);
+  transition: background 0.3s ease;
+}
+body > *:not(#neural-bg):not(#rca-topology-canvas):not(#rca-viz-overlay):not(#rca-scroll-progress-line):not(#rca-cursor-glow) {
+  position: relative;
+  z-index: 1;
+}
+.nav {
+  z-index: 100 !important;
+}
+
+/* ═══ Scroll progress (YouTube-style) ═══ */
+#rca-scroll-progress-line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  z-index: 10001;
+  pointer-events: none;
+  background: linear-gradient(90deg, #00d4ff, #00ff88);
+  transition: width 0.08s linear;
+}
+
+/* ═══ Cursor glow (dark mode only) ═══ */
+#rca-cursor-glow {
+  position: fixed;
+  width: 200px;
+  height: 200px;
+  margin: -100px 0 0 -100px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(
+    circle,
+    rgba(0, 212, 255, 0.06) 0%,
+    rgba(0, 212, 255, 0.02) 35%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+/* ═══ IntersectionObserver: initial hidden states ═══ */
+.rca-io-scenario {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: none;
+}
+.rca-io-scenario.rca-io-in {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rca-io-metric {
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: none;
+}
+.rca-io-metric.rca-io-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rca-io-heading {
+  clip-path: inset(0 100% 0 0);
+  transition: none;
+}
+.rca-io-heading.rca-io-in {
+  clip-path: inset(0 0% 0 0);
+  transition: clip-path 0.7s ease;
+}
+.rca-tab-panel-anim {
+  animation: rca-tab-panel-fade 0.3s ease forwards;
+}
+@keyframes rca-tab-panel-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══ Hero floating particles ═══ */
+.hero-copy.rca-hero-particles-host {
+  position: relative;
+  overflow: visible;
+}
+.rca-hero-float {
+  position: absolute;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 212, 255, 0.45);
+  color: #7d8590;
+  background: rgba(8, 12, 20, 0.75);
+  opacity: 0.4;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+  animation: rca-hero-float-y var(--rca-dur, 8s) ease-in-out infinite alternate;
+}
+@keyframes rca-hero-float-y {
+  0% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+}
+
+/* ═══ RUN button: shimmer, ripple host, running pulse ═══ */
+#runBtn.rca-run-fx {
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+#runBtn.rca-run-fx::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  transition: transform 0s;
+  pointer-events: none;
+}
+#runBtn.rca-run-fx:hover:not(:disabled)::before {
+  transform: translateX(120%);
+  transition: transform 0.65s ease;
+}
+#runBtn.rca-run-fx.running {
+  animation: rca-run-pulse-glow 1.4s ease-in-out infinite;
+}
+@keyframes rca-run-pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(137, 87, 229, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 28px 4px rgba(137, 87, 229, 0.35);
+  }
+}
+.rca-run-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(0);
+  animation: rca-run-ripple-anim 0.55s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes rca-run-ripple-anim {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ═══ Nav link micro (hover glow + underline) ═══ */
+.nav-links a:hover {
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.45);
+}
+.nav-links a.rca-nav-underline-active {
+  position: relative;
+  color: #e6edf3 !important;
+}
+.nav-links a.rca-nav-underline-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, #00d4ff, #00ff88);
+  border-radius: 1px;
+  animation: rca-nav-grow-line 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: left;
+}
+@keyframes rca-nav-grow-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ═══ Scenario card lift + left accent (additive) ═══ */
+.scenario-card.rca-scen-fx {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-left-color 0.2s ease, border-color 0.2s ease !important;
+}
+.scenario-card.rca-scen-fx:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.scenario-card.rca-scen-fx:hover:not(:disabled) {
+  border-left-width: 3px;
+}
+.scenario-card.rca-scen-fx:has(.badge-easy):hover {
+  border-left-color: #3fb950 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), -4px 0 12px rgba(63, 185, 80, 0.25);
+}
+.scenario-card.rca-scen-fx:has(.badge-medium):hover {
+  border-left-color: #d29922 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), -4px 0 12px rgba(210, 153, 34, 0.28);
+}
+.scenario-card.rca-scen-fx:has(.badge-hard):hover {
+  border-left-color: #f85149 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), -4px 0 12px rgba(248, 81, 73, 0.28);
+}
+.scenario-card.rca-scen-fx:has(.badge-ddos):hover {
+  border-left-color: #fb923c !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), -4px 0 12px rgba(249, 115, 22, 0.28);
+}
+</style>
+
+<script id="rca-topology-theme-motion-js">
+/* ═══ Topology canvas, theme, scroll IO, micro-FX (append-only) ═══ */
+(function () {
+  "use strict";
+
+  document.documentElement.classList.add("rca-topology-html");
+  document.body.classList.remove("light-mode");
+  var _rcaRmThemeBtn = document.getElementById("rca-theme-toggle");
+  if (_rcaRmThemeBtn) _rcaRmThemeBtn.remove();
+
+  /* ─── Topology canvas (35 nodes, incidents) ─── */
+  var topoCanvas = document.getElementById("rca-topology-canvas");
+  if (topoCanvas) {
+    var ctx = topoCanvas.getContext("2d");
+    var tw = 0;
+    var th = 0;
+    var dpr = 1;
+    var nodes = [];
+    var NODE_N = 35;
+    var LINK_DIST = 150;
+    var i;
+    var j;
+
+    function resizeTopo() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      tw = window.innerWidth;
+      th = window.innerHeight;
+      topoCanvas.width = Math.floor(tw * dpr);
+      topoCanvas.height = Math.floor(th * dpr);
+      topoCanvas.style.width = tw + "px";
+      topoCanvas.style.height = th + "px";
+      if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      for (i = 0; i < nodes.length; i++) {
+        nodes[i].x = Math.min(Math.max(nodes[i].x, 0), tw);
+        nodes[i].y = Math.min(Math.max(nodes[i].y, 0), th);
+      }
+    }
+
+    function initNodes() {
+      nodes = [];
+      for (i = 0; i < NODE_N; i++) {
+        nodes.push({
+          x: Math.random() * tw,
+          y: Math.random() * th,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          r: 2.5 + Math.random() * 1.5,
+          pulseT: 0,
+          incidentUntil: 0
+        });
+      }
+    }
+
+    function pickIncidents() {
+      var k;
+      var picks = [];
+      var target = 2 + Math.floor(Math.random() * 2);
+      while (picks.length < target && picks.length < NODE_N) {
+        k = Math.floor(Math.random() * NODE_N);
+        if (picks.indexOf(k) === -1) picks.push(k);
+      }
+      for (k = 0; k < picks.length; k++) {
+        nodes[picks[k]].incidentUntil = performance.now() + 2200 + Math.random() * 1800;
+      }
+    }
+
+    resizeTopo();
+    initNodes();
+    window.addEventListener("resize", resizeTopo);
+    setInterval(pickIncidents, 3200 + Math.random() * 2000);
+    pickIncidents();
+
+    function step() {
+      var now = performance.now();
+      var lineBase = 0.45;
+
+      for (i = 0; i < nodes.length; i++) {
+        var n = nodes[i];
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < n.r) {
+          n.x = n.r;
+          n.vx *= -1;
+        } else if (n.x > tw - n.r) {
+          n.x = tw - n.r;
+          n.vx *= -1;
+        }
+        if (n.y < n.r) {
+          n.y = n.r;
+          n.vy *= -1;
+        } else if (n.y > th - n.r) {
+          n.y = th - n.r;
+          n.vy *= -1;
+        }
+      }
+
+      if (ctx) {
+        ctx.clearRect(0, 0, tw, th);
+        for (i = 0; i < nodes.length; i++) {
+          for (j = i + 1; j < nodes.length; j++) {
+            var dx = nodes[i].x - nodes[j].x;
+            var dy = nodes[i].y - nodes[j].y;
+            var d = Math.sqrt(dx * dx + dy * dy);
+            if (d < LINK_DIST) {
+              var a = (1 - d / LINK_DIST) * lineBase;
+              ctx.strokeStyle = "rgba(0, 212, 255, " + a + ")";
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              ctx.lineTo(nodes[j].x, nodes[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        for (i = 0; i < nodes.length; i++) {
+          var ni = nodes[i];
+          var inc = now < ni.incidentUntil;
+          ctx.beginPath();
+          ctx.arc(ni.x, ni.y, ni.r, 0, Math.PI * 2);
+          if (inc) {
+            var pulse = 0.5 + 0.5 * Math.sin(now * 0.012);
+            ctx.shadowColor = "#ff4444";
+            ctx.shadowBlur = 25;
+            ctx.fillStyle = "rgba(255, 68, 68, " + (0.75 + pulse * 0.2) + ")";
+          } else {
+            ctx.shadowColor = "#00d4ff";
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = "#00d4ff";
+          }
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ─── Scroll progress ─── */
+  var progEl = document.getElementById("rca-scroll-progress-line");
+  function onScrollProg() {
+    if (!progEl) return;
+    var doc = document.documentElement;
+    var scrollTop = doc.scrollTop || document.body.scrollTop;
+    var max = (doc.scrollHeight || document.body.scrollHeight) - window.innerHeight;
+    var p = max <= 0 ? 0 : Math.min(100, (scrollTop / max) * 100);
+    progEl.style.width = p + "%";
+  }
+  window.addEventListener("scroll", onScrollProg, { passive: true });
+  onScrollProg();
+
+  /* ─── Cursor glow ─── */
+  var glowEl = document.getElementById("rca-cursor-glow");
+  function onMove(e) {
+    if (!glowEl) return;
+    glowEl.style.left = e.clientX + "px";
+    glowEl.style.top = e.clientY + "px";
+    glowEl.style.opacity = "1";
+  }
+  function onLeave() {
+    if (glowEl) glowEl.style.opacity = "0";
+  }
+  document.addEventListener("mousemove", onMove, { passive: true });
+  document.addEventListener("mouseleave", onLeave);
+  document.documentElement.addEventListener("mouseleave", onLeave);
+
+  /* ─── IntersectionObserver: scenarios + metrics + headings ─── */
+  var ioOpts = { root: null, rootMargin: "0px 0px -8% 0px", threshold: 0.05 };
+
+  document.querySelectorAll(".left-panel .scenario-card").forEach(function (card, idx) {
+    card.classList.add("rca-io-scenario", "rca-scen-fx");
+    card.style.transitionDelay = idx * 80 + "ms";
+  });
+
+  document.querySelectorAll(".metrics-bar .metric").forEach(function (m, idx) {
+    m.classList.add("rca-io-metric");
+    m.style.transitionDelay = idx * 100 + "ms";
+  });
+
+  var headingSelectors = [
+    ".hero .hero-title",
+    ".hero .hero-sub",
+    ".left-panel > div",
+    "#leaderboard-section .rca-lb-heading",
+    "#leaderboard-section .rca-run-history-heading"
+  ];
+  headingSelectors.forEach(function (sel) {
+    document.querySelectorAll(sel).forEach(function (h) {
+      if (h && !h.classList.contains("rca-io-heading")) h.classList.add("rca-io-heading");
+    });
+  });
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      en.target.classList.add("rca-io-in");
+      io.unobserve(en.target);
+    });
+  }, ioOpts);
+
+  document.querySelectorAll(".rca-io-scenario, .rca-io-metric, .rca-io-heading").forEach(function (el) {
+    io.observe(el);
+  });
+
+  /* ─── Tab panel fade (terminal / score / cognitive) ─── */
+  function flashTabPanels() {
+    var bodies = [
+      document.querySelector(".right-panel .terminal-body"),
+      document.getElementById("scorePanel"),
+      document.getElementById("cognitive-reasoning-panel")
+    ];
+    bodies.forEach(function (b) {
+      if (!b) return;
+      var st = window.getComputedStyle(b);
+      if (st.display === "none" || st.visibility === "hidden") return;
+      b.classList.remove("rca-tab-panel-anim");
+      void b.offsetWidth;
+      b.classList.add("rca-tab-panel-anim");
+    });
+  }
+
+  document.addEventListener(
+    "click",
+    function (e) {
+      var t = e.target;
+      if (!t || !t.closest) return;
+      if (t.closest(".terminal-tabs")) flashTabPanels();
+    },
+    true
+  );
+
+  var rp = document.querySelector(".right-panel");
+  if (rp) {
+    var tabFlashT = null;
+    var tabMo = new MutationObserver(function () {
+      if (tabFlashT) clearTimeout(tabFlashT);
+      tabFlashT = setTimeout(flashTabPanels, 30);
+    });
+    tabMo.observe(rp, { attributes: true, attributeFilter: ["class"] });
+  }
+
+  /* ─── Hero floating badges ─── */
+  var heroCopy = document.querySelector(".hero-copy");
+  var floatLabels = [
+    "P0 INCIDENT",
+    "ROOT CAUSE",
+    "AI AGENT",
+    "TRACE LOG",
+    "METRICS",
+    "RCA REPORT",
+    "ANOMALY",
+    "SRE"
+  ];
+  if (heroCopy) {
+    heroCopy.classList.add("rca-hero-particles-host");
+    floatLabels.forEach(function (text, fi) {
+      var sp = document.createElement("span");
+      sp.className = "rca-hero-float";
+      sp.textContent = text;
+      sp.style.setProperty("--rca-dur", 6 + (fi % 5) + fi * 0.4 + "s");
+      sp.style.animationDelay = fi * 0.35 + "s";
+      var xp = 2 + ((fi * 47) % 78);
+      var yp = 8 + ((fi * 31) % 55);
+      sp.style.left = xp + "%";
+      sp.style.top = yp + "%";
+      heroCopy.appendChild(sp);
+    });
+  }
+
+  /* ─── RUN button: classes + ripple ─── */
+  var runBtn = document.getElementById("runBtn");
+  if (runBtn) {
+    runBtn.classList.add("rca-run-fx");
+    runBtn.addEventListener(
+      "click",
+      function (e) {
+        var r = document.createElement("span");
+        r.className = "rca-run-ripple";
+        var rect = runBtn.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height);
+        r.style.width = r.style.height = size + "px";
+        r.style.left = e.clientX - rect.left - size / 2 + "px";
+        r.style.top = e.clientY - rect.top - size / 2 + "px";
+        runBtn.appendChild(r);
+        setTimeout(function () {
+          r.remove();
+        }, 600);
+      },
+      true
+    );
+  }
+
+  /* ─── Nav underline active (click tracking) ─── */
+  document.querySelectorAll(".nav-links a").forEach(function (a) {
+    a.addEventListener("click", function () {
+      document.querySelectorAll(".nav-links a.rca-nav-underline-active").forEach(function (x) {
+        x.classList.remove("rca-nav-underline-active");
+      });
+      a.classList.add("rca-nav-underline-active");
+    });
+  });
+
+  /* ─── Stat numbers: count-up once (snapshot at init) ─── */
+  var metricBar = document.querySelector(".metrics-bar");
+  if (
+    metricBar &&
+    !metricBar.getAttribute("data-rca-topo-metrics-done") &&
+    !document.documentElement.classList.contains("rca-meta-hackathon")
+  ) {
+    var snapshot = [];
+    metricBar.querySelectorAll(".metric").forEach(function (row) {
+      var lab = row.querySelector(".metric-label");
+      var val = row.querySelector(".metric-value");
+      snapshot.push({
+        label: lab ? lab.textContent.trim() : "",
+        text: val ? val.textContent.trim() : ""
+      });
+    });
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function runMetricCountUp() {
+      if (metricBar.getAttribute("data-rca-topo-metrics-done")) return;
+      metricBar.setAttribute("data-rca-topo-metrics-done", "1");
+      var rows = metricBar.querySelectorAll(".metric");
+      var start = performance.now();
+      var dur = 1200;
+
+      function tick(now) {
+        var u = Math.min(1, (now - start) / dur);
+        var e = easeOutCubic(u);
+        var ri;
+        for (ri = 0; ri < rows.length; ri++) {
+          var vel = rows[ri].querySelector(".metric-value");
+          var snap = snapshot[ri];
+          if (!vel || !snap) continue;
+          if (snap.label === "SCENARIOS") {
+            var n = parseInt(snap.text, 10) || 4;
+            vel.textContent = String(Math.round(n * e)).padStart(2, "0");
+          } else if (snap.label === "MAX SCORE") {
+            var mx = parseFloat(snap.text) || 1;
+            vel.textContent = (mx * e).toFixed(2);
+          } else if (snap.label === "BASELINE MODEL") {
+            vel.style.opacity = String(Math.min(1, e * 1.25));
+            if (u >= 1) vel.textContent = snap.text;
+          } else if (snap.label === "GRADER VERSION") {
+            vel.textContent = "v" + (2 * e).toFixed(1);
+            if (u >= 1) vel.textContent = snap.text;
+          }
+        }
+        if (u < 1) requestAnimationFrame(tick);
+        else {
+          for (ri = 0; ri < rows.length; ri++) {
+            var v2 = rows[ri].querySelector(".metric-value");
+            var s2 = snapshot[ri];
+            if (v2 && s2 && s2.label === "BASELINE MODEL") v2.style.opacity = "1";
+          }
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    var mIo = new IntersectionObserver(
+      function (ents) {
+        ents.forEach(function (en) {
+          if (en.isIntersecting) {
+            runMetricCountUp();
+            mIo.disconnect();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    mIo.observe(metricBar);
+  }
+})();
+</script>
+
+<!-- ═══ Epic BG v3 + hero restore + status HUD (append-only) ═══ -->
+<style id="rca-epic-bg-v3-css">
+/* ═══ FIX: hero title always visible (undo IO clip-path) ═══ */
+.hero .hero-title {
+  clip-path: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* ═══ FIX: remove floating pill badges ═══ */
+.rca-hero-float,
+.hero-copy .rca-hero-float {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ═══ Remove prior background layers (canvas + overlay) ═══ */
+#neural-bg,
+#rca-topology-canvas,
+#rca-viz-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ═══ LAYER 1 — bg canvas ═══ */
+#bg-canvas {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  display: block !important;
+}
+
+body.rca-bg-v3 {
+  background: #030508 !important;
+  position: relative;
+}
+
+/* Stack content above canvas; keep sticky nav + fixed widgets working */
+body.rca-bg-v3 > *:not(#bg-canvas):not(#rca-bg-dim-layer):not(#rca-corner-root):not(#rca-scroll-progress-line):not(#rca-cursor-glow) {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+body.rca-bg-v3 .nav {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 200 !important;
+}
+
+#rca-bg-dim-layer {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  background: rgba(3, 5, 8, 0.7) !important;
+}
+
+#rca-corner-root {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+/* ═══ LAYER 2 — tech grid on body ═══ */
+body.rca-bg-v3::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: rca-v3-grid-drift 20s linear infinite;
+}
+
+@keyframes rca-v3-grid-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 60px 60px, 60px 60px;
+  }
+}
+
+/* ═══ LAYER 3 — corner brackets ═══ */
+.rca-br {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  animation: rca-v3-br-pulse 4s ease-in-out infinite;
+}
+
+.rca-br-tl {
+  top: 72px;
+  left: 16px;
+}
+
+.rca-br-tr {
+  top: 72px;
+  right: 16px;
+}
+
+.rca-br-bl {
+  bottom: 16px;
+  left: 16px;
+}
+
+.rca-br-br {
+  bottom: 16px;
+  right: 16px;
+}
+
+.rca-br-h {
+  position: absolute;
+  background: rgba(0, 212, 255, 0.3);
+  height: 2px;
+  width: 30px;
+}
+
+.rca-br-v {
+  position: absolute;
+  background: rgba(0, 212, 255, 0.3);
+  width: 2px;
+  height: 30px;
+}
+
+.rca-br-tl .rca-br-h {
+  top: 0;
+  left: 0;
+}
+
+.rca-br-tl .rca-br-v {
+  top: 0;
+  left: 0;
+}
+
+.rca-br-tr .rca-br-h {
+  top: 0;
+  right: 0;
+}
+
+.rca-br-tr .rca-br-v {
+  top: 0;
+  right: 0;
+}
+
+.rca-br-bl .rca-br-h {
+  bottom: 0;
+  left: 0;
+}
+
+.rca-br-bl .rca-br-v {
+  bottom: 0;
+  left: 0;
+}
+
+.rca-br-br .rca-br-h {
+  bottom: 0;
+  right: 0;
+}
+
+.rca-br-br .rca-br-v {
+  bottom: 0;
+  right: 0;
+}
+
+@keyframes rca-v3-br-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ═══ FIX 4: techy hero ═══ */
+.hero.rca-hero-v3 {
+  position: relative;
+  overflow: visible;
+  grid-template-columns: 1fr !important;
+  align-items: start;
+}
+
+.hero.rca-hero-v3 .hero-copy {
+  max-width: none !important;
+  width: 100%;
+  overflow: visible !important;
+  padding-right: 260px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .hero.rca-hero-v3 .hero-copy {
+    padding-right: 0;
+  }
+}
+
+.hero.rca-hero-v3 .hero-title .hero-line1 {
+  display: block;
+  line-height: 1.08;
+}
+
+.hero.rca-hero-v3 .hero-title {
+  background: linear-gradient(180deg, #ffffff 0%, #c8f0ff 45%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+.hero.rca-hero-v3 .hero-title .highlight {
+  background: linear-gradient(180deg, #ffffff, #00d4ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero.rca-hero-v3 .hero-title .hero-line2 {
+  position: relative;
+  display: block;
+  line-height: 1.08;
+  margin-top: 4px;
+  padding-bottom: 8px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.hero.rca-hero-v3 .hero-title .hero-line2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  max-width: 100%;
+  background: #00d4ff;
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.65);
+  border-radius: 2px;
+  animation: rca-v3-hero-ul 1s ease forwards;
+}
+
+@keyframes rca-v3-hero-ul {
+  to {
+    width: 100%;
+  }
+}
+
+.hero.rca-hero-v3 .hero-sub {
+  color: #8892a4 !important;
+  font-size: 17px !important;
+  line-height: 1.65 !important;
+}
+
+.hero.rca-hero-v3 .hero-badge {
+  border: 1px solid rgba(0, 212, 255, 0.4) !important;
+  background: rgba(0, 212, 255, 0.05) !important;
+  color: #00d4ff !important;
+  animation: rca-v3-badge-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes rca-v3-badge-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.35);
+  }
+}
+
+/* ═══ Capability row ═══ */
+.rca-cap-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 20px;
+}
+
+.rca-cap-badge {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  color: #00d4ff;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.rca-cap-badge.rca-cap-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rca-cap-badge:hover {
+  background: rgba(0, 212, 255, 0.15);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+}
+
+/* ═══ Hero HUD (clock) ═══ */
+#rca-hero-hud {
+  position: absolute;
+  top: 40px;
+  right: 48px;
+  width: 240px;
+  padding: 14px 16px;
+  background: rgba(0, 212, 255, 0.04);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  font-family: "Courier New", Courier, monospace;
+  text-align: right;
+  z-index: 8;
+  border-radius: 4px;
+}
+
+#rca-hero-hud .rca-hud-clock {
+  font-size: 22px;
+  font-weight: 800;
+  color: #00d4ff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(0, 212, 255, 0.35);
+  margin-bottom: 10px;
+}
+
+#rca-hero-hud .rca-hud-line {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8892a4;
+  margin-top: 6px;
+}
+
+#rca-hero-hud .rca-hud-line span.val {
+  color: #e6edf3;
+}
+
+#rca-hero-hud .rca-hud-green {
+  color: #3fb950 !important;
+}
+
+/* ═══ Scroll indicator ═══ */
+#rca-hero-scroll-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 6;
+  color: rgba(0, 212, 255, 0.4);
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: opacity 0.45s ease;
+}
+
+#rca-hero-scroll-hint .rca-chev {
+  display: block;
+  font-size: 20px;
+  margin-top: 4px;
+  transform: rotate(90deg);
+  animation: rca-v3-chev-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes rca-v3-chev-bounce {
+  0%,
+  100% {
+    transform: rotate(90deg) translateX(0);
+  }
+  50% {
+    transform: rotate(90deg) translateX(6px);
+  }
+}
+
+#rca-hero-scroll-hint.rca-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  #rca-hero-hud {
+    top: 12px;
+    right: 16px;
+    width: min(240px, calc(100% - 32px));
+    padding: 10px 12px;
+  }
+
+  #rca-hero-scroll-hint {
+    bottom: 12px;
+  }
+}
+
+/* ═══ FIX 5: techy overrides ═══ */
+.metrics-bar .metric,
+.metric-card,
+.stat-card {
+  background: rgba(0, 212, 255, 0.03) !important;
+  border: 1px solid rgba(0, 212, 255, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.metrics-bar .metric:hover,
+.metric-card:hover,
+.stat-card:hover {
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.08) !important;
+  transform: translateY(-2px) !important;
+}
+
+.metrics-bar {
+  border-color: rgba(0, 212, 255, 0.08) !important;
+}
+
+nav a:hover,
+.nav a:hover {
+  color: #00d4ff !important;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5) !important;
+  transition: all 0.2s ease !important;
+}
+
+.scenario-card:hover,
+.scenario-item:hover {
+  border-left: 3px solid #00d4ff !important;
+  padding-left: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+@keyframes rca-v3-idle-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 212, 255, 0);
+  }
+}
+
+#runBtn:not(:disabled):not(.running) {
+  animation: rca-v3-idle-pulse 2.8s ease-in-out infinite;
+}
+</style>
+
+<script id="rca-epic-bg-v3-js">
+/* ═══ Epic background v3 + DOM injections (append-only) ═══ */
+(function () {
+  "use strict";
+
+  document.body.classList.add("rca-bg-v3");
+
+  document.querySelectorAll(".rca-hero-float").forEach(function (el) {
+    el.remove();
+  });
+  document.querySelectorAll(".hero-copy").forEach(function (el) {
+    el.classList.remove("rca-hero-particles-host");
+  });
+  document.querySelectorAll(".hero .hero-title").forEach(function (el) {
+    el.classList.remove("rca-io-heading", "rca-io-in");
+  });
+
+  var oldTicker = document.getElementById("rca-status-bar");
+  if (oldTicker) oldTicker.remove();
+
+  var oldTerm = document.querySelector(".hero-terminal-wrap");
+  if (oldTerm) oldTerm.remove();
+
+  var bg = document.getElementById("bg-canvas");
+  if (!bg) {
+    bg = document.createElement("canvas");
+    bg.id = "bg-canvas";
+    bg.setAttribute("aria-hidden", "true");
+    bg.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;";
+    document.body.insertBefore(bg, document.body.firstChild);
+  }
+
+  if (!document.getElementById("rca-bg-dim-layer")) {
+    var dimL = document.createElement("div");
+    dimL.id = "rca-bg-dim-layer";
+    dimL.setAttribute("aria-hidden", "true");
+    dimL.style.cssText =
+      "position:fixed;inset:0;z-index:0;pointer-events:none;background:rgba(3,5,8,0.70);";
+    if (bg.nextSibling) document.body.insertBefore(dimL, bg.nextSibling);
+    else document.body.appendChild(dimL);
+  }
+
+  if (!document.getElementById("rca-corner-root")) {
+    var cornerRoot = document.createElement("div");
+    cornerRoot.id = "rca-corner-root";
+    cornerRoot.innerHTML =
+      '<div class="rca-br rca-br-tl"><div class="rca-br-h"></div><div class="rca-br-v"></div></div>' +
+      '<div class="rca-br rca-br-tr"><div class="rca-br-h"></div><div class="rca-br-v"></div></div>' +
+      '<div class="rca-br rca-br-bl"><div class="rca-br-h"></div><div class="rca-br-v"></div></div>' +
+      '<div class="rca-br rca-br-br"><div class="rca-br-h"></div><div class="rca-br-v"></div></div>';
+    document.body.appendChild(cornerRoot);
+  }
+
+  var hero = document.querySelector(".hero");
+  var heroSub = document.querySelector(".hero-sub");
+  var heroBadge = document.querySelector(".hero-badge");
+  if (hero) {
+    hero.classList.add("rca-hero-v3");
+  }
+  if (heroSub && heroBadge) {
+    var capRow = document.createElement("div");
+    capRow.className = "rca-cap-row";
+    capRow.id = "rca-cap-row";
+    var caps = [
+      "⚡ REAL-TIME ANALYSIS",
+      "🧠 COGNITIVE REASONING",
+      "🔍 TRACE CORRELATION",
+      "📊 METRIC INTELLIGENCE",
+      "🛡 INCIDENT RESPONSE"
+    ];
+    caps.forEach(function (t, i) {
+      var b = document.createElement("span");
+      b.className = "rca-cap-badge";
+      b.textContent = t;
+      capRow.appendChild(b);
+      setTimeout(function () {
+        b.classList.add("rca-cap-in");
+      }, 120 + i * 140);
+    });
+    heroSub.insertAdjacentElement("afterend", capRow);
+  }
+
+  if (hero) {
+    var hud = document.createElement("div");
+    hud.id = "rca-hero-hud";
+    hud.innerHTML =
+      '<div class="rca-hud-clock" id="rca-hud-clock">00:00:00 UTC</div>' +
+      '<div class="rca-hud-line">INCIDENTS MONITORED: <span class="val" id="rca-hud-inc">1247</span></div>' +
+      '<div class="rca-hud-line rca-hud-green">MTTR IMPROVED: 73%</div>' +
+      '<div class="rca-hud-line rca-hud-green">FALSE POSITIVES REDUCED: 91%</div>';
+    hero.appendChild(hud);
+
+    var scrollHint = document.createElement("div");
+    scrollHint.id = "rca-hero-scroll-hint";
+    scrollHint.innerHTML = "SCROLL TO INVESTIGATE<span class=\"rca-chev\">›</span>";
+    hero.appendChild(scrollHint);
+
+    var incEl = document.getElementById("rca-hud-inc");
+    var clockEl = document.getElementById("rca-hud-clock");
+
+    function tickClock() {
+      if (!clockEl) return;
+      var now = new Date();
+      var h = now.getUTCHours();
+      var m = now.getUTCMinutes();
+      var s = now.getUTCSeconds();
+      function p(n) {
+        return (n < 10 ? "0" : "") + n;
+      }
+      clockEl.textContent = p(h) + ":" + p(m) + ":" + p(s) + " UTC";
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    function bumpInc() {
+      if (!incEl) return;
+      var n = parseInt(incEl.textContent.replace(/,/g, ""), 10) || 1247;
+      n += 1 + Math.floor(Math.random() * 3);
+      incEl.textContent = n.toLocaleString("en-US");
+    }
+    function scheduleBump() {
+      setTimeout(function () {
+        bumpInc();
+        scheduleBump();
+      }, 3000 + Math.random() * 5000);
+    }
+    scheduleBump();
+
+    var heroIo = new IntersectionObserver(
+      function (ents) {
+        ents.forEach(function (en) {
+          if (!en.isIntersecting || en.intersectionRatio < 0.15) {
+            scrollHint.classList.add("rca-hidden");
+          } else {
+            scrollHint.classList.remove("rca-hidden");
+          }
+        });
+      },
+      { threshold: [0, 0.15, 0.5] }
+    );
+    heroIo.observe(hero);
+  }
+
+  /* ─── Canvas: 45 nodes + packets + incidents ─── */
+  var ctx = bg.getContext("2d");
+  var w = 0;
+  var h = 0;
+  var dpr = 1;
+  var nodes = [];
+  var NODE_N = 45;
+  var LINK_D = 150;
+  var redUntil = [];
+  var packets = [];
+  var lastPacket = 0;
+  var lastRed = 0;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    bg.width = Math.floor(w * dpr);
+    bg.height = Math.floor(h * dpr);
+    bg.style.width = w + "px";
+    bg.style.height = h + "px";
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].x = Math.min(Math.max(nodes[i].x, 0), w);
+      nodes[i].y = Math.min(Math.max(nodes[i].y, 0), h);
+    }
+  }
+
+  function initNodes() {
+    nodes = [];
+    redUntil = [];
+    var i;
+    for (i = 0; i < NODE_N; i++) {
+      nodes.push({
+        x: Math.random() * Math.max(w, 1),
+        y: Math.random() * Math.max(h, 1),
+        vx: (Math.random() - 0.5) * 0.38,
+        vy: (Math.random() - 0.5) * 0.38,
+        r: 2.5 + Math.random() * 1.5
+      });
+      redUntil.push(0);
+    }
+  }
+
+  function pickRed(now) {
+    var a = Math.floor(Math.random() * NODE_N);
+    var b = Math.floor(Math.random() * NODE_N);
+    redUntil[a] = now + 1800;
+    redUntil[b] = now + 1800;
+  }
+
+  function findEdge() {
+    var tries = 0;
+    while (tries++ < 80) {
+      var i = Math.floor(Math.random() * NODE_N);
+      var j = Math.floor(Math.random() * NODE_N);
+      if (i === j) continue;
+      var dx = nodes[i].x - nodes[j].x;
+      var dy = nodes[i].y - nodes[j].y;
+      if (Math.sqrt(dx * dx + dy * dy) < LINK_D) return { i: i, j: j };
+    }
+    return null;
+  }
+
+  resize();
+  initNodes();
+  window.addEventListener("resize", function () {
+    resize();
+  });
+
+  function step(now) {
+    var i;
+    var j;
+    if (now - lastRed > 2500) {
+      lastRed = now;
+      pickRed(now);
+    }
+    if (now - lastPacket > 5000) {
+      lastPacket = now;
+      var e = findEdge();
+      if (e) {
+        packets.push({
+          i: e.i,
+          j: e.j,
+          t0: now,
+          trail: []
+        });
+      }
+    }
+
+    for (i = 0; i < NODE_N; i++) {
+      var n = nodes[i];
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < n.r) {
+        n.x = n.r;
+        n.vx *= -1;
+      } else if (n.x > w - n.r) {
+        n.x = w - n.r;
+        n.vx *= -1;
+      }
+      if (n.y < n.r) {
+        n.y = n.r;
+        n.vy *= -1;
+      } else if (n.y > h - n.r) {
+        n.y = h - n.r;
+        n.vy *= -1;
+      }
+    }
+
+    ctx.clearRect(0, 0, w, h);
+
+    for (i = 0; i < NODE_N; i++) {
+      for (j = i + 1; j < NODE_N; j++) {
+        var dx = nodes[i].x - nodes[j].x;
+        var dy = nodes[i].y - nodes[j].y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < LINK_D) {
+          var edgeA = (1 - d / LINK_D) * 0.45;
+          ctx.strokeStyle = "rgba(0, 212, 255, " + edgeA + ")";
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    var pk;
+    for (pk = packets.length - 1; pk >= 0; pk--) {
+      var p = packets[pk];
+      var u = (now - p.t0) / 1500;
+      if (u >= 1) {
+        packets.splice(pk, 1);
+        continue;
+      }
+      var ax = nodes[p.i].x;
+      var ay = nodes[p.i].y;
+      var bx = nodes[p.j].x;
+      var by = nodes[p.j].y;
+      var px = ax + (bx - ax) * u;
+      var py = ay + (by - ay) * u;
+      p.trail.push({ x: px, y: py, t: now });
+      if (p.trail.length > 12) p.trail.shift();
+      var ti;
+      for (ti = 0; ti < p.trail.length; ti++) {
+        var tr = p.trail[ti];
+        var age = 1 - (now - tr.t) / 400;
+        if (age <= 0) continue;
+        ctx.beginPath();
+        ctx.arc(tr.x, tr.y, 2.2 * age, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(180, 255, 255, " + (0.15 * age) + ")";
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(220, 255, 255, 0.95)";
+      ctx.shadowColor = "rgba(0, 255, 255, 0.8)";
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    for (i = 0; i < NODE_N; i++) {
+      var ni = nodes[i];
+      var isRed = now < redUntil[i];
+      ctx.beginPath();
+      ctx.arc(ni.x, ni.y, ni.r, 0, Math.PI * 2);
+      if (isRed) {
+        var pulse = 0.5 + 0.5 * Math.sin(now * 0.01);
+        ctx.shadowColor = "#ff4444";
+        ctx.shadowBlur = 25;
+        ctx.fillStyle = "rgba(255, 68, 68, " + (0.88 + pulse * 0.1) + ")";
+      } else {
+        ctx.shadowColor = "#00d4ff";
+        ctx.shadowBlur = 20;
+        ctx.fillStyle = "#00d4ff";
+      }
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+</script>
+
+<style id="rca-rich-scroll-pack-css">
+/* ═══ Rich scroll sections (HOW IT WORKS, stats, scenarios, footer) ═══ */
+#rca-rich-sections-root {
+  position: relative;
+  z-index: 1;
+}
+
+.rca-rs-io {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: none;
+}
+
+.rca-rs-io.rca-rs-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rca-rs-io .rca-rs-child {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: none;
+}
+
+.rca-rs-io.rca-rs-in .rca-rs-child {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rca-rs-io .rca-rs-scen-easy.rca-rs-child {
+  transform: translateX(-50px);
+}
+
+.rca-rs-io .rca-rs-scen-medium.rca-rs-child {
+  transform: translateY(50px);
+}
+
+.rca-rs-io .rca-rs-scen-hard.rca-rs-child {
+  transform: translateX(50px);
+}
+
+.rca-rs-io.rca-rs-in .rca-rs-scen-easy,
+.rca-rs-io.rca-rs-in .rca-rs-scen-medium,
+.rca-rs-io.rca-rs-in .rca-rs-scen-hard {
+  transform: translate(0, 0);
+}
+
+.rca-rs-how {
+  padding: 64px 48px 56px;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.08);
+}
+
+.rca-rs-h2 {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #00d4ff;
+  text-align: center;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+.rca-rs-how-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.rca-rs-card {
+  flex: 1 1 280px;
+  max-width: 360px;
+  padding: 32px;
+  background: rgba(0, 212, 255, 0.04);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-top: 3px solid #00d4ff;
+  font-family: "Courier New", Courier, monospace;
+  border-radius: 4px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.rca-rs-card:hover {
+  border-color: rgba(0, 212, 255, 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 212, 255, 0.08);
+}
+
+.rca-rs-step {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #7d8590;
+  margin-bottom: 12px;
+}
+
+.rca-rs-icon {
+  font-size: 42px;
+  line-height: 1;
+  color: #00d4ff;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.35));
+}
+
+.rca-rs-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #e6edf3;
+  margin-bottom: 12px;
+}
+
+.rca-rs-card-text {
+  font-size: 12px;
+  line-height: 1.75;
+  color: #8892a4;
+}
+
+.rca-rs-stats {
+  padding: 48px 24px;
+  background: rgba(0, 212, 255, 0.02);
+  border-top: 1px solid rgba(0, 212, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.rca-rs-stats-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.rca-rs-stat {
+  flex: 1 1 200px;
+  text-align: center;
+  padding: 16px 20px;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.rca-rs-stat-num {
+  font-size: 48px;
+  font-weight: 900;
+  color: #00d4ff;
+  line-height: 1.1;
+  text-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
+}
+
+.rca-rs-stat-label {
+  margin-top: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.rca-rs-stat-div {
+  width: 1px;
+  background: rgba(0, 212, 255, 0.12);
+  align-self: stretch;
+  min-height: 80px;
+}
+
+@media (max-width: 900px) {
+  .rca-rs-stat-div {
+    display: none;
+  }
+}
+
+.rca-rs-scenarios {
+  padding: 64px 48px 56px;
+}
+
+.rca-rs-scen-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.rca-rs-scen {
+  flex: 1 1 280px;
+  max-width: 340px;
+  padding: 28px;
+  border-radius: 4px;
+  font-family: "Courier New", Courier, monospace;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.rca-rs-scen-easy {
+  border-left: 4px solid #3fb950;
+  background: rgba(63, 185, 80, 0.04);
+}
+
+.rca-rs-scen-medium {
+  border-left: 4px solid #d29922;
+  background: rgba(210, 153, 34, 0.04);
+}
+
+.rca-rs-scen-hard {
+  border-left: 4px solid #f85149;
+  background: rgba(248, 81, 73, 0.04);
+}
+
+.rca-rs-scen-title {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #e6edf3;
+  margin-bottom: 10px;
+}
+
+.rca-rs-scen-body {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.rca-rs-scen-meta {
+  font-size: 11px;
+  color: #64748b;
+}
+</style>
+
+<script id="rca-rich-scroll-pack-js">
+(function () {
+  "use strict";
+
+  var ioOpts = { threshold: 0.15, rootMargin: "0px 0px -5% 0px" };
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function runCounters(section) {
+    var nums = section.querySelectorAll(".rca-rs-stat-num[data-rca-target]");
+    nums.forEach(function (el) {
+      if (el.getAttribute("data-rca-counted") === "1") return;
+      el.setAttribute("data-rca-counted", "1");
+      var target = parseFloat(el.getAttribute("data-rca-target"), 10);
+      var suf = el.getAttribute("data-rca-suffix") || "";
+      var dec = parseInt(el.getAttribute("data-rca-decimals"), 10) || 0;
+      if (isNaN(target)) return;
+      var start = performance.now();
+      var dur = 1400;
+      function tick(now) {
+        var u = Math.min(1, (now - start) / dur);
+        var e = easeOutCubic(u);
+        var v = target * e;
+        if (dec === 0) {
+          el.textContent = Math.round(v) + suf;
+        } else {
+          el.textContent = v.toFixed(1) + suf;
+        }
+        if (u < 1) requestAnimationFrame(tick);
+        else {
+          if (dec === 0) el.textContent = Math.round(target) + suf;
+          else el.textContent = target.toFixed(1) + suf;
+        }
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      var root = en.target;
+      root.classList.add("rca-rs-in");
+      var staggerMs = 120;
+      var kids = root.querySelectorAll(".rca-rs-child");
+      kids.forEach(function (ch, i) {
+        ch.style.transitionDelay = i * staggerMs + "ms";
+      });
+      if (root.id === "rca-section-stats") {
+        runCounters(root);
+      }
+      io.unobserve(root);
+    });
+  }, ioOpts);
+
+  document
+    .querySelectorAll("#rca-section-how, #rca-section-stats, #rca-section-scenarios-breakdown")
+    .forEach(function (sec) {
+      io.observe(sec);
+    });
+})();
+</script>
+
+<style id="rca-global-footer-v1-css">
+.rca-global-footer {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 40px 60px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 212, 255, 0.15);
+  box-shadow: 0 -1px 30px rgba(0, 212, 255, 0.05);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px 32px;
+  font-family: "Courier New", Courier, monospace;
+}
+.rca-gf-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.rca-gf-brand {
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+}
+.rca-gf-muted {
+  color: #8892a4;
+}
+.rca-gf-left .rca-gf-muted {
+  font-size: 12px;
+}
+.rca-gf-center {
+  text-align: center;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+}
+.rca-gf-accent {
+  font-size: 12px;
+  color: #00d4ff;
+}
+.rca-gf-center .rca-gf-muted {
+  font-size: 11px;
+}
+.rca-gf-right {
+  text-align: right;
+  align-items: flex-end;
+}
+.rca-gf-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #00ff88;
+  letter-spacing: 0.5px;
+}
+.rca-gf-pulse-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00ff88;
+  margin-right: 8px;
+  flex-shrink: 0;
+  animation: rca-gf-dot-pulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(0, 255, 136, 0.65);
+}
+@keyframes rca-gf-dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+}
+.rca-gf-clock {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 900px) {
+  .rca-global-footer {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 32px 24px;
+  }
+  .rca-gf-center,
+  .rca-gf-right {
+    text-align: center;
+    align-items: center;
+  }
+}
+</style>
+
+<footer id="rca-global-footer" class="rca-global-footer" role="contentinfo">
+  <div class="rca-gf-col rca-gf-left">
+    <div class="rca-gf-brand">RCAAGENT</div>
+    <div class="rca-gf-muted">AI-Powered Incident Root Cause Analysis</div>
+  </div>
+  <div class="rca-gf-col rca-gf-center">
+    
+    <div class="rca-gf-muted">Powered by Qwen + LLaMA 3.3 · Grader v2.0</div>
+  </div>
+  <div class="rca-gf-col rca-gf-right">
+    <div class="rca-gf-status">
+      <span class="rca-gf-pulse-dot" aria-hidden="true"></span>
+      SYSTEM OPERATIONAL
+    </div>
+    <div class="rca-gf-muted rca-gf-clock" id="rca-global-footer-clock">00:00:00 UTC</div>
+  </div>
+</footer>
+
+<script id="rca-global-footer-v1-js">
+(function () {
+  "use strict";
+  var el = document.getElementById("rca-global-footer-clock");
+  function pad(n) {
+    return (n < 10 ? "0" : "") + n;
+  }
+  function tick() {
+    if (!el) return;
+    var now = new Date();
+    el.textContent =
+      pad(now.getUTCHours()) + ":" + pad(now.getUTCMinutes()) + ":" + pad(now.getUTCSeconds()) + " UTC";
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
 <script src="/static/neural-bg.js"></script>
 
 </body>
