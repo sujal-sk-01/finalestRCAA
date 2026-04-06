@@ -1,6 +1,12 @@
-"""FastAPI ASGI application: Hugging Face Spaces + OpenEnv HTTP API."""
-
 from __future__ import annotations
+
+import asyncio
+import sys
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+"""FastAPI ASGI application: Hugging Face Spaces + OpenEnv HTTP API."""
 
 from pathlib import Path
 
@@ -10,14 +16,9 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(_PROJECT_ROOT / ".env")
 load_dotenv()
 
-import asyncio
 import json
 import logging
 import os
-import sys
-
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 logging.basicConfig(level=logging.INFO)
 
@@ -170,7 +171,7 @@ def root():
   .dot-green { background: #22c55e; }
   .terminal-title { color: #475569; font-size: 12px; margin-left: 8px; }
 
-  .terminal-body { background: #050508; border: 1px solid #1e293b; border-radius: 6px; padding: 24px; min-height: 400px; font-size: 13px; line-height: 1.8; }
+  .terminal-body { background: #050508; border: 1px solid #1e293b; border-radius: 6px; padding: 24px; min-height: 400px; max-height: 520px; overflow-y: auto; font-size: 13px; line-height: 1.8; }
   .terminal-body .placeholder { color: #1e293b; text-align: center; padding-top: 80px; font-size: 14px; }
   
   .log-line { margin-bottom: 4px; animation: fadeIn 0.3s ease; }

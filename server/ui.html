@@ -7,11 +7,15 @@
 <style>
 html{scroll-behavior:smooth}
 *{margin:0;padding:0;box-sizing:border-box}
-html{background:#080c14}
+html{background:#0a0f1e}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-body{animation:fadeIn .6s ease both;background:transparent;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
-#neural-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block}
-body>section,body>div.main{position:relative;z-index:1}
+body{animation:fadeIn .6s ease both;background:#0a0f1e;position:relative;overflow-x:hidden;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 50%, rgba(0,255,180,0.12) 0%, transparent 60%),radial-gradient(ellipse at 80% 20%, rgba(100,0,255,0.1) 0%, transparent 55%),radial-gradient(ellipse at 60% 80%, rgba(255,60,60,0.08) 0%, transparent 50%);animation:driftOrbs 12s ease-in-out infinite alternate;pointer-events:none}
+body::after{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(0,255,180,0.03) 1px, transparent 1px),linear-gradient(90deg, rgba(0,255,180,0.03) 1px, transparent 1px);background-size:40px 40px;animation:gridPulse 4s ease-in-out infinite;pointer-events:none}
+@keyframes driftOrbs{0%{transform:scale(1) translate(0,0);opacity:.7}50%{transform:scale(1.05) translate(-15px,10px);opacity:1}100%{transform:scale(1) translate(10px,-10px);opacity:.8}}
+@keyframes gridPulse{0%,100%{opacity:.4}50%{opacity:.8}}
+#neural-bg{position:fixed;inset:0;width:100%;height:100%;z-index:-2;pointer-events:none;display:block}
+body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.right-panel,.score-panel,#leaderboard-section,.rca-run-history-wrap,.rca-lb-head,.rca-lb-table,.rca-run-history-body,.rca-export-toolbar{position:relative;z-index:1}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:#0d1117}
 ::-webkit-scrollbar-thumb{background:#1e2d3d;border-radius:3px}
@@ -50,8 +54,12 @@ body>section,body>div.main{position:relative;z-index:1}
 .right-panel{flex:1;background:rgba(8,12,20,.8);display:flex;flex-direction:column}
 
 /* SCENARIO CARDS */
-.scenario-card{width:100%;text-align:left;background:#080c14;border:1px solid #1e2d3d;border-left:3px solid transparent;border-radius:4px;padding:14px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;gap:8px}
-.scenario-card:hover{border-left-color:#388bfd;box-shadow:0 0 0 1px rgba(56,139,253,.15)}
+.scenario-card{width:100%;text-align:left;background:#080c14;border:1px solid #1e2d3d;border-left:3px solid transparent;border-radius:4px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .3s ease, border-color .15s, box-shadow .3s ease, transform .3s ease;display:flex;flex-direction:column;gap:8px}
+.scenario-card:hover{border-left-color:#388bfd;box-shadow:0 0 20px rgba(56,139,253,.18);transform:translateY(-1px)}
+.scenario-card.easy:hover{box-shadow:0 0 20px rgba(0,255,100,.25)}
+.scenario-card.medium:hover{box-shadow:0 0 20px rgba(255,200,0,.25)}
+.scenario-card.hard:hover{box-shadow:0 0 20px rgba(255,60,60,.25)}
+.scenario-card.ddos:hover{box-shadow:0 0 20px rgba(188,140,255,.25)}
 .scenario-card.selected{border-left-color:#388bfd;box-shadow:0 0 0 1px rgba(56,139,253,.25)}
 .scenario-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .scenario-title{font-size:13px;font-weight:700;color:#e6edf3;line-height:1.2}
@@ -80,6 +88,179 @@ body>section,body>div.main{position:relative;z-index:1}
 .tab.active{color:#388bfd;border-bottom-color:#388bfd}
 .action-btn{background:transparent;border:1px solid #1e2d3d;color:#7d8590;border-radius:4px;padding:8px 12px;font-family:'Courier New',monospace;font-size:11px;cursor:pointer}
 .action-btn:hover{border-color:#388bfd;color:#e6edf3}
+
+.report-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #1e293b;
+}
+
+.share-btn {
+  background: transparent;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+.share-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(59,130,246,0.3);
+}
+
+.export-btn {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #fff;
+}
+.export-btn:hover {
+  background: #2563eb;
+  box-shadow: 0 0 20px rgba(37,99,235,0.4);
+}
+
+.share-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 9998;
+  display: none;
+}
+
+.share-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(560px, calc(100% - 32px));
+  max-width: 680px;
+  z-index: 9999;
+  display: none;
+}
+
+.share-modal-inner {
+  background: #0d1117;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+}
+
+.share-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #1e293b;
+}
+
+.share-modal-title {
+  color: #3b82f6;
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.share-close-btn {
+  background: none;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.share-close-btn:hover { color: #f1f5f9; background: #1e293b; }
+
+.share-modal-body { padding: 24px; }
+
+.share-link-input {
+  flex: 1;
+  background: #050508;
+  border: 1px solid #1e293b;
+  color: #64748b;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  outline: none;
+  resize: none;
+  height: 80px;
+  line-height: 1.6;
+}
+
+.share-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.copy-btn {
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.copy-btn:hover { background: #334155; color: #f1f5f9; }
+.copy-btn.copied { background: #052e16; border-color: #16a34a; color: #4ade80; }
+
+.share-divider {
+  text-align: center;
+  color: #334155;
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 16px;
+  position: relative;
+}
+.share-divider::before, .share-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background: #1e293b;
+}
+.share-divider::before { left: 0; }
+.share-divider::after { right: 0; }
+
+.share-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.share-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.share-option-btn:hover {
+  border-color: #3b82f6;
+  color: #f1f5f9;
+  background: #0f172a;
+}
+
 .terminal-body{flex:1;height:520px;max-height:520px;padding:24px 28px;overflow-y:auto;font-size:12px;line-height:1.9;font-family:'Courier New',monospace;background:rgba(8,12,20,.88)}
 .placeholder-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#7d8590;text-align:center}
 .placeholder-icon{font-size:48px;margin-bottom:16px;opacity:.35}
@@ -120,6 +301,152 @@ body>section,body>div.main{position:relative;z-index:1}
 .report-box span{color:#7d8590}
 @keyframes networkRootPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(248,81,73,.9));opacity:1}50%{filter:drop-shadow(0 0 16px rgba(248,81,73,.5));opacity:.88}}
 .network-root-pulse{animation:networkRootPulse 2s ease-in-out infinite}
+
+.history-timeline-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(0,255,180,0.15);
+}
+
+.timeline-heading {
+  font-family: monospace;
+  letter-spacing: 0.15em;
+  color: rgba(0,255,180,0.8);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-entry {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.timeline-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 16px;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.timeline-dot.green {
+  background: rgba(0,255,100,0.3);
+  border-color: #00ff64;
+  box-shadow: 0 0 8px rgba(0,255,100,0.6);
+}
+
+.timeline-dot.red {
+  background: rgba(255,60,60,0.3);
+  border-color: #ff3c3c;
+  box-shadow: 0 0 8px rgba(255,60,60,0.6);
+}
+
+.timeline-dot.yellow {
+  background: rgba(255,200,0,0.3);
+  border-color: #ffc800;
+  box-shadow: 0 0 8px rgba(255,200,0,0.6);
+}
+
+.timeline-line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+  margin: 4px 0;
+  min-height: 20px;
+}
+
+.timeline-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  flex: 1;
+  transition: all 0.3s ease;
+  animation: fadeInLeft 0.4s ease forwards;
+}
+
+.timeline-card:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(0,255,180,0.2);
+  box-shadow: 0 0 12px rgba(0,255,180,0.08);
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.tl-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.diff-badge {
+  font-size: 0.65rem;
+  font-family: monospace;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.diff-badge.easy   { background: rgba(0,255,100,0.15); color: #00ff64; border: 1px solid rgba(0,255,100,0.3); }
+.diff-badge.medium { background: rgba(255,200,0,0.15); color: #ffc800; border: 1px solid rgba(255,200,0,0.3); }
+.diff-badge.hard   { background: rgba(255,60,60,0.15);  color: #ff3c3c; border: 1px solid rgba(255,60,60,0.3); }
+
+.tl-title {
+  color: rgba(255,255,255,0.85);
+  font-size: 0.82rem;
+  font-family: monospace;
+  flex: 1;
+}
+
+.tl-status { font-size: 0.7rem; font-family: monospace; }
+.solved-tag { color: #00ff64; }
+.failed-tag { color: #ff3c3c; }
+
+.tl-time {
+  color: rgba(255,255,255,0.3);
+  font-size: 0.68rem;
+  font-family: monospace;
+}
+
+.tl-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  font-family: monospace;
+  margin-bottom: 0.4rem;
+}
+
+.tl-cause {
+  font-size: 0.72rem;
+  color: rgba(0,255,180,0.5);
+  font-family: monospace;
+  font-style: italic;
+}
 
 @media (max-width:1024px){
   .hero{grid-template-columns:1fr;padding:32px 24px}
@@ -170,7 +497,7 @@ body>section,body>div.main{position:relative;z-index:1}
   <aside class="left-panel">
     <div style="margin:8px 8px 14px;font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;color:#7d8590">Scenarios</div>
 
-    <button class="scenario-card" onclick="select('easy',this)">
+    <button class="scenario-card easy" onclick="select('easy',this)">
       <div class="scenario-title-row">
         <div class="scenario-title">INC-001 · Cache Failure</div>
         <span class="severity-p2">P2</span>
@@ -179,7 +506,7 @@ body>section,body>div.main{position:relative;z-index:1}
       <div class="scenario-meta">Optimal: 3 queries · 1 root service</div>
     </button>
 
-    <button class="scenario-card" onclick="select('medium',this)">
+    <button class="scenario-card medium" onclick="select('medium',this)">
       <div class="scenario-title-row">
         <div class="scenario-title">INC-002 · Config Cascade</div>
         <span class="severity-p1">P1</span>
@@ -188,7 +515,7 @@ body>section,body>div.main{position:relative;z-index:1}
       <div class="scenario-meta">Optimal: 6 queries · 4 services</div>
     </button>
 
-    <button class="scenario-card" onclick="select('hard',this)">
+    <button class="scenario-card hard" onclick="select('hard',this)">
       <div class="scenario-title-row">
         <div class="scenario-title">INC-003 · AZ Packet Loss</div>
         <span class="severity-p0">P0</span>
@@ -197,7 +524,7 @@ body>section,body>div.main{position:relative;z-index:1}
       <div class="scenario-meta">Optimal: 10 queries · 12 services</div>
     </button>
 
-    <button class="scenario-card" onclick="select('ddos',this)">
+    <button class="scenario-card ddos" onclick="select('ddos',this)">
       <div class="scenario-title-row">
         <div class="scenario-title">INC-004 · DDoS Attack</div>
         <span class="severity-p0">P0</span>
@@ -205,7 +532,7 @@ body>section,body>div.main{position:relative;z-index:1}
       <div class="badge badge-ddos">DDOS</div>
       <div class="scenario-meta">Optimal: 4 queries · 5 services</div>
     </button>
-<button class="scenario-card" onclick="select('data_breach',this)">
+<button class="scenario-card hard" onclick="select('data_breach',this)">
       <div class="scenario-title-row">
         <div class="scenario-title">INC-005 · Data Breach</div>
         <span class="severity-p0">P0</span>
@@ -244,6 +571,25 @@ body>section,body>div.main{position:relative;z-index:1}
         <div class="score-final" id="scoreFinal">—</div>
       </div>
       <div class="score-grid" id="scoreGrid"></div>
+      <div class="report-actions">
+        <button class="action-btn share-btn" onclick="shareReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          SHARE REPORT
+        </button>
+        <button class="action-btn export-btn" onclick="exportPDF()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          EXPORT PDF
+        </button>
+      </div>
       <div class="report-box" id="reportBox"></div>
     </div>
     <div id="networkGraph" style="display:none;background:#080c14;border-top:1px solid #1e2d3d;padding:32px"></div>
@@ -278,7 +624,7 @@ body>section,body>div.main{position:relative;z-index:1}
   <section class="rca-rs-stats rca-rs-io" id="rca-section-stats" aria-label="Live statistics">
     <div class="rca-rs-stats-inner">
       <div class="rca-rs-stat rca-rs-child" data-rca-stagger="0">
-        <div class="rca-rs-stat-num" data-rca-target="2.3" data-rca-suffix="s" data-rca-decimals="1">0</div>
+        <div class="rca-rs-stat-num" data-rca-target="7" data-rca-suffix="s" data-rca-decimals="1">0</div>
         <div class="rca-rs-stat-label">MEAN TIME TO DETECT</div>
       </div>
       <div class="rca-rs-stat-div" aria-hidden="true"></div>
@@ -308,6 +654,7 @@ body>section,body>div.main{position:relative;z-index:1}
         <p class="rca-rs-scen-meta">Optimal: 3-6 queries · 1-4 services</p>
       </article>
       <article class="rca-rs-scen rca-rs-scen-medium rca-rs-child" data-rca-stagger="1">
+
         <h3 class="rca-rs-scen-title">MEDIUM</h3>
         <p class="rca-rs-scen-body">Network Cascades, Auth Failures</p>
         <p class="rca-rs-scen-meta">Optimal: 6-8 queries · 4-8 services</p>
@@ -322,8 +669,29 @@ body>section,body>div.main{position:relative;z-index:1}
 
 </div>
 
+<div id="shareBackdrop" class="share-backdrop" onclick="closeShare()" style="display:none;"></div>
+<div id="shareModal" class="share-modal" style="display:none;">
+  <div class="share-modal-inner">
+    <div class="share-modal-header">
+      <div class="share-modal-title">Share Investigation Report</div>
+      <button class="share-close-btn" type="button" onclick="closeShare()">✕</button>
+    </div>
+    <div class="share-modal-body">
+      <p>Copy the report link below or share it directly via your preferred channel.</p>
+      <textarea id="shareLinkInput" readonly class="share-link-input"></textarea>
+      <div class="share-modal-actions">
+        <button type="button" class="action-btn copy-btn" onclick="copyLink()">COPY</button>
+        <button type="button" class="action-btn share-option-btn" onclick="shareVia('twitter')">TWITTER</button>
+        <button type="button" class="action-btn share-option-btn" onclick="shareVia('linkedin')">LINKEDIN</button>
+        <button type="button" class="action-btn share-option-btn" onclick="shareVia('email')">EMAIL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 let difficulty = null;
+let currentReportData = null;
 
 function select(d, btn) {
   difficulty = d;
@@ -339,6 +707,235 @@ function select(d, btn) {
 function clearLog() {
   document.getElementById('termBody').innerHTML = '<div class="placeholder-state"><div class="placeholder-icon">⬡</div><div class="placeholder-text">READY — CLICK RUN AGENT</div></div>';
 }
+
+function shareReport() {
+  const score = currentReportData 
+    ? Math.round((currentReportData.scores?.final_score || 0) * 100)
+    : 0;
+  const diff  = currentReportData?.difficulty?.toUpperCase() || 'UNKNOWN';
+  const svc   = currentReportData?.report?.root_cause_service || 'Unknown Service';
+  const type  = currentReportData?.report?.root_cause_type    || 'Unknown Type';
+
+  const title = 'RCAAgent Investigation Report — ' + diff;
+  const text  = 
+    '🔍 RCAAgent Investigation Complete!\n' +
+    'Scenario: ' + diff + '  |  Score: ' + score + '%\n' +
+    'Root Cause: ' + svc + ' (' + type + ')\n' +
+    'Powered by RCAAgent-Env v2.0 · AI-Powered SRE Intelligence\n' +
+    '#RCAAgent #SRE #AIops #IncidentResponse';
+
+  /* Try native share first (works on mobile + some desktop) */
+  if (navigator.share) {
+    navigator.share({ title: title, text: text })
+      .catch(function(err) { console.log('Share cancelled:', err); });
+    return;
+  }
+
+  /* Fallback: show a simple custom share panel */
+  const existing = document.getElementById('rcaSharePanel');
+  if (existing) { existing.remove(); return; }
+
+  const panel = document.createElement('div');
+  panel.id = 'rcaSharePanel';
+  panel.style.cssText = [
+    'position:fixed',
+    'top:50%',
+    'left:50%',
+    'transform:translate(-50%,-50%)',
+    'z-index:999999',
+    'background:#0d1117',
+    'border:1px solid #3b82f6',
+    'border-radius:8px',
+    'padding:28px',
+    'width:440px',
+    'max-width:92vw',
+    'box-shadow:0 24px 64px rgba(0,0,0,0.9)',
+    'font-family:Courier New,monospace'
+  ].join(';');
+
+  const encoded = encodeURIComponent(text);
+  const emailSubject = encodeURIComponent(title);
+
+  panel.innerHTML = 
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">' +
+      '<span style="color:#3b82f6;font-size:11px;letter-spacing:2px;font-weight:700">⬡ SHARE REPORT</span>' +
+      '<button onclick="document.getElementById(\'rcaSharePanel\').remove();document.getElementById(\'rcaShareBg\').remove();" ' +
+        'style="background:none;border:none;color:#64748b;font-size:18px;cursor:pointer;padding:2px 6px">✕</button>' +
+    '</div>' +
+
+    '<textarea readonly style="width:100%;height:90px;background:#050508;border:1px solid #1e293b;' +
+      'color:#94a3b8;padding:10px;border-radius:4px;font-family:Courier New,monospace;' +
+      'font-size:11px;line-height:1.7;resize:none;margin-bottom:14px">' + text + '</textarea>' +
+
+    '<button onclick="navigator.clipboard.writeText(' + JSON.stringify(text) + ');' +
+      'this.textContent=\'✓ COPIED\';this.style.color=\'#4ade80\';this.style.borderColor=\'#4ade80\';' +
+      'setTimeout(()=>{this.textContent=\'COPY TEXT\';this.style.color=\'\';this.style.borderColor=\'\'},2000)" ' +
+      'style="width:100%;padding:10px;background:transparent;border:1px solid #334155;' +
+      'color:#94a3b8;border-radius:4px;cursor:pointer;font-family:Courier New,monospace;' +
+      'font-size:11px;letter-spacing:2px;margin-bottom:16px;transition:all 0.2s">' +
+      'COPY TEXT' +
+    '</button>' +
+
+    '<div style="font-size:10px;letter-spacing:2px;color:#334155;text-align:center;margin-bottom:14px">SHARE VIA</div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+
+      '<a href="https://twitter.com/intent/tweet?text=' + encoded + '" target="_blank" rel="noopener" ' +
+        'style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#111827;' +
+        'border:1px solid #1e293b;border-radius:4px;color:#94a3b8;text-decoration:none;' +
+        'font-size:12px;transition:all 0.2s" ' +
+        'onmouseover="this.style.borderColor=\'#3b82f6\';this.style.color=\'#f1f5f9\'" ' +
+        'onmouseout="this.style.borderColor=\'#1e293b\';this.style.color=\'#94a3b8\'">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">' +
+          '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>' +
+        '</svg>X / Twitter' +
+      '</a>' +
+
+      '<a href="https://www.linkedin.com/feed/?shareActive=true&text=' + encoded + '" target="_blank" rel="noopener" ' +
+        'style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#111827;' +
+        'border:1px solid #1e293b;border-radius:4px;color:#94a3b8;text-decoration:none;' +
+        'font-size:12px;transition:all 0.2s" ' +
+        'onmouseover="this.style.borderColor=\'#3b82f6\';this.style.color=\'#f1f5f9\'" ' +
+        'onmouseout="this.style.borderColor=\'#1e293b\';this.style.color=\'#94a3b8\'">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">' +
+          '<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>' +
+        '</svg>LinkedIn' +
+      '</a>' +
+
+      '<a href="mailto:?subject=' + emailSubject + '&body=' + encoded + '" ' +
+        'style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#111827;' +
+        'border:1px solid #1e293b;border-radius:4px;color:#94a3b8;text-decoration:none;' +
+        'font-size:12px;transition:all 0.2s" ' +
+        'onmouseover="this.style.borderColor=\'#3b82f6\';this.style.color=\'#f1f5f9\'" ' +
+        'onmouseout="this.style.borderColor=\'#1e293b\';this.style.color=\'#94a3b8\'">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+          '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>' +
+          '<polyline points="22,6 12,13 2,6"/>' +
+        '</svg>Email' +
+      '</a>' +
+
+      '<a href="https://wa.me/?text=' + encoded + '" target="_blank" rel="noopener" ' +
+        'style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:#111827;' +
+        'border:1px solid #1e293b;border-radius:4px;color:#94a3b8;text-decoration:none;' +
+        'font-size:12px;transition:all 0.2s" ' +
+        'onmouseover="this.style.borderColor=\'#3b82f6\';this.style.color=\'#f1f5f9\'" ' +
+        'onmouseout="this.style.borderColor=\'#1e293b\';this.style.color=\'#94a3b8\'">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">' +
+          '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>' +
+          '<path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.943l6.272-1.643A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.006-1.368l-.36-.214-3.724.976.994-3.63-.234-.373A9.818 9.818 0 1 1 12 21.818z"/>' +
+        '</svg>WhatsApp' +
+      '</a>' +
+
+    '</div>';
+
+  /* Dark backdrop */
+  const bg = document.createElement('div');
+  bg.id = 'rcaShareBg';
+  bg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:999998;backdrop-filter:blur(4px)';
+  bg.onclick = function() {
+    panel.remove();
+    bg.remove();
+  };
+
+  document.body.appendChild(bg);
+  document.body.appendChild(panel);
+}
+
+function closeShare() {
+  document.getElementById('shareModal').style.display   = 'none';
+  document.getElementById('shareBackdrop').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function copyLink() {
+  const input = document.getElementById('shareLinkInput');
+  const text  = input.dataset.shareText || input.value;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const original = btn.textContent;
+    btn.textContent = '✓ COPIED';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    /* Fallback for browsers that block clipboard */
+    input.select();
+    document.execCommand('copy');
+  });
+}
+
+function shareVia(platform) {
+  const score = Math.round((currentReportData?.scores?.final_score || 0) * 100);
+  const diff  = (currentReportData?.difficulty || 'unknown').toUpperCase();
+  const svc   = currentReportData?.report?.root_cause_service || 'Unknown';
+  const type  = currentReportData?.report?.root_cause_type    || 'Unknown';
+
+  const message = 
+    `🔍 RCAAgent Investigation Complete!\n` +
+    `Scenario: ${diff} | Score: ${score}%\n` +
+    `Root Cause: ${svc} (${type})\n` +
+    `#RCAAgent #SRE #AIops #IncidentResponse`;
+
+  const encoded = encodeURIComponent(message);
+  const repoUrl = encodeURIComponent('https://github.com/your-org/rcaagent');
+
+  const links = {
+    twitter:  `https://twitter.com/intent/tweet?text=${encoded}`,
+    linkedin: `https://www.linkedin.com/feed/?shareActive=true&text=${encoded}`,
+    slack:    `https://slack.com/share?text=${encoded}`,
+    email:    `mailto:?subject=RCAAgent%20Investigation%20Report%20%E2%80%94%20${diff}%20%7C%20Score%3A%20${score}%25&body=${encoded}`
+  };
+
+  if (links[platform]) {
+    window.open(links[platform], '_blank', 'noopener,noreferrer');
+  }
+
+  closeShare();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var panel = document.getElementById('rcaSharePanel');
+    var bg    = document.getElementById('rcaShareBg');
+    if (panel) panel.remove();
+    if (bg)    bg.remove();
+  }
+});
+
+function exportPDF() {
+  const btn = document.querySelector('.export-btn');
+  if (btn) {
+    btn.innerHTML = '⏳ GENERATING...';
+    btn.disabled = true;
+  }
+
+  const r = currentReportData?.report || {};
+  const s = currentReportData?.scores || {};
+  const diff = (currentReportData?.difficulty || 'unknown').toUpperCase();
+  const score = Math.round((s.final_score || 0) * 100);
+  const ts = new Date().toLocaleString();
+  const scoreColor = score >= 70 ? '#4ade80' : score >= 40 ? '#fbbf24' : '#ef4444';
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Courier New',monospace;background:#fff;color:#1e293b;padding:48px;} .header{border-bottom:3px solid #1d4ed8;padding-bottom:24px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:flex-end;} .logo{font-size:22px;font-weight:900;color:#0f172a;letter-spacing:3px;} .logo span{color:#1d4ed8;} .meta{text-align:right;font-size:11px;color:#64748b;line-height:1.8;} .score-hero{text-align:center;padding:32px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:32px;} .score-hero .label{font-size:10px;letter-spacing:3px;color:#64748b;margin-bottom:8px;} .score-hero .value{font-size:64px;font-weight:900;color:${scoreColor};} .score-hero .diff{font-size:12px;letter-spacing:2px;color:#94a3b8;margin-top:8px;} .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:32px;} .grid-item{text-align:center;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;} .glabel{font-size:9px;letter-spacing:1px;color:#64748b;text-transform:uppercase;margin-bottom:6px;} .gval{font-size:20px;font-weight:800;color:#1d4ed8;} .section{margin-bottom:24px;} .section-title{font-size:10px;letter-spacing:2px;color:#64748b;text-transform:uppercase;margin-bottom:12px;border-bottom:1px solid #e2e8f0;padding-bottom:8px;} .info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;} .info-row .key{color:#64748b;} .info-row .val{color:#0f172a;font-weight:600;} .footer{margin-top:48px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;letter-spacing:1px;} </style></head><body><div class="header"><div class="logo">RCA<span>AGENT</span></div><div class="meta"><div>Generated: ${ts}</div><div>Scenario: ${diff}</div><div>RCAAgent-Env</div></div></div><div class="score-hero"><div class="label">FINAL INVESTIGATION SCORE</div><div class="value">${score}%</div><div class="diff">${diff} DIFFICULTY</div></div><div class="grid">${[['Root Cause', s.root_cause_score],['Causal Path', s.causal_path_score],['Efficiency', s.efficiency_score],['Report Quality', s.report_quality_score],['Confidence', (data.report && data.report.confidence) || 0]].map(([l,v])=>`<div class="grid-item"><div class="glabel">${l}</div><div class="gval">${Math.round((v||0)*100)}%</div></div>`).join('')}</div><div class="section"><div class="section-title">Root Cause Analysis</div><div class="info-row"><span class="key">Root Cause Service</span><span class="val">${r.root_cause_service||'—'}</span></div><div class="info-row"><span class="key">Failure Type</span><span class="val">${r.root_cause_type||'—'}</span></div><div class="info-row"><span class="key">Confidence</span><span class="val">${r.confidence_score?Math.round(r.confidence_score*100)+'%':'—'}</span></div><div class="info-row"><span class="key">Affected Services</span><span class="val">${(r.affected_services||[]).join(' → ')||'—'}</span></div></div><div class="section"><div class="section-title">Summary</div><p style="font-size:13px;line-height:1.8;color:#475569">${(r.summary||'No summary available.').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div><div class="footer"><span>RCAAGENT · AI-Powered SRE Intelligence Platform</span><span>CONFIDENTIAL INVESTIGATION REPORT</span></div></body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  setTimeout(() => {
+    if (win) win.print();
+    URL.revokeObjectURL(url);
+    if (btn) {
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> EXPORT PDF`;
+      btn.disabled = false;
+    }
+  }, 800);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeShare();
+});
 
 function ts() {
   return new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -513,16 +1110,16 @@ async function runAgent() {
           addLog('', 'lb-anomaly', `  ⚠ ANOMALY DETECTED: ${obs.anomaly_type}`);
         }
         if (obs.data && obs.data.metrics) {
-          await new Promise(r => setTimeout(r, 200));
+          await new Promise(r => setTimeout(r, 50));
           const m = obs.data.metrics;
           addLog('', 'lb-system', `  ↳ CPU: ${(m.cpu_usage*100).toFixed(0)}% | Error Rate: ${(m.error_rate*100).toFixed(0)}% | Status: ${m.status}`);
         }
         if (obs.reward) {
-          await new Promise(r => setTimeout(r, 200));
+          await new Promise(r => setTimeout(r, 50));
           addLog('', 'lb-reward', `  ↳ +${obs.reward.step_reward.toFixed(3)} reward | cumulative: ${obs.reward.cumulative_reward.toFixed(3)}`);
         }
 
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 80));
       }
 
       addLog('SYSTEM', 'lb-system', '─────────────────────────────────────────────────');
@@ -549,7 +1146,7 @@ async function runAgent() {
           ['Causal Path', s.causal_path_score],
           ['Efficiency', s.efficiency_score],
           ['Report Quality', s.report_quality_score],
-          ['Confidence', s.confidence_bonus]
+          ['Confidence', (data.report && data.report.confidence) || 0]
         ].map(([l,v]) => {
           const pct = ((v||0)*100).toFixed(0);
           const c = v >= 0.7 ? 'siv-green' : v >= 0.4 ? 'siv-yellow' : 'siv-red';
@@ -565,6 +1162,12 @@ async function runAgent() {
         }
 
         document.getElementById('scorePanel').classList.add('show');
+        currentReportData = {
+          scores: data.scores,
+          report: data.report,
+          difficulty: selectedDifficulty,
+          timestamp: new Date().toISOString()
+        };
 
         if (data.report && networkGraphEl) {
           const r = data.report;
@@ -731,6 +1334,61 @@ ${labels}
     </thead>
     <tbody id="rca-leaderboard-tbody"></tbody>
   </table>
+<div class="history-timeline-section">
+  <h3 class="timeline-heading">
+    <span class="heading-icon">📋</span> INVESTIGATION HISTORY
+  </h3>
+
+  <div class="timeline-container">
+
+    <!-- ENTRY 1 — FAILED -->
+    <div class="timeline-entry failed">
+      <div class="timeline-left">
+        <div class="timeline-dot red"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="timeline-card">
+        <div class="tl-header">
+          <span class="diff-badge hard">HARD</span>
+          <span class="tl-title">DDoS + AZ Failure Investigation</span>
+          <span class="tl-status failed-tag">✕ FAILED</span>
+          <span class="tl-time">19:09:25 UTC</span>
+        </div>
+        <div class="tl-meta">
+          <span>🔍 0 queries</span>
+          <span>⚙️ 0 services</span>
+          <span>⏱ 00:03 elapsed</span>
+          <span>❌ HF_TOKEN not set</span>
+        </div>
+        <div class="tl-cause">Root Cause: Configuration error — model token missing</div>
+      </div>
+    </div>
+
+    <!-- ENTRY 2 — SOLVED (example) -->
+    <div class="timeline-entry solved">
+      <div class="timeline-left">
+        <div class="timeline-dot green"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="timeline-card">
+        <div class="tl-header">
+          <span class="diff-badge easy">EASY</span>
+          <span class="tl-title">Cache Failure Investigation</span>
+          <span class="tl-status solved-tag">✓ SOLVED</span>
+          <span class="tl-time">18:45:10 UTC</span>
+        </div>
+        <div class="tl-meta">
+          <span>🔍 4 queries</span>
+          <span>⚙️ 2 services</span>
+          <span>⏱ 02:18 elapsed</span>
+          <span>📊 Score: 91/100</span>
+        </div>
+        <div class="tl-cause">Root Cause: Redis cache TTL misconfiguration caused cascade</div>
+      </div>
+    </div>
+
+  </div>
+</div>
   <div class="rca-run-history-wrap">
     <h3 class="rca-lb-heading rca-run-history-heading">RUN HISTORY TIMELINE</h3>
     <div id="rca-run-history-body" class="rca-run-history-body"></div>
@@ -998,33 +1656,10 @@ body.rca-pro-ui #networkGraph {
 }
 
 /* Investigation failed modal */
-.rca-fail-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.78);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  animation: fadeIn 0.25s ease;
-  padding: 24px;
-}
-.rca-fail-card {
-  position: relative;
-  max-width: 480px;
-  width: 100%;
-  padding: 36px 32px 28px;
-  background: rgba(8, 12, 20, 0.98);
-  border: 1px solid rgba(248, 81, 73, 0.65);
-  border-radius: 4px;
-  box-shadow: 0 0 48px rgba(255, 0, 0, 0.2);
-  text-align: center;
-}
 .rca-fail-card svg {
   filter: drop-shadow(0 0 14px rgba(248, 81, 73, 0.5));
   margin-bottom: 16px;
+  animation: pulseRed 1.8s ease-in-out infinite;
 }
 .rca-fail-title {
   font-family: "Courier New", monospace;
@@ -1066,6 +1701,36 @@ body.rca-pro-ui #networkGraph {
 .rca-fail-close:hover {
   background: rgba(248, 81, 73, 0.28);
   border-color: #f87171;
+}
+
+@keyframes pulseRed {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255,60,60,0.5)); }
+  50% { filter: drop-shadow(0 0 18px rgba(255,60,60,1)); }
+}
+
+@keyframes shakeIn {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  60% { transform: translate(-50%, -50%) translateX(-8px) scale(1.02); }
+  80% { transform: translate(-50%, -50%) translateX(8px); }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.particle {
+  position: fixed;
+  width: 2px;
+  height: 2px;
+  background: rgba(0, 255, 200, 0.6);
+  border-radius: 50%;
+  animation: floatUp linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
 }
 
 /* Leaderboard + history + ticker + toolbar (retained) */
@@ -1123,7 +1788,7 @@ body.rca-leaderboard-on .main { display: none !important; }
   border-top: 1px solid #0f172a;
 }
 .rca-run-history-heading { margin-bottom: 20px; }
-.rca-run-history-body { display: flex; flex-direction: column; gap: 0; }
+.rca-run-history-body { position: relative; display: flex; flex-direction: column; gap: 18px; }
 .rca-rh-empty {
   text-align: center;
   padding: 48px 16px;
@@ -1132,6 +1797,41 @@ body.rca-leaderboard-on .main { display: none !important; }
   letter-spacing: 1px;
   font-family: "Courier New", monospace;
 }
+.rca-rh-empty .rca-rh-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: #64748b;
+  animation: rca-cursor-blink 1s step-end infinite;
+}
+.history-timeline { position: relative; display: flex; flex-direction: column; gap: 18px; padding-left: 24px; }
+.history-timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: rgba(0,255,200,0.35); }
+.timeline-entry { position: relative; padding-left: 34px; opacity: 0; transform: translateX(-22px); animation: fadeInLeft 0.55s ease forwards; }
+.timeline-entry:hover .timeline-card { box-shadow: 0 0 12px rgba(0,255,200,0.15); }
+.timeline-dot { position: absolute; left: 0; top: 18px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.14); background: #0a0f1e; }
+.timeline-dot.success { background: #22c55e; box-shadow: 0 0 0 6px rgba(34,197,94,0.18); }
+.timeline-dot.fail { background: #ef4444; box-shadow: 0 0 0 6px rgba(248,81,73,0.18); }
+.timeline-dot.warning { background: #facc15; box-shadow: 0 0 0 6px rgba(251,191,36,0.18); }
+.timeline-connector { position: absolute; left: 7px; top: 28px; bottom: 0; width: 2px; background: rgba(0,255,200,0.22); }
+.timeline-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); }
+.timeline-header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 14px; }
+.scenario-badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+.scenario-badge.easy { background: rgba(63,185,80,0.12); color: #3fb950; border: 1px solid rgba(63,185,80,0.28); }
+.scenario-badge.medium { background: rgba(255,200,0,0.12); color: #facc15; border: 1px solid rgba(255,200,0,0.3); }
+.scenario-badge.hard, .scenario-badge.ddos { background: rgba(255,60,60,0.12); color: #f87171; border: 1px solid rgba(255,60,60,0.3); }
+.timestamp { color: #7d8590; font-size: 11px; letter-spacing: .8px; }
+.status-badge { display: inline-flex; align-items: center; justify-content: center; padding: 5px 10px; border-radius: 999px; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .8px; }
+.status-badge.SOLVED { color: #22c55e; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.18); }
+.status-badge.FAILED { color: #ef4444; background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.18); }
+.status-badge.TIMEOUT { color: #facc15; background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.18); }
+.timeline-body { display: flex; flex-direction: column; gap: 12px; }
+.incident-name { margin: 0; font-size: 15px; color: #e6edf3; }
+.timeline-meta { display: flex; flex-wrap: wrap; gap: 12px; color: #94a3b8; font-size: 12px; line-height: 1.5; }
+.timeline-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.root-cause-summary { color: #cbd5e1; font-size: 13px; line-height: 1.8; }
+@keyframes fadeInLeft { 0% { opacity: 0; transform: translateX(-24px); } 100% { opacity: 1; transform: translateX(0); } }
 .rca-rh-empty .rca-rh-cursor {
   display: inline-block;
   width: 8px;
@@ -1353,6 +2053,7 @@ body.rca-leaderboard-on .main { display: none !important; }
   var displayedPct = 0;
   var lastRunPayload = null;
   var failModalEl = null;
+  var failBackdropEl = null;
 
   function el(id) {
     return document.getElementById(id);
@@ -1424,6 +2125,13 @@ body.rca-leaderboard-on .main { display: none !important; }
     return 0;
   }
 
+  function runStatusFromScore(score) {
+    var pct = parseScorePercent({ score: score });
+    if (pct >= 70) return "SOLVED";
+    if (pct >= 40) return "TIMEOUT";
+    return "FAILED";
+  }
+
   function refreshRunHistoryTimeline() {
     var body = el("rca-run-history-body");
     if (!body) return;
@@ -1437,76 +2145,83 @@ body.rca-leaderboard-on .main { display: none !important; }
       body.appendChild(empty);
       return;
     }
+    var timeline = document.createElement("div");
+    timeline.className = "history-timeline";
     var reversed = list.slice().reverse();
+
     reversed.forEach(function (entry, i) {
-      var pct = parseScorePercent(entry);
-      var row = document.createElement("div");
-      row.className = "rca-rh-row";
-      row.style.animationDelay = i * 80 + "ms";
-
-      var inner = document.createElement("div");
-      inner.className = "rca-rh-row-inner";
-
-      var left = document.createElement("div");
-      left.className = "rca-rh-left";
-      var scen = document.createElement("span");
-      scen.className = "rca-rh-scen";
-      scen.textContent = scenarioTitleFromKey(entry.scenario);
-      var badge = document.createElement("span");
+      var statusText = entry.status || runStatusFromScore(entry.score);
+      var statusClass = statusText.toLowerCase();
       var diff = (entry.difficulty || entry.scenario || "").toString().toLowerCase();
-      badge.className = "rca-rh-badge rca-rh-badge-default";
-      if (diff === "easy") badge.className = "rca-rh-badge rca-rh-badge-easy";
-      else if (diff === "medium") badge.className = "rca-rh-badge rca-rh-badge-medium";
-      else if (diff === "hard") badge.className = "rca-rh-badge rca-rh-badge-hard";
-      else if (diff === "ddos") badge.className = "rca-rh-badge rca-rh-badge-ddos";
-      badge.textContent = (entry.difficulty || entry.scenario || "—").toString().toUpperCase();
-      left.appendChild(scen);
-      left.appendChild(badge);
+      var scoreLabel = entry.score != null ? String(entry.score) : "—";
+      var queriesLabel = entry.queries != null ? entry.queries : entry.steps != null ? entry.steps : "—";
+      var serviceLabel = entry.services != null ? entry.services : "—";
+      var elapsedLabel = entry.elapsed || "00:00";
+      var rootSummary = entry.root_cause_summary || "Root Cause: Unknown";
 
-      var mid = document.createElement("div");
-      mid.className = "rca-rh-mid";
-      var track = document.createElement("div");
-      track.className = "rca-rh-track";
-      var fill = document.createElement("div");
-      var barClass = "rca-rh-fill-red";
-      if (pct >= 80) barClass = "rca-rh-fill-green";
-      else if (pct >= 50) barClass = "rca-rh-fill-yellow";
-      fill.className = "rca-rh-fill " + barClass;
-      track.appendChild(fill);
-      mid.appendChild(track);
+      var item = document.createElement("div");
+      item.className = "timeline-entry";
+      item.style.animationDelay = i * 80 + "ms";
 
-      var right = document.createElement("div");
-      right.className = "rca-rh-right";
-      var pctEl = document.createElement("div");
-      pctEl.className = "rca-rh-pct";
-      pctEl.textContent =
-        pct > 0
-          ? pct.toFixed(1) + "%"
-          : entry.score != null && String(entry.score) !== ""
-            ? String(entry.score)
-            : "—";
-      var stepsEl = document.createElement("div");
-      stepsEl.className = "rca-rh-steps";
-      stepsEl.textContent = "STEPS: " + (entry.steps != null ? entry.steps : "—");
-      right.appendChild(pctEl);
-      right.appendChild(stepsEl);
+      var dot = document.createElement("div");
+      dot.className = "timeline-dot " + (statusClass === "solved" ? "success" : statusClass === "timeout" ? "warning" : "fail");
+      item.appendChild(dot);
 
-      inner.appendChild(left);
-      inner.appendChild(mid);
-      inner.appendChild(right);
-      row.appendChild(inner);
+      var connector = document.createElement("div");
+      connector.className = "timeline-connector";
+      item.appendChild(connector);
 
-      var ts = document.createElement("div");
-      ts.className = "rca-rh-ts";
-      ts.textContent = entry.timestamp || "";
-      row.appendChild(ts);
+      var card = document.createElement("div");
+      card.className = "timeline-card";
 
-      body.appendChild(row);
+      var header = document.createElement("div");
+      header.className = "timeline-header";
+      var badge = document.createElement("span");
+      badge.className = "scenario-badge " + (diff || "easy");
+      badge.textContent = (entry.difficulty || entry.scenario || "UNKNOWN").toString().toUpperCase();
+      var timestamp = document.createElement("span");
+      timestamp.className = "timestamp";
+      timestamp.textContent = entry.timestamp || "";
+      var statusBadge = document.createElement("span");
+      statusBadge.className = "status-badge " + statusText;
+      statusBadge.textContent = statusText;
+      header.appendChild(badge);
+      header.appendChild(timestamp);
+      header.appendChild(statusBadge);
 
-      requestAnimationFrame(function () {
-        fill.style.width = pct + "%";
-      });
+      var bodyCard = document.createElement("div");
+      bodyCard.className = "timeline-body";
+      var incidentName = document.createElement("h4");
+      incidentName.className = "incident-name";
+      incidentName.textContent = scenarioTitleFromKey(entry.scenario) + " Investigation";
+      var meta = document.createElement("div");
+      meta.className = "timeline-meta";
+      var qSpan = document.createElement("span");
+      qSpan.textContent = "🔍 " + queriesLabel + " queries";
+      var sSpan = document.createElement("span");
+      sSpan.textContent = "⚙️ " + serviceLabel + " services";
+      var eSpan = document.createElement("span");
+      eSpan.textContent = "⏱ " + elapsedLabel + " elapsed";
+      var scSpan = document.createElement("span");
+      scSpan.textContent = "📊 Score: " + scoreLabel;
+      meta.appendChild(qSpan);
+      meta.appendChild(sSpan);
+      meta.appendChild(eSpan);
+      meta.appendChild(scSpan);
+      var rootCause = document.createElement("div");
+      rootCause.className = "root-cause-summary";
+      rootCause.textContent = rootSummary;
+      bodyCard.appendChild(incidentName);
+      bodyCard.appendChild(meta);
+      bodyCard.appendChild(rootCause);
+
+      card.appendChild(header);
+      card.appendChild(bodyCard);
+      item.appendChild(card);
+      timeline.appendChild(item);
     });
+
+    body.appendChild(timeline);
   }
 
   function showLeaderboardPage() {
@@ -1691,34 +2406,21 @@ body.rca-leaderboard-on .main { display: none !important; }
   }
 
   function removeFailModal() {
-    if (failModalEl && failModalEl.parentNode) {
-      failModalEl.parentNode.removeChild(failModalEl);
-    }
-    failModalEl = null;
+    var backdrop = el("modal-backdrop");
+    var modal = el("investigation-failed-modal");
+    if (backdrop) backdrop.style.display = "none";
+    if (modal) modal.style.display = "none";
   }
 
   function showFailModal(message, elapsedSec) {
     removeFailModal();
     hideTickerCompletely();
 
-    var ov = document.createElement("div");
-    ov.className = "rca-fail-overlay";
-    ov.setAttribute("role", "dialog");
-    ov.setAttribute("aria-modal", "true");
-    ov.innerHTML =
-      "<div class=\"rca-fail-card\">" +
-      "<div style=\"display:flex;justify-content:center\">" +
-      "<svg width=\"56\" height=\"56\" viewBox=\"0 0 64 64\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" aria-hidden=\"true\">" +
-      "<path d=\"M32 4L8 14v18c0 14 10.5 27 24 30 13.5-3 24-16 24-30V14L32 4z\" stroke=\"#f85149\" stroke-width=\"2.5\" fill=\"rgba(248,81,73,0.12)\"/>" +
-      "<path d=\"M24 24l16 16M40 24L24 40\" stroke=\"#f87171\" stroke-width=\"3\" stroke-linecap=\"round\"/>" +
-      "</svg></div>" +
-      "<div class=\"rca-fail-title\">INVESTIGATION FAILED</div>" +
-      "<div class=\"rca-fail-msg\" id=\"rcaFailMsg\"></div>" +
-      "<div class=\"rca-fail-elapsed\" id=\"rcaFailElapsed\"></div>" +
-      "<button type=\"button\" class=\"rca-fail-close\" id=\"rcaFailClose\">CLOSE</button>" +
-      "</div>";
-    document.body.appendChild(ov);
-    failModalEl = ov;
+    var backdrop = el("modal-backdrop");
+    var modal = el("investigation-failed-modal");
+    if (backdrop) backdrop.style.display = "block";
+    if (modal) modal.style.display = "block";
+
     el("rcaFailMsg").textContent = message || "An unexpected error occurred.";
     el("rcaFailElapsed").textContent = "ELAPSED BEFORE FAILURE: " + fmtElapsed(elapsedSec >= 0 ? elapsedSec : 0);
     el("rcaFailClose").addEventListener("click", function () {
@@ -1840,12 +2542,25 @@ body.rca-leaderboard-on .main { display: none !important; }
               var list = parseLeaderboardList();
               var totalScore =
                 json.scores != null && json.scores.total != null ? json.scores.total : "N/A";
+              var queries = json.queries_used != null ? json.queries_used : json.steps;
+              if (queries == null) queries = "—";
+              var services = Array.isArray(json.report && json.report.affected_services)
+                ? json.report.affected_services.length + 1
+                : "—";
+              var rootSummary = json.report && json.report.root_cause_service
+                ? "Root Cause: " + json.report.root_cause_service + (json.report.root_cause_type ? " (" + json.report.root_cause_type + ")" : "")
+                : "Root Cause: Unknown";
               list.push({
                 scenario: difficulty,
                 difficulty: json.difficulty,
                 score: totalScore,
                 steps: json.steps,
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString(),
+                queries: queries,
+                services: services,
+                elapsed: fmtElapsed(elapsedSec),
+                status: runStatusFromScore(totalScore),
+                root_cause_summary: rootSummary
               });
               localStorage.setItem(LB_KEY, JSON.stringify(list));
               if (document.body.classList.contains("rca-leaderboard-on")) {
@@ -2161,9 +2876,25 @@ body.rca-leaderboard-on .main { display: none !important; }
   var pdfBtn = el("rca-btn-export-pdf");
   if (pdfBtn) pdfBtn.addEventListener("click", openPrintReport);
 
+  function spawnBackgroundParticles() {
+    var root = document.body;
+    if (!root) return;
+    for (var i = 0; i < 20; i++) {
+      var p = document.createElement("div");
+      p.className = "particle";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.top = Math.random() * 100 + "%";
+      p.style.animationDuration = 6 + Math.random() * 12 + "s";
+      p.style.animationDelay = Math.random() * 10 + "s";
+      p.style.opacity = 0.2 + Math.random() * 0.6;
+      root.appendChild(p);
+    }
+  }
+
   function boot() {
     injectNavLeaderboard();
     mountTickerAndToolbar();
+    spawnBackgroundParticles();
     refreshRunHistoryTimeline();
   }
 
@@ -4915,6 +5646,21 @@ nav a:hover,
 </script>
 
 <script src="/static/neural-bg.js"></script>
+
+<div id="modal-backdrop" style="position: fixed !important; inset: 0 !important; background: rgba(0,0,0,0.8) !important; z-index: 999998 !important; backdrop-filter: blur(4px) !important; display: none !important;"></div>
+
+<div id="investigation-failed-modal" style="position: fixed !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 999999 !important; margin: 0 !important; width: 460px !important; max-width: 90vw !important; display: none !important; padding: 36px 32px 28px; background: rgba(8, 12, 20, 0.98); border: 1px solid rgba(248, 81, 73, 0.65); border-radius: 16px; box-shadow: 0 0 48px rgba(255, 0, 0, 0.25); text-align: center; animation: shakeIn 0.35s ease-out forwards;">
+  <div style="display:flex;justify-content:center">
+    <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M32 4L8 14v18c0 14 10.5 27 24 30 13.5-3 24-16 24-30V14L32 4z" stroke="#f85149" stroke-width="2.5" fill="rgba(248,81,73,0.12)"/>
+      <path d="M24 24l16 16M40 24L24 40" stroke="#f87171" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="rca-fail-title">INVESTIGATION FAILED</div>
+  <div class="rca-fail-msg" id="rcaFailMsg"></div>
+  <div class="rca-fail-elapsed" id="rcaFailElapsed"></div>
+  <button type="button" class="rca-fail-close" id="rcaFailClose">CLOSE</button>
+</div>
 
 </body>
 </html>

@@ -1,3 +1,13 @@
+---
+title: RCAAgent-Env
+emoji: 🔍
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_file: server/app.py
+pinned: false
+---
+
 # RCAAgent-Env 🔍
 
 > **OpenEnv-compatible AI environment for training agents on microservice Root Cause Analysis**
