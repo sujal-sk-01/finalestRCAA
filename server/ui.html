@@ -906,31 +906,80 @@ document.addEventListener('keydown', function(e) {
 });
 
 function exportPDF() {
-  const btn = document.querySelector('.export-btn');
-  if (btn) {
-    btn.innerHTML = '⏳ GENERATING...';
-    btn.disabled = true;
-  }
-
   const r = currentReportData?.report || {};
   const s = currentReportData?.scores || {};
   const diff = (currentReportData?.difficulty || 'unknown').toUpperCase();
   const score = Math.round((s.final_score || 0) * 100);
-  const ts = new Date().toLocaleString();
-  const scoreColor = score >= 70 ? '#4ade80' : score >= 40 ? '#fbbf24' : '#ef4444';
+  const ts2 = new Date().toLocaleString();
+  const scoreColor = score >= 70 ? '#16a34a' : score >= 40 ? '#d97706' : '#dc2626';
 
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Courier New',monospace;background:#fff;color:#1e293b;padding:48px;} .header{border-bottom:3px solid #1d4ed8;padding-bottom:24px;margin-bottom:32px;display:flex;justify-content:space-between;align-items:flex-end;} .logo{font-size:22px;font-weight:900;color:#0f172a;letter-spacing:3px;} .logo span{color:#1d4ed8;} .meta{text-align:right;font-size:11px;color:#64748b;line-height:1.8;} .score-hero{text-align:center;padding:32px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:32px;} .score-hero .label{font-size:10px;letter-spacing:3px;color:#64748b;margin-bottom:8px;} .score-hero .value{font-size:64px;font-weight:900;color:${scoreColor};} .score-hero .diff{font-size:12px;letter-spacing:2px;color:#94a3b8;margin-top:8px;} .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:32px;} .grid-item{text-align:center;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;} .glabel{font-size:9px;letter-spacing:1px;color:#64748b;text-transform:uppercase;margin-bottom:6px;} .gval{font-size:20px;font-weight:800;color:#1d4ed8;} .section{margin-bottom:24px;} .section-title{font-size:10px;letter-spacing:2px;color:#64748b;text-transform:uppercase;margin-bottom:12px;border-bottom:1px solid #e2e8f0;padding-bottom:8px;} .info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;} .info-row .key{color:#64748b;} .info-row .val{color:#0f172a;font-weight:600;} .footer{margin-top:48px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;letter-spacing:1px;} </style></head><body><div class="header"><div class="logo">RCA<span>AGENT</span></div><div class="meta"><div>Generated: ${ts}</div><div>Scenario: ${diff}</div><div>RCAAgent-Env</div></div></div><div class="score-hero"><div class="label">FINAL INVESTIGATION SCORE</div><div class="value">${score}%</div><div class="diff">${diff} DIFFICULTY</div></div><div class="grid">${[['Root Cause', s.root_cause_score],['Causal Path', s.causal_path_score],['Efficiency', s.efficiency_score],['Report Quality', s.report_quality_score],['Confidence', (data.report && data.report.confidence) || 0]].map(([l,v])=>`<div class="grid-item"><div class="glabel">${l}</div><div class="gval">${Math.round((v||0)*100)}%</div></div>`).join('')}</div><div class="section"><div class="section-title">Root Cause Analysis</div><div class="info-row"><span class="key">Root Cause Service</span><span class="val">${r.root_cause_service||'—'}</span></div><div class="info-row"><span class="key">Failure Type</span><span class="val">${r.root_cause_type||'—'}</span></div><div class="info-row"><span class="key">Confidence</span><span class="val">${r.confidence_score?Math.round(r.confidence_score*100)+'%':'—'}</span></div><div class="info-row"><span class="key">Affected Services</span><span class="val">${(r.affected_services||[]).join(' → ')||'—'}</span></div></div><div class="section"><div class="section-title">Summary</div><p style="font-size:13px;line-height:1.8;color:#475569">${(r.summary||'No summary available.').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p></div><div class="footer"><span>RCAAGENT · AI-Powered SRE Intelligence Platform</span><span>CONFIDENTIAL INVESTIGATION REPORT</span></div></body></html>`;
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  const win = window.open(url, '_blank');
-  setTimeout(() => {
-    if (win) win.print();
-    URL.revokeObjectURL(url);
-    if (btn) {
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> EXPORT PDF`;
-      btn.disabled = false;
-    }
-  }, 800);
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RCAAgent Report</title>' +
+    '<style>' +
+    '*{margin:0;padding:0;box-sizing:border-box}' +
+    'body{font-family:Georgia,serif;background:#fff;color:#1e293b;padding:48px;max-width:860px;margin:0 auto}' +
+    'h1{font-size:26px;font-weight:700;color:#0f172a;margin-bottom:4px}' +
+    '.sub{font-size:12px;color:#64748b;margin-bottom:28px}' +
+    '.score-hero{text-align:center;padding:32px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:28px}' +
+    '.slabel{font-size:10px;letter-spacing:3px;color:#94a3b8;margin-bottom:8px}' +
+    '.sval{font-size:68px;font-weight:900;color:' + scoreColor + ';line-height:1}' +
+    '.sdiff{font-size:12px;color:#94a3b8;margin-top:6px;letter-spacing:2px}' +
+    '.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:28px}' +
+    '.cell{text-align:center;padding:12px 6px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px}' +
+    '.clabel{font-size:8px;letter-spacing:1px;color:#94a3b8;text-transform:uppercase;margin-bottom:5px}' +
+    '.cval{font-size:20px;font-weight:800;color:#1d4ed8}' +
+    'h2{font-size:10px;letter-spacing:2px;color:#94a3b8;text-transform:uppercase;border-bottom:2px solid #e2e8f0;padding-bottom:6px;margin:24px 0 12px}' +
+    '.row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px}' +
+    '.rk{color:#64748b}.rv{color:#0f172a;font-weight:600;text-align:right;max-width:55%}' +
+    'p{font-size:13px;line-height:1.9;color:#475569}' +
+    '.footer{margin-top:40px;padding-top:14px;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;letter-spacing:1px}' +
+    '@media print{body{padding:24px}@page{margin:1cm size:A4}}' +
+    '</style></head><body>' +
+    '<h1>RCA Investigation Report</h1>' +
+    '<div class="sub">Generated: ' + ts2 + ' &nbsp;|&nbsp; RCAAgent-Env v2.0 &nbsp;|&nbsp; AI-Powered SRE Intelligence</div>' +
+    '<div class="score-hero">' +
+      '<div class="slabel">FINAL INVESTIGATION SCORE</div>' +
+      '<div class="sval">' + score + '%</div>' +
+      '<div class="sdiff">' + diff + ' DIFFICULTY</div>' +
+    '</div>' +
+    '<div class="grid">' +
+    [['Root Cause',s.root_cause_score],['Causal Path',s.causal_path_score],
+     ['Efficiency',s.efficiency_score],['Report Quality',s.report_quality_score],
+     ['Confidence',r.confidence||0]]
+    .map(function(x){
+      return '<div class="cell"><div class="clabel">'+x[0]+'</div><div class="cval">'+Math.round((x[1]||0)*100)+'%</div></div>';
+    }).join('') +
+    '</div>' +
+    '<h2>Root Cause Analysis</h2>' +
+    '<div class="row"><span class="rk">Root Cause Service</span><span class="rv">'+(r.root_cause_service||'—')+'</span></div>' +
+    '<div class="row"><span class="rk">Failure Type</span><span class="rv">'+(r.root_cause_type||'—')+'</span></div>' +
+    '<div class="row"><span class="rk">Confidence</span><span class="rv">'+Math.round((r.confidence||0)*100)+'%</span></div>' +
+    '<div class="row"><span class="rk">Affected Services</span><span class="rv">'+((r.affected_services||[]).join(' → ')||'—')+'</span></div>' +
+    '<div class="row"><span class="rk">Causal Chain</span><span class="rv">'+((r.causal_chain||[]).join(' → ')||'—')+'</span></div>' +
+    '<h2>Executive Summary</h2>' +
+    '<p>'+(r.summary||'No summary available.').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</p>' +
+    '<h2>Recommended Remediation</h2>' +
+    '<p>'+(r.suggested_fix||r.fix_recommendation||'No fix available.').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</p>' +
+    '<h2>Score Breakdown</h2>' +
+    '<div class="row"><span class="rk">Root Cause (40% weight)</span><span class="rv">'+Math.round((s.root_cause_score||0)*100)+'%</span></div>' +
+    '<div class="row"><span class="rk">Causal Path (25% weight)</span><span class="rv">'+Math.round((s.causal_path_score||0)*100)+'%</span></div>' +
+    '<div class="row"><span class="rk">Efficiency (20% weight)</span><span class="rv">'+Math.round((s.efficiency_score||0)*100)+'%</span></div>' +
+    '<div class="row"><span class="rk">Report Quality (15% weight)</span><span class="rv">'+Math.round((s.report_quality_score||0)*100)+'%</span></div>' +
+    '<div class="row"><span class="rk">Queries Used / Optimal</span><span class="rv">'+(s.queries_used||'—')+' / '+(s.optimal_queries||'—')+'</span></div>' +
+    '<div class="footer"><span>RCAAGENT · AI-Powered SRE Intelligence Platform</span><span>CONFIDENTIAL INVESTIGATION REPORT</span></div>' +
+    '</body></html>';
+
+ const blob = new Blob([html], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (win) {
+    win.onload = function() {
+      setTimeout(function() {
+        win.document.title = diff + '_RCA_Report';
+        win.print();
+      }, 500);
+    };
+  }
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
 }
 
 document.addEventListener('keydown', e => {
