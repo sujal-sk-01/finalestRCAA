@@ -1,0 +1,26 @@
+{
+  "scenario_id": "CUSTOM-001",
+  "difficulty": "custom",
+  "alert": "P99 latency on checkout flow exceeded 3s. Errors from api_gateway correlated with database timeouts.",
+  "services": {
+    "api_gateway": {"dependencies": ["auth", "order_service"]},
+    "auth": {"dependencies": ["database"]},
+    "order_service": {"dependencies": ["database", "cache"]},
+    "database": {"dependencies": []},
+    "cache": {"dependencies": []}
+  },
+  "service_metrics": {
+    "api_gateway": {"error_rate": 0.15, "cpu_usage": 0.45, "memory_usage": 0.5, "latency_p99_ms": 2800, "requests_per_second": 120, "status": "degraded"},
+    "auth": {"error_rate": 0.02, "cpu_usage": 0.3, "memory_usage": 0.4, "latency_p99_ms": 200, "requests_per_second": 80, "status": "healthy"},
+    "order_service": {"error_rate": 0.18, "cpu_usage": 0.55, "memory_usage": 0.6, "latency_p99_ms": 1800, "requests_per_second": 60, "status": "degraded"},
+    "database": {"error_rate": 0.45, "cpu_usage": 0.95, "memory_usage": 0.88, "latency_p99_ms": 4200, "requests_per_second": 200, "status": "down"},
+    "cache": {"error_rate": 0.01, "cpu_usage": 0.2, "memory_usage": 0.3, "latency_p99_ms": 5, "requests_per_second": 500, "status": "healthy"}
+  },
+  "ground_truth": {
+    "root_cause_service": "database",
+    "root_cause_type": "cpu_exhaustion",
+    "causal_chain": ["database", "order_service", "api_gateway"],
+    "affected_services": ["database", "order_service", "api_gateway"],
+    "optimal_queries": 3
+  }
+}
