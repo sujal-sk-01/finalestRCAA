@@ -512,6 +512,10 @@ class BaselineBody(BaseModel):
     difficulty: str = Field(description="easy, medium, or hard")
 
 
+class CustomScenarioRequest(BaseModel):
+    data: dict = Field(description="Custom scenario JSON payload")
+
+
 @app.post("/baseline")
 async def post_baseline(body: BaselineBody) -> dict:
     from baseline.agent import run_baseline
@@ -520,3 +524,12 @@ async def post_baseline(body: BaselineBody) -> dict:
     if d not in SCENARIOS:
         raise HTTPException(status_code=404, detail=f"Unknown difficulty: {body.difficulty}")
     return await asyncio.to_thread(run_baseline, d)
+
+
+@app.post("/api/investigate/custom")
+async def post_custom_investigation(body: CustomScenarioRequest) -> dict:
+    from baseline.agent import run_baseline
+
+    if not isinstance(body.data, dict) or not body.data:
+        raise HTTPException(status_code=400, detail="Custom scenario data must be a non-empty JSON object")
+    return await asyncio.to_thread(run_baseline, "custom", body.data)

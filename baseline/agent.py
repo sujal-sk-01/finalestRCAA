@@ -132,7 +132,7 @@ def _query_action(action_type: str, service: str) -> Action:
     })
 
 
-def run_baseline(difficulty: str) -> dict[str, Any]:
+def run_baseline(difficulty: str, custom_data: dict | None = None) -> dict[str, Any]:
     if not is_llm_configured():
         return {
             "difficulty": difficulty,
@@ -143,10 +143,32 @@ def run_baseline(difficulty: str) -> dict[str, Any]:
             "error": "HF_TOKEN is not set",
         }
 
-    env = RCAEnvironment(difficulty)
-    env.reset()
+    env = RCAEnvironment("easy" if difficulty == "custom" else difficulty)
+    if difficulty == "custom":
+        if not custom_data:
+            return {
+                "difficulty": difficulty,
+                "steps": 0,
+                "history": [],
+                "report": None,
+                "scores": None,
+                "error": "Custom scenario data is required",
+            }
+        if hasattr(env, "_init_from_scenario"):
+            env._init_from_scenario(custom_data)  # type: ignore[attr-defined]
+        else:
+            env._raw_scenario = custom_data  # type: ignore[attr-defined]
+            env._hypotheses = []  # type: ignore[attr-defined]
+            env._queries_used = 0  # type: ignore[attr-defined]
+            env._rca_submitted = False  # type: ignore[attr-defined]
+            env._submitted_report = None  # type: ignore[attr-defined]
+            env._episode_reward = 0.0  # type: ignore[attr-defined]
+            env._queried = set()  # type: ignore[attr-defined]
+            env._current_step = 0  # type: ignore[attr-defined]
+    else:
+        env.reset()
 
-    gt = GROUND_TRUTH.get(difficulty)
+    gt = custom_data if difficulty == "custom" else GROUND_TRUTH.get(difficulty)
     if gt is None:
         return {
             "difficulty": difficulty,
@@ -157,10 +179,32 @@ def run_baseline(difficulty: str) -> dict[str, Any]:
             "error": f"Unknown difficulty: {difficulty}",
         }
 
+    investigation_cfg = gt if difficulty != "custom" else (custom_data or {})
+    report_cfg = investigation_cfg.get("ground_truth", investigation_cfg)
+    required_report_keys = {
+        "root_cause_service",
+        "root_cause_type",
+        "affected_services",
+        "causal_chain",
+    }
+    if any(k not in report_cfg for k in required_report_keys):
+        return {
+            "difficulty": difficulty,
+            "steps": 0,
+            "history": [],
+            "report": None,
+            "scores": None,
+            "error": "Custom scenario missing required ground truth fields",
+        }
+
     history: list[dict] = []
     steps = 0
-    investigate = gt["investigate"]
-    target_queries = gt["queries_to_use"]
+    investigate = investigation_cfg.get("investigate") or investigation_cfg.get("investigation_path") or []
+    target_queries = int(
+        investigation_cfg.get("queries_to_use")
+        or investigation_cfg.get("target_queries")
+        or len(investigate)
+    )
 
     for svc in investigate:
         steps += 1
@@ -175,7 +219,7 @@ def run_baseline(difficulty: str) -> dict[str, Any]:
 
     # Submit RCA
     steps += 1
-    final_action = _make_rca(gt)
+    final_action = _make_rca(report_cfg)
     obs = env.step(final_action)
     history.append({
         "action": final_action.model_dump(mode="json"),

@@ -61,6 +61,9 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
 .scenario-card.hard:hover{box-shadow:0 0 20px rgba(255,60,60,.25)}
 .scenario-card.ddos:hover{box-shadow:0 0 20px rgba(188,140,255,.25)}
 .scenario-card.selected{border-left-color:#388bfd;box-shadow:0 0 0 1px rgba(56,139,253,.25)}
+.scenario-upload-btn{width:100%;text-align:center;background:transparent;border:1px dashed #388bfd;border-radius:4px;padding:12px 10px;margin:8px 0 6px;cursor:pointer;color:#58a6ff;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;transition:all .2s ease}
+.scenario-upload-btn:hover{background:rgba(56,139,253,.08);border-color:#58a6ff;color:#79c0ff}
+.scenario-upload-btn.active{background:rgba(56,139,253,.14);border-color:#79c0ff;color:#a5d6ff}
 .scenario-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .scenario-title{font-size:13px;font-weight:700;color:#e6edf3;line-height:1.2}
 .scenario-meta{font-size:11px;color:#7d8590;line-height:1.6}
@@ -541,6 +544,11 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
       <div class="scenario-meta">Optimal: 5 queries · 5 services</div>
     </button>
 
+    <button class="scenario-upload-btn" id="customUploadBtn" type="button" onclick="document.getElementById('customScenarioInput').click()">
+      Upload Custom JSON
+    </button>
+    <input id="customScenarioInput" type="file" accept=".json,application/json" style="display:none" onchange="handleFileUpload(event)">
+
     <button class="run-btn" id="runBtn" onclick="runAgent()" disabled>
       <span id="btnIcon">▶</span>
       <span id="btnText">RUN AGENT</span>
@@ -692,16 +700,55 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
 <script>
 let difficulty = null;
 let currentReportData = null;
+let customScenarioData = null;
 
 function select(d, btn) {
   difficulty = d;
   document.querySelectorAll('.scenario-card').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
+  document.getElementById('customUploadBtn')?.classList.remove('active');
   const rb = document.getElementById('runBtn');
   rb.disabled = false;
   document.getElementById('btnText').textContent = 'RUN AGENT';
   clearLog();
   document.getElementById('scorePanel').classList.remove('show');
+}
+
+function handleFileUpload(event) {
+  const file = event && event.target ? event.target.files[0] : null;
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const parsed = JSON.parse((e.target && e.target.result) || "{}");
+      customScenarioData = parsed;
+      difficulty = 'custom';
+      document.querySelectorAll('.scenario-card').forEach(b => b.classList.remove('selected'));
+      document.getElementById('customUploadBtn')?.classList.add('active');
+      const rb = document.getElementById('runBtn');
+      rb.disabled = false;
+      document.getElementById('btnText').textContent = 'RUN AGENT';
+      clearLog();
+      addLog('SYSTEM', 'lb-success', `Custom scenario loaded: <span class="highlight-service">${file.name}</span>`);
+    } catch (err) {
+      customScenarioData = null;
+      difficulty = null;
+      document.getElementById('customUploadBtn')?.classList.remove('active');
+      addLog('ERROR', 'lb-error', 'Invalid JSON file. Please upload a valid scenario JSON.');
+      document.getElementById('runBtn').disabled = true;
+    } finally {
+      event.target.value = '';
+    }
+  };
+  reader.onerror = function () {
+    customScenarioData = null;
+    difficulty = null;
+    document.getElementById('customUploadBtn')?.classList.remove('active');
+    addLog('ERROR', 'lb-error', 'Failed to read selected file.');
+    document.getElementById('runBtn').disabled = true;
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 function clearLog() {
@@ -1084,7 +1131,7 @@ async function runAgent() {
   addLog('SYSTEM', 'lb-system', '─────────────────────────────────────────────────');
 
   try {
-    const selectedDifficulty = difficulty;
+    const selectedScenario = difficulty;
     document.getElementById('termBody').insertAdjacentHTML('beforeend', `<div id="thinkingBlock" style="margin-top:12px">
   <div id="thinkDots" style="color:#a78bfa;font-family:'Courier New',monospace;font-size:12px"></div>
   <div id="elapsedTimer" style="color:#94a3b8;font-family:'Courier New',monospace;font-size:11px;margin-top:6px"></div>
@@ -1124,10 +1171,15 @@ async function runAgent() {
       if(slaEl) slaEl.innerHTML = `<span style="color:${color};font-weight:900">⚠ SLA BREACH IN: ${mins}:${secs.toString().padStart(2,'0')}</span>`;
       if(slaRemaining <= 0) clearInterval(slaInterval);
     }, 1000);
-    const res = await fetch('/baseline', {
+    const isCustomScenario = selectedScenario === 'custom';
+    const endpoint = isCustomScenario ? '/api/investigate/custom' : '/baseline';
+    const payload = isCustomScenario
+      ? { data: customScenarioData || {} }
+      : { difficulty: selectedScenario };
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ difficulty: selectedDifficulty }),
+      body: JSON.stringify(payload),
       signal: AbortSignal.timeout(600000)
     });
     const data = await res.json();
@@ -1214,7 +1266,7 @@ async function runAgent() {
         currentReportData = {
           scores: data.scores,
           report: data.report,
-          difficulty: selectedDifficulty,
+          difficulty: selectedScenario,
           timestamp: new Date().toISOString()
         };
 
