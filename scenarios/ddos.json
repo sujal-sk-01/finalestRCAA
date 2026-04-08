@@ -1,6 +1,6 @@
 {
   "scenario_id": "INC-004",
-  "difficulty": "hard",
+  "difficulty": "ddos",
   "alert": "DDoS attack detected: api_gateway receiving 500000 req/sec from 10000 unique IPs. Legitimate traffic dropping. Rate limiter overwhelmed.",
   "services": ["api_gateway", "rate_limiter", "auth_service", "backend_api", "database"],
   "max_queries": 30,

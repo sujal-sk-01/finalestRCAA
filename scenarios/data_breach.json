@@ -1,72 +1,186 @@
 {
-  "scenario_id": "data_breach",
+  "scenario_id": "INC-005",
   "difficulty": "data_breach",
-  "alert": "CRITICAL: Unusual data exfiltration detected. Auth service showing 500% increase in token generation. Database query volumes spiked 800%. Possible credential compromise detected by security monitoring.",
-  "services": {
+  "alert": "CRITICAL: Unusual data exfiltration detected. Auth service token generation spiked 500% and database query volume spiked 800%.",
+  "services": [
+    "api_gateway",
+    "auth_service",
+    "database",
+    "audit_logger",
+    "encryption_service"
+  ],
+  "max_queries": 30,
+  "service_metrics": {
     "api_gateway": {
-      "latency_ms": 250,
+      "latency_ms": 250.0,
       "error_rate": 0.15,
-      "cpu_percent": 45,
-      "memory_percent": 60,
-      "status": "degraded"
+      "cpu_percent": 45.0,
+      "memory_percent": 60.0,
+      "status": "degraded",
+      "cpu_usage": 0.45,
+      "memory_usage": 0.6,
+      "requests_per_second": 1100.0,
+      "latency_p99_ms": 250.0
     },
     "auth_service": {
-      "latency_ms": 800,
+      "latency_ms": 800.0,
       "error_rate": 0.75,
-      "cpu_percent": 92,
-      "memory_percent": 88,
-      "status": "degraded"
+      "cpu_percent": 92.0,
+      "memory_percent": 88.0,
+      "status": "degraded",
+      "cpu_usage": 0.92,
+      "memory_usage": 0.88,
+      "requests_per_second": 2600.0,
+      "latency_p99_ms": 800.0
     },
     "database": {
-      "latency_ms": 1200,
-      "error_rate": 0.60,
-      "cpu_percent": 89,
-      "memory_percent": 95,
-      "status": "degraded"
+      "latency_ms": 1200.0,
+      "error_rate": 0.6,
+      "cpu_percent": 89.0,
+      "memory_percent": 95.0,
+      "status": "degraded",
+      "cpu_usage": 0.89,
+      "memory_usage": 0.95,
+      "requests_per_second": 2100.0,
+      "latency_p99_ms": 1200.0
     },
     "audit_logger": {
-      "latency_ms": 3000,
-      "error_rate": 0.90,
-      "cpu_percent": 40,
-      "memory_percent": 45,
-      "status": "down"
+      "latency_ms": 3000.0,
+      "error_rate": 0.9,
+      "cpu_percent": 40.0,
+      "memory_percent": 45.0,
+      "status": "down",
+      "cpu_usage": 0.4,
+      "memory_usage": 0.45,
+      "requests_per_second": 1400.0,
+      "latency_p99_ms": 3000.0
     },
     "encryption_service": {
-      "latency_ms": 200,
+      "latency_ms": 200.0,
       "error_rate": 0.05,
-      "cpu_percent": 30,
-      "memory_percent": 35,
-      "status": "healthy"
+      "cpu_percent": 30.0,
+      "memory_percent": 35.0,
+      "status": "healthy",
+      "cpu_usage": 0.3,
+      "memory_usage": 0.35,
+      "requests_per_second": 700.0,
+      "latency_p99_ms": 200.0
     }
   },
-  "dependencies": {
-    "api_gateway": ["auth_service", "database"],
-    "auth_service": ["database", "audit_logger"],
-    "database": ["audit_logger"],
-    "audit_logger": [],
+  "logs": {
+    "api_gateway": [
+      "suspicious_token_burst detected from auth_service",
+      "data_download_endpoint spikes from newly issued tokens"
+    ],
+    "auth_service": [
+      "token_issue_rate 5x baseline",
+      "anomalous_oauth_client observed; audit sink retries increasing"
+    ],
+    "database": [
+      "SELECT bulk_export volume spike",
+      "sensitive_table_access outside business pattern"
+    ],
+    "audit_logger": [
+      "queue_overflow during security events",
+      "sink_write_failed repeated; logger process unhealthy"
+    ],
+    "encryption_service": [
+      "key_usage normal"
+    ]
+  },
+  "traces": {
+    "api_gateway": [
+      {
+        "trace_id": "t-dbreach-001",
+        "span": "GET /export",
+        "duration_ms": 420.0,
+        "status": "degraded"
+      }
+    ],
+    "auth_service": [
+      {
+        "trace_id": "t-dbreach-002",
+        "span": "issue_token",
+        "duration_ms": 760.0,
+        "status": "error"
+      }
+    ],
+    "database": [
+      {
+        "trace_id": "t-dbreach-003",
+        "span": "bulk_export_query",
+        "duration_ms": 1350.0,
+        "status": "error"
+      }
+    ],
+    "audit_logger": [
+      {
+        "trace_id": "t-dbreach-004",
+        "span": "write_audit_event",
+        "duration_ms": 3100.0,
+        "status": "error"
+      }
+    ],
     "encryption_service": []
   },
-  "anomalies": {
+  "dependencies": {
+    "api_gateway": {
+      "upstream": [],
+      "downstream": [
+        "auth_service",
+        "database"
+      ]
+    },
     "auth_service": {
-      "type": "dependency_failure",
-      "description": "Auth service generating excessive tokens due to compromised credentials. Audit logger down preventing security event recording."
+      "upstream": [
+        "api_gateway"
+      ],
+      "downstream": [
+        "database",
+        "audit_logger"
+      ]
     },
     "database": {
-      "type": "error_rate",
-      "description": "Database receiving massive unauthorized query volume from compromised auth tokens."
+      "upstream": [
+        "api_gateway",
+        "auth_service"
+      ],
+      "downstream": [
+        "audit_logger"
+      ]
     },
     "audit_logger": {
-      "type": "crash",
-      "description": "Audit logger overwhelmed and crashed, unable to record security events."
+      "upstream": [
+        "auth_service",
+        "database"
+      ],
+      "downstream": []
+    },
+    "encryption_service": {
+      "upstream": [],
+      "downstream": []
     }
   },
   "ground_truth": {
     "root_cause_service": "auth_service",
     "root_cause_type": "dependency_failure",
-    "causal_chain": ["audit_logger", "auth_service", "database", "api_gateway"],
-    "affected_services": ["auth_service", "database", "audit_logger", "api_gateway"],
+    "affected_services": [
+      "auth_service",
+      "database",
+      "audit_logger",
+      "api_gateway"
+    ],
+    "causal_chain": [
+      "audit_logger",
+      "auth_service",
+      "database",
+      "api_gateway"
+    ],
     "optimal_queries": 5,
-    "max_queries": 30,
-    "summary": "Credential compromise caused auth_service to generate excessive tokens. Audit logger crashed under load preventing security event recording. Database overwhelmed with unauthorized queries."
+    "difficulty_rationale": "Credential compromise and failed audit telemetry produce blended security and reliability symptoms.",
+    "teaching_points": [
+      "Correlate auth token anomalies with data access patterns.",
+      "Audit pipeline failure can hide primary security indicators."
+    ]
   }
 }

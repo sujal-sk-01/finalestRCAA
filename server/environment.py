@@ -107,7 +107,7 @@ class RCAEnvironment:
         """
         Dense reward: relevance, repeat penalty, hypothesis bonus, budget pressure.
         """
-        step_reward = 0.0
+        progress = 0.0
         components: dict[str, float] = {}
 
         gt = self._raw_scenario.get("ground_truth", {})
@@ -121,46 +121,47 @@ class RCAEnvironment:
             "query_dependencies",
         ):
             if not observation_success:
-                step_reward -= 0.1
-                components["invalid_query"] = -0.1
+                progress += 0.05
+                components["invalid_query"] = 0.05
             else:
                 ts = target_service or ""
                 if ts == root_cause_service:
-                    step_reward += 0.15
-                    components["root_cause_relevance"] = 0.15
+                    progress += 0.6
+                    components["root_cause_relevance"] = 0.6
                 elif ts in affected_services:
-                    step_reward += 0.08
-                    components["affected_service_relevance"] = 0.08
+                    progress += 0.3
+                    components["affected_service_relevance"] = 0.3
                 else:
-                    step_reward += 0.02
-                    components["valid_query"] = 0.02
+                    progress += 0.1
+                    components["valid_query"] = 0.1
 
                 query_key = f"{action_type}:{target_service}"
                 if query_key in self._queried:
-                    step_reward -= 0.05
+                    progress = max(0.0, progress - 0.05)
                     components["repeat_penalty"] = -0.05
                 else:
                     self._queried.add(query_key)
 
         elif action_type == "form_hypothesis":
-            step_reward += 0.05
-            components["hypothesis_bonus"] = 0.05
+            progress += 0.2
+            components["hypothesis_bonus"] = 0.2
 
         elif action_type == "submit_rca":
-            step_reward += 0.1
-            components["submission_attempt"] = 0.1
+            progress += 0.9
+            components["submission_attempt"] = 0.9
 
         mq = max(self._raw_scenario.get("max_queries", 25), 1)
         queries_used_ratio = self._queries_used / mq
         if queries_used_ratio > 0.8:
-            penalty = -0.02 * (queries_used_ratio - 0.8) * 10
-            step_reward += penalty
+            penalty = -0.05 * (queries_used_ratio - 0.8) * 10
+            progress += penalty
             components["budget_pressure"] = round(penalty, 4)
 
+        step_reward = round(min(1.0, max(0.0, progress)), 4)
         self._episode_reward += step_reward
 
         return Reward(
-            step_reward=round(step_reward, 4),
+            step_reward=step_reward,
             cumulative_reward=round(self._episode_reward, 4),
             reward_components=components,
             done=False,

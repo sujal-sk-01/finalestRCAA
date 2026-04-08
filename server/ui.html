@@ -696,11 +696,69 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
     </div>
   </div>
 </div>
+<div id="uploadToast" class="upload-toast" role="status" aria-live="polite" hidden></div>
 
 <script>
 let difficulty = null;
 let currentReportData = null;
 let customScenarioData = null;
+
+function showUploadToast(kind, message) {
+  try {
+    // Guaranteed fallback signal in case any overlay/style stack hides custom popup.
+    if (window.__forceUploadAlert === true) {
+      alert(message);
+      return;
+    }
+  } catch (e) {}
+
+  const oldBackdrop = document.getElementById('uploadToastBackdrop');
+  const oldModal = document.getElementById('uploadToastModal');
+  if (oldBackdrop) oldBackdrop.remove();
+  if (oldModal) oldModal.remove();
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'uploadToastBackdrop';
+  backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:1000000;';
+
+  const modal = document.createElement('div');
+  modal.id = 'uploadToastModal';
+  const isSuccess = kind === 'success';
+  const border = isSuccess ? 'rgba(34,197,94,.95)' : 'rgba(239,68,68,.95)';
+  const glow = isSuccess ? 'rgba(34,197,94,.35)' : 'rgba(239,68,68,.35)';
+  const text = isSuccess ? '#86efac' : '#fca5a5';
+  modal.style.cssText =
+    'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000001;' +
+    'min-width:360px;max-width:min(92vw,560px);padding:18px 20px;border-radius:14px;' +
+    'background:rgba(8,12,20,.98);border:1px solid ' + border + ';color:' + text + ';' +
+    'font-family:\"Courier New\",monospace;font-size:12px;font-weight:700;letter-spacing:.4px;text-align:center;' +
+    'box-shadow:0 0 0 1px ' + border + ',0 0 34px ' + glow + ';';
+  modal.textContent = message;
+
+  document.body.appendChild(backdrop);
+  document.body.appendChild(modal);
+
+  clearTimeout(window.__uploadToastTimer);
+  window.__uploadToastTimer = setTimeout(() => {
+    modal.remove();
+    backdrop.remove();
+  }, 2200);
+}
+
+function validateCustomScenarioPayload(parsed) {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return 'Scenario must be a JSON object.';
+  }
+  // Keep upload permissive: backend already supports flexible custom schemas.
+  // Only block clearly unusable payloads.
+  const hasPath = Array.isArray(parsed.investigation_path) || Array.isArray(parsed.investigate);
+  const hasQueryTarget = parsed.target_queries != null || parsed.queries_to_use != null;
+  const hasServiceMetrics = parsed.service_metrics && typeof parsed.service_metrics === 'object';
+  if (!hasPath && !hasQueryTarget && !hasServiceMetrics) {
+    return 'Missing investigation hints (add investigation_path/investigate, target_queries/queries_to_use, or service_metrics).';
+  }
+  return null;
+}
 
 function select(d, btn) {
   difficulty = d;
@@ -717,10 +775,21 @@ function select(d, btn) {
 function handleFileUpload(event) {
   const file = event && event.target ? event.target.files[0] : null;
   if (!file) return;
+  // Use explicit custom modal by default; keep hard fallback available via console if needed.
+  window.__forceUploadAlert = false;
   const reader = new FileReader();
   reader.onload = function (e) {
     try {
       const parsed = JSON.parse((e.target && e.target.result) || "{}");
+      const validationError = validateCustomScenarioPayload(parsed);
+      if (validationError) {
+        customScenarioData = null;
+        difficulty = null;
+        document.getElementById('customUploadBtn')?.classList.remove('active');
+        showUploadToast('error', 'Invalid Scenario Format — ' + validationError);
+        document.getElementById('runBtn').disabled = true;
+        return;
+      }
       customScenarioData = parsed;
       difficulty = 'custom';
       document.querySelectorAll('.scenario-card').forEach(b => b.classList.remove('selected'));
@@ -729,12 +798,12 @@ function handleFileUpload(event) {
       rb.disabled = false;
       document.getElementById('btnText').textContent = 'RUN AGENT';
       clearLog();
-      addLog('SYSTEM', 'lb-success', `Custom scenario loaded: <span class="highlight-service">${file.name}</span>`);
+      showUploadToast('success', 'Scenario Loaded Successfully — ' + file.name);
     } catch (err) {
       customScenarioData = null;
       difficulty = null;
       document.getElementById('customUploadBtn')?.classList.remove('active');
-      addLog('ERROR', 'lb-error', 'Invalid JSON file. Please upload a valid scenario JSON.');
+      showUploadToast('error', 'Invalid Scenario Format — malformed JSON.');
       document.getElementById('runBtn').disabled = true;
     } finally {
       event.target.value = '';
@@ -744,7 +813,7 @@ function handleFileUpload(event) {
     customScenarioData = null;
     difficulty = null;
     document.getElementById('customUploadBtn')?.classList.remove('active');
-    addLog('ERROR', 'lb-error', 'Failed to read selected file.');
+    showUploadToast('error', 'Invalid Scenario Format — file could not be read.');
     document.getElementById('runBtn').disabled = true;
     event.target.value = '';
   };
@@ -5747,6 +5816,230 @@ nav a:hover,
 </script>
 
 <script src="/static/neural-bg.js"></script>
+
+<style id="rca-meta-hackathon-final-polish">
+/* Performance + readability overlay */
+body.rca-meta-hackathon .main,
+body.rca-meta-hackathon .right-panel,
+body.rca-meta-hackathon .left-panel {
+  will-change: transform;
+  transform: translateZ(0);
+}
+body.rca-meta-hackathon::before {
+  opacity: 0.5 !important;
+}
+body.rca-meta-hackathon::after {
+  opacity: 0.12 !important;
+}
+/* Keep animated background lightweight and non-distracting */
+body.rca-meta-hackathon #neural-bg,
+body.rca-meta-hackathon #rca-topology-canvas,
+body.rca-meta-hackathon #bg-canvas {
+  opacity: 0.2 !important;
+  filter: saturate(0.8) blur(0.25px);
+  transform: translateZ(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  body.rca-meta-hackathon #neural-bg,
+  body.rca-meta-hackathon #rca-topology-canvas,
+  body.rca-meta-hackathon #bg-canvas {
+    display: none !important;
+  }
+}
+
+/* Unified interactive hover states */
+:where(
+  .run-btn,
+  .scenario-upload-btn,
+  .action-btn,
+  .copy-btn,
+  .share-option-btn,
+  .rca-fail-close,
+  #rca-btn-clear-leaderboard,
+  .rca-export-btn,
+  .rca-voice-btn
+) {
+  transition: all 0.3s ease !important;
+}
+:where(
+  .run-btn,
+  .scenario-upload-btn,
+  .action-btn,
+  .copy-btn,
+  .share-option-btn,
+  .rca-fail-close,
+  #rca-btn-clear-leaderboard,
+  .rca-export-btn,
+  .rca-voice-btn
+):hover:not(:disabled) {
+  transform: scale(1.05);
+  border-color: rgba(56, 139, 253, 0.9) !important;
+  box-shadow: 0 0 0 1px rgba(56, 139, 253, 0.45), 0 0 18px rgba(56, 139, 253, 0.28);
+}
+
+/* Upload toast */
+.upload-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1000000;
+  min-width: 280px;
+  max-width: 420px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+.upload-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.upload-toast.ok {
+  background: rgba(5, 46, 22, 0.96);
+  color: #86efac;
+  border-color: #16a34a;
+  box-shadow: 0 0 20px rgba(22, 163, 74, 0.28);
+}
+.upload-toast.err {
+  background: rgba(69, 10, 10, 0.96);
+  color: #fca5a5;
+  border-color: #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.28);
+}
+
+/* Leaderboard + history hover polish */
+.rca-lb-table tbody tr {
+  transition: background-color 0.22s ease, box-shadow 0.22s ease;
+}
+.rca-lb-table tbody tr:hover {
+  background: rgba(56, 139, 253, 0.12) !important;
+  box-shadow: inset 0 0 0 1px rgba(56, 139, 253, 0.3);
+}
+.timeline-entry .timeline-card {
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease !important;
+}
+.timeline-entry:hover .timeline-card {
+  transform: translateY(-1px);
+  border-color: rgba(56, 139, 253, 0.35);
+}
+
+/* Icon/text alignment consistency */
+.report-actions .action-btn,
+.share-modal-actions .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.report-actions .action-btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+</style>
+<script id="rca-meta-hackathon-final-perf-js">
+(function () {
+  try {
+    var lowPower =
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    if (!lowPower) return;
+    ["neural-bg", "rca-topology-canvas", "bg-canvas"].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) node.style.display = "none";
+    });
+  } catch (e) {}
+})();
+</script>
+<style id="rca-meta-hackathon-overhaul-v2">
+/* More obvious hackathon-ready overhaul */
+body.rca-meta-hackathon {
+  --fx-cyan: #22d3ee;
+  --fx-blue: #3b82f6;
+  --fx-green: #22c55e;
+  --fx-red: #ef4444;
+}
+body.rca-meta-hackathon .hero,
+body.rca-meta-hackathon .metrics-bar,
+body.rca-meta-hackathon .left-panel,
+body.rca-meta-hackathon .right-panel,
+body.rca-meta-hackathon .terminal-body,
+body.rca-meta-hackathon .score-panel {
+  background: linear-gradient(180deg, rgba(8, 12, 20, 0.94), rgba(6, 10, 18, 0.94)) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.12), 0 16px 36px rgba(2, 8, 20, 0.6) !important;
+}
+body.rca-meta-hackathon .hero-title .highlight {
+  color: #22d3ee !important;
+  text-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
+}
+body.rca-meta-hackathon .scenario-card,
+body.rca-meta-hackathon .scenario-upload-btn,
+body.rca-meta-hackathon .action-btn,
+body.rca-meta-hackathon .run-btn {
+  border-radius: 10px !important;
+}
+body.rca-meta-hackathon .run-btn {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb, #22d3ee) !important;
+  background-size: 180% 100% !important;
+}
+body.rca-meta-hackathon .run-btn:hover:not(:disabled) {
+  background-position: 100% 0 !important;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.7), 0 0 30px rgba(34, 211, 238, 0.45) !important;
+}
+body.rca-meta-hackathon .scenario-upload-btn:hover:not(:disabled),
+body.rca-meta-hackathon .action-btn:hover:not(:disabled),
+body.rca-meta-hackathon .copy-btn:hover:not(:disabled),
+body.rca-meta-hackathon .share-option-btn:hover:not(:disabled),
+body.rca-meta-hackathon #rca-btn-clear-leaderboard:hover:not(:disabled) {
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.8), 0 0 26px rgba(56, 189, 248, 0.42) !important;
+  transform: scale(1.06) translateY(-1px) !important;
+  color: #e6faff !important;
+}
+body.rca-meta-hackathon .rca-lb-table tbody tr:hover,
+body.rca-meta-hackathon .timeline-entry:hover .timeline-card {
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.45), 0 0 28px rgba(34, 211, 238, 0.2) !important;
+}
+
+/* Separate popup-style upload feedback (not in logs) */
+body.rca-meta-hackathon .upload-toast.modal-pop {
+  left: 50%;
+  right: auto;
+  top: 90px;
+  bottom: auto;
+  transform: translate(-50%, -14px) scale(0.97);
+  min-width: 380px;
+  max-width: min(92vw, 540px);
+  padding: 16px 18px;
+  border-radius: 14px;
+  font-size: 12px;
+  letter-spacing: 0.35px;
+  font-weight: 700;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+body.rca-meta-hackathon .upload-toast.modal-pop.show {
+  transform: translate(-50%, 0) scale(1);
+}
+body.rca-meta-hackathon .upload-toast.modal-pop.ok {
+  border-color: rgba(34, 197, 94, 0.92);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5), 0 0 34px rgba(34, 197, 94, 0.35);
+}
+body.rca-meta-hackathon .upload-toast.modal-pop.err {
+  border-color: rgba(239, 68, 68, 0.95);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.56), 0 0 34px rgba(239, 68, 68, 0.35);
+}
+</style>
+<script id="rca-meta-hackathon-overhaul-v2-js">
+(function () {
+  document.body.classList.add("rca-meta-hackathon");
+})();
+</script>
 
 <div id="modal-backdrop" style="position: fixed !important; inset: 0 !important; background: rgba(0,0,0,0.8) !important; z-index: 999998 !important; backdrop-filter: blur(4px) !important; display: none !important;"></div>
 

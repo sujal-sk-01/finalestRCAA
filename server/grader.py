@@ -1,4 +1,4 @@
-"""Deterministic grader plus LLM rubric for report quality."""
+"""Deterministic grader with optional LLM metadata."""
 
 from __future__ import annotations
 
@@ -54,9 +54,27 @@ def _efficiency_score(state: EnvironmentState, raw_scenario: dict[str, Any]) -> 
     return 0.1
 
 
-def _report_quality_score(report: RCAReport, raw_scenario: dict[str, Any]) -> float:
+def _report_quality_rule_based(report: RCAReport) -> float:
+    summary = (report.summary or "").strip()
+    fix = (report.suggested_fix or report.fix_recommendation or "").strip()
+    causal_chain = list(report.causal_chain or [])
+    score = 0.0
+    if len(summary) >= 30:
+        score += 0.25
+    if any(k in summary.lower() for k in ("root cause", "caused", "impact", "degrad")):
+        score += 0.25
+    if len(fix) >= 20:
+        score += 0.25
+    if any(k in fix.lower() for k in ("restart", "rollback", "throttle", "scale", "patch", "monitor")):
+        score += 0.15
+    if len(causal_chain) >= 2:
+        score += 0.10
+    return round(min(1.0, max(0.0, score)), 4)
+
+
+def _llm_report_quality_metadata(report: RCAReport, raw_scenario: dict[str, Any]) -> dict[str, Any] | None:
     if not is_llm_configured():
-        return 0.5
+        return None
     ground_truth = raw_scenario.get("ground_truth", {})
     rubric_prompt = (
         "You output only valid JSON with keys score (number) and reason (string).\n\n"
@@ -75,16 +93,18 @@ def _report_quality_score(report: RCAReport, raw_scenario: dict[str, Any]) -> fl
             json_mode=True,
         )
         match = re.search(r"\{.*\}", raw, re.DOTALL)
-        result = json.loads(match.group()) if match else {"score": 0.5}
-        score = float(result.get("score", 0.5))
-        return max(0.0, min(1.0, score))
-    except Exception:
-        return 0.5
+        result = json.loads(match.group()) if match else {"score": 0.5, "reason": "parse_fallback"}
+        return {
+            "score": max(0.0, min(1.0, float(result.get("score", 0.5)))),
+            "reason": str(result.get("reason", "")),
+        }
+    except Exception as e:
+        return {"score": None, "reason": f"llm_error: {e}"}
 
 
 def grade(report: RCAReport, state: EnvironmentState, raw_scenario: dict) -> dict:
     """
-    Hybrid grader: deterministic rule-based + optional LLM quality rubric.
+    Deterministic grader with optional LLM metadata.
 
     Weights (matching openenv.yaml):
       root_cause:   0.40
@@ -100,21 +120,23 @@ def grade(report: RCAReport, state: EnvironmentState, raw_scenario: dict) -> dic
     root_cause_score = _root_cause_component(report, gt)
     causal_path_score = _causal_path_score(report, gt)
     efficiency_score = _efficiency_score(state, raw_scenario)
-    report_quality_score = _report_quality_score(report, raw_scenario)
+    report_quality_score = _report_quality_rule_based(report)
 
     confidence_accuracy = 1.0 - abs(report.confidence - root_cause_score)
     confidence_bonus = max(0.0, (confidence_accuracy - 0.5) * 0.1)
 
-    final_score = (
+    deterministic_score = (
         root_cause_score * 0.40
         + causal_path_score * 0.25
         + efficiency_score * 0.20
         + report_quality_score * 0.15
         + confidence_bonus
     )
-    final_score = round(min(1.0, max(0.0, final_score)), 4)
+    final_score = round(min(1.0, max(0.0, deterministic_score)), 4)
+    llm_meta = _llm_report_quality_metadata(report, raw_scenario)
 
-    return {
+    out = {
+        "reward": final_score,
         "final_score": final_score,
         "root_cause_score": round(root_cause_score, 4),
         "causal_path_score": round(causal_path_score, 4),
@@ -124,4 +146,9 @@ def grade(report: RCAReport, state: EnvironmentState, raw_scenario: dict) -> dic
         "queries_used": state.max_queries - state.queries_remaining,
         "optimal_queries": gt.get("optimal_queries", 10),
         "grader_version": "2.0",
+        "info": {
+            "deterministic": True,
+            "llm_report_quality": llm_meta,
+        },
     }
+    return out

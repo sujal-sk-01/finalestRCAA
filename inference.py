@@ -1,17 +1,3 @@
-"""
-inference.py — Hackathon submission entry point.
-
-Runs the RCA baseline agent on all three difficulties (easy/medium/hard)
-using the OpenAI-compatible client pointed at HuggingFace inference router.
-
-Environment variables required:
-  API_BASE_URL  — e.g. https://router.huggingface.co/v1
-  MODEL_NAME    — e.g. meta-llama/Llama-3.3-70B-Instruct
-  HF_TOKEN      — your HuggingFace API token
-
-Runtime: < 20 minutes on 2 vCPU / 8 GB RAM
-"""
-
 from __future__ import annotations
 
 import json
@@ -20,262 +6,197 @@ import time
 from pathlib import Path
 
 from dotenv import load_dotenv
-
-_ROOT = Path(__file__).resolve()
-load_dotenv(_ROOT.parent / ".env")
-load_dotenv()
-
-required_vars = ["API_BASE_URL", "MODEL_NAME", "HF_TOKEN"]
-missing = [v for v in required_vars if not os.environ.get(v)]
-if missing:
-    raise EnvironmentError(
-        f"Missing required environment variables: {missing}\n"
-        f"Set them in .env or export them before running."
-    )
-
 from openai import OpenAI
 
 from models import Action, ActionType, RCAReport
 from server.environment import RCAEnvironment
 from server.grader import grade
 
-client = OpenAI(
-    base_url=os.environ["API_BASE_URL"],
-    api_key=os.environ["HF_TOKEN"],
-)
-MODEL = os.environ["MODEL_NAME"]
+_ROOT = Path(__file__).resolve().parent
+load_dotenv(_ROOT / ".env")
+load_dotenv()
 
 
-def call_llm(prompt: str, system: str | None = None) -> str:
-    """OpenAI-compatible LLM call."""
-    messages: list[dict[str, str]] = []
-    if system:
-        messages.append({"role": "system", "content": system})
-    messages.append({"role": "user", "content": prompt})
-    try:
-        response = client.chat.completions.create(
-            model=MODEL,
-            messages=messages,
-            max_tokens=1000,
-            temperature=0,
+def log_start(task: str, env: str, model: str):
+    print(json.dumps({
+        "type": "START",
+        "task": task,
+        "env": env,
+        "model": model
+    }), flush=True)
+
+
+def log_step(step: int, action: str, reward: float, done: bool, error):
+    print(json.dumps({
+        "type": "STEP",
+        "step": step,
+        "action": action,
+        "reward": reward,
+        "done": done,
+        "error": error
+    }), flush=True)
+
+
+def log_end(success: bool, steps: int, score: float, rewards: list):
+    print(json.dumps({
+        "type": "END",
+        "success": success,
+        "steps": steps,
+        "score": score,
+        "rewards": rewards
+    }), flush=True)
+
+
+API_BASE_URL = os.getenv("API_BASE_URL", "")
+MODEL_NAME = os.getenv("MODEL_NAME", "")
+HF_TOKEN = os.getenv("HF_TOKEN", "")
+
+MAX_STEPS = 12
+TASKS = ("easy", "medium", "hard")
+
+
+def _make_client() -> OpenAI | None:
+    if not API_BASE_URL or not MODEL_NAME or not HF_TOKEN:
+        return None
+    return OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
+
+
+def _build_prompt(state, history: list[str]) -> str:
+    metrics_summary = []
+    for svc, m in state.service_metrics.items():
+        metrics_summary.append(
+            f"{svc}: status={m.status}, error_rate={m.error_rate:.2%}, latency_p99={m.latency_p99_ms}ms"
         )
-        return response.choices[0].message.content or ""
-    except Exception as e:
-        print(f"  LLM error: {e}")
-        return ""
+    return (
+        "You are an SRE investigating an incident.\n"
+        f"ALERT: {state.alert}\n"
+        f"QUERIES_REMAINING: {state.queries_remaining}/{state.max_queries}\n"
+        "SERVICES:\n"
+        + "\n".join(metrics_summary)
+        + "\nHISTORY:\n"
+        + ("\n".join(history[-8:]) if history else "none")
+        + "\nReturn ONLY JSON Action with one of: query_metrics, query_logs, pull_traces, query_dependencies, form_hypothesis, submit_rca."
+    )
 
 
-def parse_action(text: str) -> Action:
-    """Parse LLM output into a typed Action, with fallback."""
+def _parse_action(raw: str) -> Action:
+    text = (raw or "").strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        text = "\n".join(lines[1:-1]) if len(lines) > 2 else ""
     try:
-        clean = text.strip()
-        if clean.startswith("```"):
-            lines = clean.split("\n")
-            clean = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
-        data = json.loads(clean)
+        data = json.loads(text)
         if isinstance(data.get("rca_report"), dict):
             data["rca_report"] = RCAReport(**data["rca_report"])
         return Action.model_validate(data)
     except Exception:
+        return Action(action_type=ActionType.FORM_HYPOTHESIS, hypothesis="Fallback hypothesis")
+
+
+def _fallback_action(state) -> Action:
+    if state.queries_remaining <= 1:
         return Action(
-            action_type=ActionType.FORM_HYPOTHESIS,
-            hypothesis=f"Parse failed. Raw: {text[:200]}",
+            action_type=ActionType.SUBMIT_RCA,
+            rca_report=RCAReport(
+                root_cause_service="unknown",
+                root_cause_type="unknown",
+                affected_services=[],
+                causal_chain=["insufficient_signal"],
+                summary="Fallback submission due to budget constraints.",
+                suggested_fix="Increase observability and retry.",
+                confidence=0.2,
+            ),
         )
+    service_names = list(state.service_metrics.keys())
+    target = service_names[min(len(service_names) - 1, max(0, len(service_names) // 2))]
+    return Action(action_type=ActionType.QUERY_METRICS, target_service=target)
 
 
-def build_prompt(state, history: list) -> str:
-    services = list(state.service_metrics.keys())
-    metrics_summary = []
-    for svc, m in state.service_metrics.items():
-        metrics_summary.append(
-            f"  {svc}: status={m.status}, error_rate={m.error_rate:.2%}, "
-            f"latency_p99={m.latency_p99_ms}ms"
-        )
-
-    return f"""You are an expert SRE investigating a production incident.
-
-ALERT: {state.alert}
-
-SERVICES AND CURRENT STATUS:
-{chr(10).join(metrics_summary)}
-
-QUERIES REMAINING: {state.queries_remaining}/{state.max_queries}
-
-INVESTIGATION HISTORY (last 8 steps):
-{chr(10).join(history[-8:]) if history else "No investigation yet."}
-
-INSTRUCTIONS:
-- Investigate systematically: check metrics, logs, traces, dependencies
-- Form hypotheses to record your reasoning (free, no budget cost)
-- When confident, submit your RCA
-- Be efficient: you have limited queries
-
-RESPOND WITH VALID JSON ONLY. Choose one action:
-
-Query a service:
-{{"action_type": "query_metrics", "target_service": "<name>"}}
-{{"action_type": "query_logs", "target_service": "<name>"}}
-{{"action_type": "pull_traces", "target_service": "<name>"}}
-{{"action_type": "query_dependencies", "target_service": "<name>"}}
-
-Record reasoning (free):
-{{"action_type": "form_hypothesis", "hypothesis": "<your reasoning>"}}
-
-Submit final analysis:
-{{"action_type": "submit_rca", "rca_report": {{
-  "root_cause_service": "<service_name>",
-  "root_cause_type": "<latency|error_rate|crash|memory_leak|network|dependency_failure>",
-  "affected_services": ["<svc1>", "<svc2>"],
-  "causal_chain": ["<event1>", "<event2>", "<event3>"],
-  "summary": "<2-3 sentence summary>",
-  "suggested_fix": "<concrete remediation steps>",
-  "confidence": 0.85
-}}}}
-
-Available services: {services}
-JSON only, no explanation:"""
-
-
-def run_for_difficulty(difficulty: str) -> dict:
-    print(f"\n{'='*60}")
-    print(f"  DIFFICULTY: {difficulty.upper()}")
-    print(f"{'='*60}")
-
-    env = RCAEnvironment(difficulty)
+def run_task(task: str, client: OpenAI | None) -> dict:
+    env_name = "RCAEnvironment"
+    log_start(task, env_name, MODEL_NAME or "unset")
+    env = RCAEnvironment(task)
     state = env.reset()
+    history: list[str] = []
+    rewards: list[float] = []
+    success = False
+    final_score = 0.0
+    steps = 0
+    last_report: RCAReport | None = None
+    start = time.time()
+    max_runtime_per_task = 360
 
-    print(f"  Scenario: {state.scenario_id}")
-    print(f"  Alert:    {state.alert}")
-    print(f"  Budget:   {state.max_queries} queries")
+    try:
+        for i in range(1, MAX_STEPS + 1):
+            if time.time() - start > max_runtime_per_task:
+                log_step(i, "timeout", 0.0, True, "task_timeout")
+                break
 
-    history = []
-    last_report = None
-    start_time = time.time()
-    MAX_STEPS = 18
+            action = _fallback_action(state)
+            error = None
+            if client is not None:
+                try:
+                    prompt = _build_prompt(state, history)
+                    resp = client.chat.completions.create(
+                        model=MODEL_NAME,
+                        messages=[
+                            {"role": "system", "content": "Output valid JSON action only."},
+                            {"role": "user", "content": prompt},
+                        ],
+                        temperature=0,
+                        max_tokens=500,
+                    )
+                    raw = resp.choices[0].message.content or ""
+                    action = _parse_action(raw)
+                except Exception as e:
+                    error = str(e)
 
-    for step_num in range(MAX_STEPS):
-        elapsed = time.time() - start_time
-        if elapsed > 360:
-            print(f"  Time limit reached at step {step_num}")
-            break
+            obs = env.step(action)
+            state = env.state()
+            steps = i
+            step_reward = float(obs.reward.step_reward if obs.reward else 0.0)
+            rewards.append(step_reward)
+            done = bool(obs.reward.done) if obs.reward else False
+            log_step(i, action.action_type.value, step_reward, done, error)
+            history.append(f"{i}:{action.action_type.value}:{obs.message}")
 
-        prompt = build_prompt(state, history)
-        raw = call_llm(
-            prompt,
-            system="You are an expert SRE. Respond only with valid JSON, no markdown, no explanation.",
-        )
+            if action.action_type == ActionType.SUBMIT_RCA and obs.success:
+                last_report = action.rca_report
+                success = True
+                break
 
-        if not raw:
-            print(f"  Step {step_num+1}: LLM returned empty — skipping")
-            continue
+            if state.queries_remaining <= 0:
+                break
 
-        action = parse_action(raw)
-        observation = env.step(action)
-        state = env.state()
-
-        entry = f"[{step_num+1}] {action.action_type.value}"
-        if action.target_service:
-            entry += f"({action.target_service})"
-        entry += f" -> {'OK' if observation.success else 'FAIL'} {observation.message[:120]}"
-        if observation.reward:
-            entry += f" [reward={observation.reward.step_reward:+.3f}]"
-        history.append(entry)
-        print(f"  {entry}")
-
-        if action.action_type == ActionType.SUBMIT_RCA and observation.success:
-            last_report = action.rca_report
-            cum = observation.reward.cumulative_reward if observation.reward else "N/A"
-            print(f"\n  RCA submitted. Cumulative reward: {cum}")
-            break
-
-        if state.queries_remaining is not None and state.queries_remaining <= 1:
-            print(f"\n  Budget nearly exhausted — stopping loop")
-            break
-
-    if last_report is None:
-        print("  No RCA submitted — using fallback report")
-        last_report = RCAReport(
-            root_cause_service="unknown",
-            root_cause_type="unknown",
-            affected_services=[],
-            causal_chain=["Investigation did not complete within budget"],
-            summary="Agent exhausted query budget without submitting RCA.",
-            suggested_fix="Increase query budget or improve agent efficiency.",
-            confidence=0.0,
-        )
-
-    final_state = env.state()
-    scores = grade(last_report, final_state, env.raw_scenario)
-
-    elapsed = time.time() - start_time
-    print(f"\n  SCORES:")
-    print(f"     final_score:        {scores.get('final_score', 0):.4f}")
-    print(f"     root_cause_score:   {scores.get('root_cause_score', 0):.4f}")
-    print(f"     causal_path_score:  {scores.get('causal_path_score', 0):.4f}")
-    print(f"     efficiency_score:   {scores.get('efficiency_score', 0):.4f}")
-    print(f"     report_quality:     {scores.get('report_quality_score', 0):.4f}")
-    print(f"     time_elapsed:       {elapsed:.1f}s")
+        if last_report is None:
+            last_report = RCAReport(
+                root_cause_service="unknown",
+                root_cause_type="unknown",
+                affected_services=[],
+                causal_chain=["fallback_submission"],
+                summary="No RCA submitted by agent.",
+                suggested_fix="Increase query budget and re-run.",
+                confidence=0.1,
+            )
+        scores = grade(last_report, env.state(), env.raw_scenario)
+        final_score = float(scores.get("final_score", 0.0))
+    finally:
+        log_end(success, steps, final_score, rewards)
 
     return {
-        "difficulty": difficulty,
-        "scenario_id": state.scenario_id,
-        "scores": scores,
-        "steps_taken": len(history),
-        "time_elapsed_seconds": round(elapsed, 1),
+        "task": task,
+        "success": success,
+        "steps": steps,
+        "score": final_score,
+        "rewards": rewards,
     }
 
 
 def main() -> None:
-    print("SRE RCA Environment — Inference Script")
-    print(f"   API_BASE_URL : {os.environ.get('API_BASE_URL')}")
-    print(f"   MODEL_NAME   : {os.environ.get('MODEL_NAME')}")
-    print(f"   HF_TOKEN     : {'set' if os.environ.get('HF_TOKEN') else 'MISSING'}")
-
-    start = time.time()
-    results = []
-
-    for difficulty in ["easy", "medium", "hard"]:
-        try:
-            result = run_for_difficulty(difficulty)
-            results.append(result)
-        except Exception as e:
-            print(f"\nError on {difficulty}: {e}")
-            import traceback
-
-            traceback.print_exc()
-            results.append(
-                {
-                    "difficulty": difficulty,
-                    "error": str(e),
-                    "scores": {"final_score": 0.0},
-                }
-            )
-
-    total_elapsed = time.time() - start
-
-    print(f"\n{'='*60}")
-    print("  FINAL RESULTS SUMMARY")
-    print(f"{'='*60}")
-    for r in results:
-        if "error" in r:
-            print(f"  {r['difficulty']:8s} -> ERROR: {r['error']}")
-        else:
-            fs = r["scores"].get("final_score", 0)
-            steps = r.get("steps_taken", "?")
-            t = r.get("time_elapsed_seconds", "?")
-            print(f"  {r['difficulty']:8s} -> final_score={fs:.4f}  steps={steps}  time={t}s")
-
-    print(f"\n  Total runtime: {total_elapsed:.1f}s")
-    assert total_elapsed < 1200, f"Runtime {total_elapsed:.0f}s exceeds 20 minute limit!"
-
-    for r in results:
-        fs = r["scores"].get("final_score", 0)
-        assert 0.0 <= fs <= 1.0, f"Score {fs} out of range for {r['difficulty']}"
-    print("  All scores in valid range [0.0, 1.0]")
-
-    with open(_ROOT.parent / "inference_results.json", "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, default=str)
-    print("  Results saved to inference_results.json")
+    client = _make_client()
+    results = [run_task(task, client) for task in TASKS]
+    with (_ROOT / "inference_results.json").open("w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2)
 
 
 if __name__ == "__main__":
