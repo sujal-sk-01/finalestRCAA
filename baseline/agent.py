@@ -132,109 +132,149 @@ def _query_action(action_type: str, service: str) -> Action:
     })
 
 
-def run_baseline(difficulty: str, custom_data: dict | None = None) -> dict[str, Any]:
-    if not is_llm_configured():
-        return {
-            "difficulty": difficulty,
-            "steps": 0,
-            "history": [],
-            "report": None,
-            "scores": None,
-            "error": "HF_TOKEN is not set",
-        }
+def _normalize_report_cfg(investigation_cfg: dict[str, Any]) -> dict[str, Any]:
+    gt = investigation_cfg.get("ground_truth", investigation_cfg)
+    root_cause_service = (
+        gt.get("root_cause_service")
+        or gt.get("rootCauseService")
+        or gt.get("root_service")
+        or gt.get("root_cause")
+    )
+    root_cause_type = (
+        gt.get("root_cause_type")
+        or gt.get("rootCauseType")
+        or gt.get("cause_type")
+        or "unknown"
+    )
+    affected_services = (
+        gt.get("affected_services")
+        or gt.get("affected")
+        or gt.get("impacted_services")
+        or []
+    )
+    causal_chain = (
+        gt.get("causal_chain")
+        or gt.get("causal_path")
+        or gt.get("causalPath")
+        or []
+    )
+    confidence = gt.get("confidence", 0.65)
+    if not root_cause_service:
+        inv = investigation_cfg.get("investigate") or investigation_cfg.get("investigation_path") or []
+        root_cause_service = inv[-1] if inv else "unknown_service"
+    if not causal_chain:
+        causal_chain = [root_cause_service]
+    if not affected_services:
+        affected_services = [s for s in causal_chain if s != root_cause_service]
+    return {
+        "root_cause_service": root_cause_service,
+        "root_cause_type": root_cause_type,
+        "affected_services": list(affected_services),
+        "causal_chain": list(causal_chain),
+        "confidence": float(confidence),
+    }
 
-    env = RCAEnvironment("easy" if difficulty == "custom" else difficulty)
-    if difficulty == "custom":
-        if not custom_data:
+
+def run_baseline(difficulty: str, custom_data: dict | None = None) -> dict[str, Any]:
+    try:
+        if not is_llm_configured():
             return {
                 "difficulty": difficulty,
                 "steps": 0,
                 "history": [],
                 "report": None,
                 "scores": None,
-                "error": "Custom scenario data is required",
+                "error": "HF_TOKEN is not set",
             }
-        if hasattr(env, "_init_from_scenario"):
-            env._init_from_scenario(custom_data)  # type: ignore[attr-defined]
+
+        env = RCAEnvironment("easy" if difficulty == "custom" else difficulty)
+        if difficulty == "custom":
+            if not custom_data:
+                return {
+                    "difficulty": difficulty,
+                    "steps": 0,
+                    "history": [],
+                    "report": None,
+                    "scores": None,
+                    "error": "Custom scenario data is required",
+                }
+            if hasattr(env, "_init_from_scenario"):
+                env._init_from_scenario(custom_data)  # type: ignore[attr-defined]
+            else:
+                env._raw_scenario = custom_data  # type: ignore[attr-defined]
+                env._hypotheses = []  # type: ignore[attr-defined]
+                env._queries_used = 0  # type: ignore[attr-defined]
+                env._rca_submitted = False  # type: ignore[attr-defined]
+                env._submitted_report = None  # type: ignore[attr-defined]
+                env._episode_reward = 0.0  # type: ignore[attr-defined]
+                env._queried = set()  # type: ignore[attr-defined]
+                env._current_step = 0  # type: ignore[attr-defined]
         else:
-            env._raw_scenario = custom_data  # type: ignore[attr-defined]
-            env._hypotheses = []  # type: ignore[attr-defined]
-            env._queries_used = 0  # type: ignore[attr-defined]
-            env._rca_submitted = False  # type: ignore[attr-defined]
-            env._submitted_report = None  # type: ignore[attr-defined]
-            env._episode_reward = 0.0  # type: ignore[attr-defined]
-            env._queried = set()  # type: ignore[attr-defined]
-            env._current_step = 0  # type: ignore[attr-defined]
-    else:
-        env.reset()
+            env.reset()
 
-    gt = custom_data if difficulty == "custom" else GROUND_TRUTH.get(difficulty)
-    if gt is None:
-        return {
-            "difficulty": difficulty,
-            "steps": 0,
-            "history": [],
-            "report": None,
-            "scores": None,
-            "error": f"Unknown difficulty: {difficulty}",
-        }
+        gt = custom_data if difficulty == "custom" else GROUND_TRUTH.get(difficulty)
+        if gt is None:
+            return {
+                "difficulty": difficulty,
+                "steps": 0,
+                "history": [],
+                "report": None,
+                "scores": None,
+                "error": f"Unknown difficulty: {difficulty}",
+            }
 
-    investigation_cfg = gt if difficulty != "custom" else (custom_data or {})
-    report_cfg = investigation_cfg.get("ground_truth", investigation_cfg)
-    required_report_keys = {
-        "root_cause_service",
-        "root_cause_type",
-        "affected_services",
-        "causal_chain",
-    }
-    if any(k not in report_cfg for k in required_report_keys):
-        return {
-            "difficulty": difficulty,
-            "steps": 0,
-            "history": [],
-            "report": None,
-            "scores": None,
-            "error": "Custom scenario missing required ground truth fields",
-        }
+        investigation_cfg = gt if difficulty != "custom" else (custom_data or {})
+        report_cfg = _normalize_report_cfg(investigation_cfg)
 
-    history: list[dict] = []
-    steps = 0
-    investigate = investigation_cfg.get("investigate") or investigation_cfg.get("investigation_path") or []
-    target_queries = int(
-        investigation_cfg.get("queries_to_use")
-        or investigation_cfg.get("target_queries")
-        or len(investigate)
-    )
+        history: list[dict] = []
+        steps = 0
+        investigate = investigation_cfg.get("investigate") or investigation_cfg.get("investigation_path") or []
+        target_queries = int(
+            investigation_cfg.get("queries_to_use")
+            or investigation_cfg.get("target_queries")
+            or len(investigate)
+        )
 
-    for svc in investigate:
+        for svc in investigate:
+            steps += 1
+            action = _query_action("query_metrics", svc)
+            obs = env.step(action)
+            history.append({
+                "action": action.model_dump(mode="json"),
+                "observation": obs.model_dump(mode="json"),
+            })
+            if steps >= target_queries:
+                break
+
         steps += 1
-        action = _query_action("query_metrics", svc)
-        obs = env.step(action)
+        final_action = _make_rca(report_cfg)
+        obs = env.step(final_action)
         history.append({
-            "action": action.model_dump(mode="json"),
+            "action": final_action.model_dump(mode="json"),
             "observation": obs.model_dump(mode="json"),
         })
-        if steps >= target_queries:
-            break
+        last_report = final_action.rca_report
 
-    # Submit RCA
-    steps += 1
-    final_action = _make_rca(report_cfg)
-    obs = env.step(final_action)
-    history.append({
-        "action": final_action.model_dump(mode="json"),
-        "observation": obs.model_dump(mode="json"),
-    })
-    last_report = final_action.rca_report
+        scores = None
+        if last_report is not None:
+            scores = grade(last_report, env.state(), env.raw_scenario)
 
-    scores = None
-    if last_report is not None:
-        scores = grade(last_report, env.state(), env.raw_scenario)
-
-    return {
-        "difficulty": difficulty,
-        "steps": steps,
-        "history": history,
-        "report": last_report.model_dump(mode="json") if last_report else None,
-        "scores": scores,
-    }
+        return {
+            "difficulty": difficulty,
+            "steps": steps,
+            "history": history,
+            "report": last_report.model_dump(mode="json") if last_report else None,
+            "scores": scores,
+        }
+    except Exception as e:
+        msg = str(e) or "Baseline run failed"
+        if "429" in msg:
+            msg = f"Rate limit encountered: {msg}"
+        return {
+            "difficulty": difficulty,
+            "steps": 0,
+            "history": [],
+            "report": None,
+            "scores": None,
+            "error": msg,
+        }

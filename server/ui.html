@@ -1113,6 +1113,9 @@ async function runAgent() {
   if (!difficulty) return;
   await showIncidentAlarm(difficulty);
   const btn = document.getElementById('runBtn');
+  let dotsInterval = null;
+  let timerInterval = null;
+  let slaInterval = null;
   btn.disabled = true;
   btn.classList.add('running');
   document.getElementById('btnIcon').textContent = '◉';
@@ -1150,11 +1153,11 @@ async function runAgent() {
     thinkDotsEl.textContent = frames[0];
     const thinkStart = Date.now();
     elapsedTimerEl.textContent = '⏱ Elapsed: 0s';
-    var dotsInterval = setInterval(() => {
+    dotsInterval = setInterval(() => {
       frameIdx = (frameIdx + 1) % frames.length;
       thinkDotsEl.textContent = frames[frameIdx];
     }, 400);
-    var timerInterval = setInterval(() => {
+    timerInterval = setInterval(() => {
       elapsedTimerEl.textContent = '⏱ Elapsed: ' + Math.floor((Date.now() - thinkStart) / 1000) + 's';
     }, 1000);
     const slaSeconds = {easy:120, medium:240, hard:480, ddos:300};
@@ -1163,7 +1166,7 @@ async function runAgent() {
     slaEl.id = 'slaTimer';
     slaEl.style = 'margin-top:8px;font-family:Courier New,monospace;font-size:12px';
     document.getElementById('thinkingBlock').appendChild(slaEl);
-    var slaInterval = setInterval(() => {
+    slaInterval = setInterval(() => {
       slaRemaining--;
       const mins = Math.floor(slaRemaining/60);
       const secs = slaRemaining%60;
@@ -1182,11 +1185,13 @@ async function runAgent() {
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(600000)
     });
+    if (!res.ok) {
+      throw new Error(`Request failed (${res.status})`);
+    }
     const data = await res.json();
-    clearInterval(dotsInterval);
-    clearInterval(timerInterval);
-    clearInterval(slaInterval);
-    document.getElementById('thinkingBlock')?.remove();
+    if (data == null) {
+      throw new Error('Empty response from server');
+    }
     console.log('API response:', JSON.stringify(data).slice(0, 200));
 
     if (data.error) {
@@ -1377,17 +1382,17 @@ ${labels}
       }
     }
   } catch(e) {
+    addLog('ERROR', 'lb-error', e.message);
+  } finally {
     clearInterval(dotsInterval);
     clearInterval(timerInterval);
     clearInterval(slaInterval);
     document.getElementById('thinkingBlock')?.remove();
-    addLog('ERROR', 'lb-error', e.message);
+    btn.disabled = false;
+    btn.classList.remove('running');
+    document.getElementById('btnIcon').textContent = '▶';
+    document.getElementById('btnText').textContent = 'RUN AGENT';
   }
-
-  btn.disabled = false;
-  btn.classList.remove('running');
-  document.getElementById('btnIcon').textContent = '▶';
-  document.getElementById('btnText').textContent = 'RUN AGENT';
 }
 
 (function(){
@@ -1439,56 +1444,6 @@ ${labels}
   <h3 class="timeline-heading">
     <span class="heading-icon">📋</span> INVESTIGATION HISTORY
   </h3>
-
-  <div class="timeline-container">
-
-    <!-- ENTRY 1 — FAILED -->
-    <div class="timeline-entry failed">
-      <div class="timeline-left">
-        <div class="timeline-dot red"></div>
-        <div class="timeline-line"></div>
-      </div>
-      <div class="timeline-card">
-        <div class="tl-header">
-          <span class="diff-badge hard">HARD</span>
-          <span class="tl-title">DDoS + AZ Failure Investigation</span>
-          <span class="tl-status failed-tag">✕ FAILED</span>
-          <span class="tl-time">19:09:25 UTC</span>
-        </div>
-        <div class="tl-meta">
-          <span>🔍 0 queries</span>
-          <span>⚙️ 0 services</span>
-          <span>⏱ 00:03 elapsed</span>
-          <span>❌ HF_TOKEN not set</span>
-        </div>
-        <div class="tl-cause">Root Cause: Configuration error — model token missing</div>
-      </div>
-    </div>
-
-    <!-- ENTRY 2 — SOLVED (example) -->
-    <div class="timeline-entry solved">
-      <div class="timeline-left">
-        <div class="timeline-dot green"></div>
-        <div class="timeline-line"></div>
-      </div>
-      <div class="timeline-card">
-        <div class="tl-header">
-          <span class="diff-badge easy">EASY</span>
-          <span class="tl-title">Cache Failure Investigation</span>
-          <span class="tl-status solved-tag">✓ SOLVED</span>
-          <span class="tl-time">18:45:10 UTC</span>
-        </div>
-        <div class="tl-meta">
-          <span>🔍 4 queries</span>
-          <span>⚙️ 2 services</span>
-          <span>⏱ 02:18 elapsed</span>
-          <span>📊 Score: 91/100</span>
-        </div>
-        <div class="tl-cause">Root Cause: Redis cache TTL misconfiguration caused cascade</div>
-      </div>
-    </div>
-
-  </div>
 </div>
   <div class="rca-run-history-wrap">
     <h3 class="rca-lb-heading rca-run-history-heading">RUN HISTORY TIMELINE</h3>
@@ -2126,6 +2081,7 @@ body.rca-leaderboard-on .main { display: none !important; }
   "use strict";
 
   var LB_KEY = "rca_leaderboard";
+  var LB_SCHEMA_KEY = "rca_leaderboard_schema_v2";
   var SOC_STATUSES = [
     "DEPLOYING AI AGENT...",
     "ESTABLISHING CONNECTIONS...",
@@ -2169,6 +2125,38 @@ body.rca-leaderboard-on .main { display: none !important; }
     return pad2(m) + ":" + pad2(s);
   }
 
+  function fmtTimestamp24(dateObj) {
+    var d = dateObj || new Date();
+    return (
+      pad2(d.getDate()) +
+      "/" +
+      pad2(d.getMonth() + 1) +
+      "/" +
+      d.getFullYear() +
+      ", " +
+      pad2(d.getHours()) +
+      ":" +
+      pad2(d.getMinutes()) +
+      ":" +
+      pad2(d.getSeconds())
+    );
+  }
+
+  function scoreFromResult(json) {
+    var raw = null;
+    if (json && json.scores) {
+      if (typeof json.scores.total_score === "number") raw = json.scores.total_score;
+      else if (typeof json.scores.final_score === "number") raw = json.scores.final_score;
+      else if (typeof json.scores.total === "number") raw = json.scores.total;
+      else if (typeof json.scores.score === "number") raw = json.scores.score;
+    } else if (json && typeof json.total_score === "number") {
+      raw = json.total_score;
+    }
+    if (typeof raw !== "number" || isNaN(raw)) return 0;
+    var pct = raw <= 1 && raw >= 0 ? raw * 100 : raw;
+    return Math.max(0, Math.min(100, Math.round(pct * 10) / 10));
+  }
+
   document.documentElement.classList.add("rca-pro-ui");
   document.body.classList.add("rca-pro-ui");
 
@@ -2185,6 +2173,10 @@ body.rca-leaderboard-on .main { display: none !important; }
 
   function parseLeaderboardList() {
     try {
+      if (localStorage.getItem(LB_SCHEMA_KEY) !== "v2") {
+        localStorage.removeItem(LB_KEY);
+        localStorage.setItem(LB_SCHEMA_KEY, "v2");
+      }
       var raw = localStorage.getItem(LB_KEY);
       var list = raw ? JSON.parse(raw) : [];
       return Array.isArray(list) ? list : [];
@@ -2283,7 +2275,7 @@ body.rca-leaderboard-on .main { display: none !important; }
       timestamp.className = "timestamp";
       timestamp.textContent = entry.timestamp || "";
       var statusBadge = document.createElement("span");
-      statusBadge.className = "status-badge " + statusText;
+      statusBadge.className = "status-badge " + statusClass;
       statusBadge.textContent = statusText;
       header.appendChild(badge);
       header.appendChild(timestamp);
@@ -2617,11 +2609,13 @@ body.rca-leaderboard-on .main { display: none !important; }
   window.fetch = function (input, init) {
     var url = typeof input === "string" ? input : (input && input.url) || "";
     var method = init && init.method ? String(init.method).toUpperCase() : "GET";
-    var isBaselinePost = url.indexOf("/baseline") !== -1 && method === "POST";
+    var isInvestigationPost =
+      (url.indexOf("/baseline") !== -1 || url.indexOf("/api/investigate/custom") !== -1) &&
+      method === "POST";
     return origFetch
       .apply(this, arguments)
       .catch(function (err) {
-        if (isBaselinePost) {
+        if (isInvestigationPost) {
           var startMs = window.__rcaRunStartMs || Date.now();
           var elapsedSec = Math.floor((Date.now() - startMs) / 1000);
           showFailModal(err && err.message ? err.message : "Network request failed", elapsedSec);
@@ -2629,7 +2623,7 @@ body.rca-leaderboard-on .main { display: none !important; }
         return Promise.reject(err);
       })
       .then(function (res) {
-      if (!isBaselinePost) return res;
+      if (!isInvestigationPost) return res;
       return res
         .clone()
         .json()
@@ -2640,8 +2634,7 @@ body.rca-leaderboard-on .main { display: none !important; }
           try {
             if (res.ok && json && !json.error && typeof difficulty !== "undefined" && difficulty) {
               var list = parseLeaderboardList();
-              var totalScore =
-                json.scores != null && json.scores.total != null ? json.scores.total : "N/A";
+              var totalScore = scoreFromResult(json);
               var queries = json.queries_used != null ? json.queries_used : json.steps;
               if (queries == null) queries = "—";
               var services = Array.isArray(json.report && json.report.affected_services)
@@ -2650,16 +2643,22 @@ body.rca-leaderboard-on .main { display: none !important; }
               var rootSummary = json.report && json.report.root_cause_service
                 ? "Root Cause: " + json.report.root_cause_service + (json.report.root_cause_type ? " (" + json.report.root_cause_type + ")" : "")
                 : "Root Cause: Unknown";
+              var statusFromBackend =
+                typeof json.is_correct === "boolean"
+                  ? json.is_correct
+                    ? "SOLVED"
+                    : "FAILED"
+                  : runStatusFromScore(totalScore);
               list.push({
                 scenario: difficulty,
                 difficulty: json.difficulty,
                 score: totalScore,
                 steps: json.steps,
-                timestamp: new Date().toLocaleString(),
+                timestamp: fmtTimestamp24(new Date()),
                 queries: queries,
                 services: services,
                 elapsed: fmtElapsed(elapsedSec),
-                status: runStatusFromScore(totalScore),
+                status: statusFromBackend,
                 root_cause_summary: rootSummary
               });
               localStorage.setItem(LB_KEY, JSON.stringify(list));
@@ -3465,7 +3464,9 @@ body.rca-meta-hackathon .right-panel.rca-tab-log #scorePanel.show {
   window.fetch = function (input, init) {
     var url = typeof input === "string" ? input : input && input.url ? input.url : "";
     var method = init && init.method ? String(init.method).toUpperCase() : "GET";
-    var isBaseline = url.indexOf("/baseline") !== -1 && method === "POST";
+    var isBaseline =
+      (url.indexOf("/baseline") !== -1 || url.indexOf("/api/investigate/custom") !== -1) &&
+      method === "POST";
     return innerFetch.apply(this, arguments).then(function (res) {
       if (!isBaseline) return res;
       return res

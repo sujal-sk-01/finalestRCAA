@@ -23,6 +23,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -520,16 +521,28 @@ class CustomScenarioRequest(BaseModel):
 async def post_baseline(body: BaselineBody) -> dict:
     from baseline.agent import run_baseline
 
-    d = body.difficulty.lower()
-    if d not in SCENARIOS:
-        raise HTTPException(status_code=404, detail=f"Unknown difficulty: {body.difficulty}")
-    return await asyncio.to_thread(run_baseline, d)
+    try:
+        d = body.difficulty.lower()
+        if d not in SCENARIOS:
+            raise HTTPException(status_code=404, detail=f"Unknown difficulty: {body.difficulty}")
+        return await asyncio.to_thread(run_baseline, d)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Baseline run failed")
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 @app.post("/api/investigate/custom")
 async def post_custom_investigation(body: CustomScenarioRequest) -> dict:
     from baseline.agent import run_baseline
 
-    if not isinstance(body.data, dict) or not body.data:
-        raise HTTPException(status_code=400, detail="Custom scenario data must be a non-empty JSON object")
-    return await asyncio.to_thread(run_baseline, "custom", body.data)
+    try:
+        if not isinstance(body.data, dict) or not body.data:
+            raise HTTPException(status_code=400, detail="Custom scenario data must be a non-empty JSON object")
+        return await asyncio.to_thread(run_baseline, "custom", body.data)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Custom investigation run failed")
+        return JSONResponse(status_code=500, content={"error": str(e)})
