@@ -107,9 +107,24 @@ async def get_ui():
 
 
 @app.post("/openenv/reset")
-async def openenv_reset() -> dict:
-    return {"status": "ok"}
+async def openenv_reset_standard(request: Request):
+    """The standard OpenEnv grader path."""
+    print(f"GRADER HIT OPENENV RESET: {request.url.path}")
+    body = await request.json()
+    # The grader usually sends the task in the body for this endpoint
+    difficulty = body.get("task_id", body.get("difficulty", "easy"))
+    return await _reset_impl(difficulty, request)
 
+
+@app.post("/openenv/step")
+async def openenv_step_standard(body: Action, request: Request):
+    """The standard OpenEnv step path."""
+    print(f"GRADER HIT OPENENV STEP: {request.url.path}")
+    # Logic to detect current session difficulty
+    difficulty = "easy" # Fallback or detect from session
+    return take_step(difficulty, body, request)
+
+    
 
 @app.post("/openenv/validate")
 async def openenv_validate() -> dict:
