@@ -100,7 +100,12 @@ def startup_event() -> None:
 
 
 @app.get("/")
-def root():
+def health() -> dict:
+    return {"status": "ok"}
+
+
+@app.get("/ui")
+def ui_page():
     from fastapi.responses import HTMLResponse
     html = open(_PROJECT_ROOT / "server" / "ui.html", encoding="utf-8").read()
     ui_html = """<!DOCTYPE html>
