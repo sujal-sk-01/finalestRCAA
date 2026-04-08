@@ -135,3 +135,55 @@ python inference.py
 - Pydantic v2
 - OpenAI-compatible client (configured by env)
 - Vanilla HTML/CSS/JS frontend
+
+## Citation
+
+If you use RCAAgent-Env in your research or evaluation pipeline, please cite:
+
+```bibtex
+@misc{rcaagent-env-2025,
+  title={RCAAgent-Env: An OpenEnv Environment for SRE Incident Root Cause Analysis},
+  author={Sujal K},
+  year={2025},
+  publisher={Hugging Face},
+  url={https://huggingface.co/spaces/Sujalk123/rcaagent-env}
+}
+```
+
+## Custom Scenarios
+
+- Agents can upload custom JSON scenarios via `POST /api/investigate/custom`.
+- Custom scenarios must follow the same schema as `scenarios/easy.json`.
+- Required fields:
+  - `scenario_id`
+  - `difficulty`
+  - `alert`
+  - `services`
+  - `max_queries`
+  - `service_metrics`
+  - `logs`
+  - `traces`
+  - `dependencies`
+  - `ground_truth`
+- Use `scenarios/custom_example.json` as a template.
+
+## Evaluation Criteria Alignment
+
+| Meta Criterion | Implementation |
+|---|---|
+| Real-world utility | SRE incident RCA is a daily task at every tech company |
+| Task & grader quality | 5 tasks, deterministic grader, 0.0-1.0 scores |
+| Environment design | Partial rewards, clean reset(), typed Pydantic models |
+| Code quality | OpenEnv spec compliant, Dockerfile, typed contracts |
+| Creativity | Novel RCA domain, budget-aware investigation mechanics |
+
+## Contributing
+
+- Fork the repo
+- Create a feature branch
+- Submit a PR with clear description
+- Issues and scenario contributions welcome
+
+## License
+
+MIT License. See LICENSE file for details.

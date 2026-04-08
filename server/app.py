@@ -224,8 +224,8 @@ def root():
 
 <div class="metrics-bar">
   <div class="metric">
-    <div class="metric-label">Scenarios</div>
-    <div class="metric-value blue">04</div>
+    <div class="metric-label">Scenarios(Inbuilt + Custom)</div>
+    <div class="metric-value blue">05</div>
   </div>
   <div class="metric">
     <div class="metric-label">Max Score</div>
@@ -233,7 +233,7 @@ def root():
   </div>
   <div class="metric">
     <div class="metric-label">Baseline Model</div>
-    <div class="metric-value" style="font-size:16px;padding-top:6px">Qwen 72B</div>
+    <div class="metric-value" style="font-size:16px;padding-top:6px">Qwen 72B + LLama 3.1</div>
   </div>
   <div class="metric">
     <div class="metric-label">Environment</div>
