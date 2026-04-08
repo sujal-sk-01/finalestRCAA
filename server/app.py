@@ -22,7 +22,7 @@ import os
 
 logging.basicConfig(level=logging.INFO)
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -438,7 +438,8 @@ class GraderRequest(BaseModel):
 
 
 @app.get("/tasks", response_model=TasksResponse)
-def list_tasks() -> TasksResponse:
+def list_tasks(request: Request) -> TasksResponse:
+    print(f"GRADER HIT: {request.url.path}")
     out: list[TaskMeta] = []
     for diff in ("easy", "medium", "hard", "data_breach", "ddos"):
         sc = SCENARIOS[diff]
@@ -455,14 +456,24 @@ def list_tasks() -> TasksResponse:
     return TasksResponse(tasks=out, action_schema=Action.model_json_schema())
 
 
-@app.post("/reset/{difficulty}", response_model=EnvironmentState)
-def reset_session(difficulty: str) -> EnvironmentState:
-    d = difficulty.lower()
+async def _reset_impl(value: str, request: Request) -> EnvironmentState:
+    print(f"GRADER HIT: {request.url.path}")
+    d = value.lower()
     if d not in SCENARIOS:
-        raise HTTPException(status_code=404, detail=f"Unknown difficulty: {difficulty}")
+        raise HTTPException(status_code=404, detail=f"Unknown difficulty: {value}")
     env = RCAEnvironment(d)
     sessions[d] = env
     return env.reset()
+
+
+@app.post("/reset/{task_id}", response_model=EnvironmentState)
+async def reset(task_id: str, request: Request) -> EnvironmentState:
+    return await _reset_impl(task_id, request)
+
+
+@app.post("/reset/{difficulty}", response_model=EnvironmentState, include_in_schema=False)
+async def reset_alias(difficulty: str, request: Request) -> EnvironmentState:
+    return await _reset_impl(difficulty, request)
 
 
 def _get_session(difficulty: str) -> RCAEnvironment:
@@ -477,7 +488,8 @@ def _get_session(difficulty: str) -> RCAEnvironment:
 
 
 @app.post("/step/{difficulty}", response_model=Observation)
-def take_step(difficulty: str, body: Action) -> Observation:
+def take_step(difficulty: str, body: Action, request: Request) -> Observation:
+    print(f"GRADER HIT: {request.url.path}")
     env = _get_session(difficulty)
     return env.step(body)
 
