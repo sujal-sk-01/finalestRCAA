@@ -106,6 +106,16 @@ async def get_ui():
         return HTMLResponse(content=f.read())
 
 
+@app.post("/openenv/reset")
+async def openenv_reset() -> dict:
+    return {"status": "ok"}
+
+
+@app.post("/openenv/validate")
+async def openenv_validate() -> dict:
+    return {"status": "ok"}
+
+
 @app.get("/ui", response_class=HTMLResponse)
 async def ui_page():
     html = open(_PROJECT_ROOT / "server" / "ui.html", encoding="utf-8").read()
