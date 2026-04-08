@@ -23,7 +23,7 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -83,7 +83,7 @@ def _environment_state_for_grader(
 
 app = FastAPI(title="RCAAgent-Env", version="2.0.0")
 
-app.mount("/static", StaticFiles(directory=str(_PROJECT_ROOT / "static")), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.on_event("startup")
@@ -99,14 +99,15 @@ def startup_event() -> None:
     logger.info("RCAAgent-Env ready (scenarios=%s)", list(SCENARIOS.keys()))
 
 
-@app.get("/")
-def health() -> dict:
-    return {"status": "ok"}
+@app.get("/", response_class=HTMLResponse)
+async def get_ui():
+    ui_path = _PROJECT_ROOT / "server" / "ui.html"
+    with open(ui_path, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
 
 
-@app.get("/ui")
-def ui_page():
-    from fastapi.responses import HTMLResponse
+@app.get("/ui", response_class=HTMLResponse)
+async def ui_page():
     html = open(_PROJECT_ROOT / "server" / "ui.html", encoding="utf-8").read()
     ui_html = """<!DOCTYPE html>
 <html lang="en">
