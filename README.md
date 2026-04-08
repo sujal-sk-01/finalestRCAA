@@ -8,182 +8,461 @@ app_file: server/app.py
 pinned: false
 ---
 
-# RCAAgent-Env
+<div align="center">
 
-OpenEnv-compatible environment for training and evaluating RCA agents on realistic microservice incidents.
+# 🔍 RCAAgent-Env
 
-- Hugging Face Space URL format: `https://huggingface.co/spaces/<username>/<space-name>`
-- Current deployment reference: `https://sujalk123-rcaagent-env.hf.space`
-- Demo description: The web UI shows end-to-end incident investigation, step-by-step telemetry queries, and final RCA grading.
+**A production-grade, OpenEnv-compatible simulation environment for training and evaluating AI agents on SRE incident Root Cause Analysis (RCA).**
 
-## Environment Description and Motivation
+[![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-yellow?logo=huggingface)](https://huggingface.co/spaces/Sujalk123/rcaagent-env)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
+[![OpenEnv](https://img.shields.io/badge/OpenEnv-Compatible-22c55e)](https://github.com/meta-pytorch/OpenEnv)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111+-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Modern incidents rarely fail in one obvious place. RCAAgent-Env simulates cross-service degradation where agents must inspect metrics, logs, traces, and dependency edges to identify root cause and submit a structured report. The environment is designed for:
+### 🌐 Live Space: [huggingface.co/spaces/Sujalk123/rcaagent-env](https://huggingface.co/spaces/Sujalk123/rcaagent-env)
 
-- SRE/on-call training
-- Agent benchmarking under query budget constraints
-- Reproducible scoring for OpenEnv-style evaluations
+</div>
 
-## Task Descriptions (Difficulty)
+---
 
-- `easy`: single dominant root cause with short dependency chain
-- `medium`: cascading failure with multiple degraded tiers
-- `hard`: diffuse symptoms with subtler correlation signals
-- `ddos`: volumetric traffic saturation at ingress edge
-- `data_breach`: security/event-driven anomaly pattern
+## 📌 Table of Contents
 
-## Action Space Definition
+- [Motivation](#-motivation)
+- [Quick Start](#-quick-start)
+- [Environment Description](#-environment-description)
+- [Agent ↔ Environment Loop](#-agent--environment-loop)
+- [Task Descriptions](#-task-descriptions)
+- [Action Space](#-action-space)
+- [Observation Space](#-observation-space)
+- [Reward Function](#-reward-function)
+- [Deterministic Grading](#-deterministic-grading)
+- [API Endpoints](#-api-endpoints)
+- [Inference Runner](#-inference-runner)
+- [Baseline Scores](#-baseline-scores)
+- [Environment Variables](#-required-environment-variables)
+- [Project Structure](#-project-structure)
+- [Custom Scenarios](#-custom-scenarios)
+- [Deployment Notes](#-deployment-notes)
+- [Citation](#-citation)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-Agent sends structured JSON actions:
+---
 
-```json
-{"action_type":"query_metrics","target_service":"api_gateway"}
-{"action_type":"query_logs","target_service":"database"}
-{"action_type":"pull_traces","target_service":"order_service"}
-{"action_type":"query_dependencies","target_service":"auth_service"}
-{"action_type":"form_hypothesis","hypothesis":"Likely cache misconfiguration"}
-{"action_type":"submit_rca","rca_report":{"root_cause_service":"cache","root_cause_type":"misconfiguration","affected_services":["pricing_service"],"causal_chain":["cache","pricing_service","api_gateway"],"summary":"...","suggested_fix":"...","confidence":0.82}}
-```
+## 🎯 Motivation
 
-## Observation Space Definition
+Modern production incidents are rarely single-point failures. Symptoms appear across multiple services, and true causes hide behind cascades, retries, and noisy telemetry. This makes RCA an ideal benchmark for agentic reasoning because it demands:
 
-Environment returns structured observations:
+- **Multi-hop investigation** across metrics, logs, traces, and service dependencies
+- **Budget-aware decision making** under limited query constraints
+- **Structured reporting** with causal chains and remediation steps
+- **Reproducible evaluation** via deterministic, rule-based scoring
 
-```json
-{
-  "success": true,
-  "message": "Metrics for api_gateway",
-  "data": {},
-  "anomaly_detected": true,
-  "anomaly_type": "degraded",
-  "queries_remaining": 18,
-  "reward": {
-    "step_reward": 0.15,
-    "cumulative_reward": 0.52,
-    "reward_components": {},
-    "done": false
-  }
-}
-```
+RCAAgent-Env provides a realistic, constrained environment where agents can be compared fairly on both investigation quality and efficiency — mirroring exactly what on-call SREs do every day at scale.
 
-## Scenario JSON Schema
+---
 
-All `scenarios/*.json` use a common top-level schema:
+## ⚡ Quick Start
 
-```json
-{
-  "scenario_id": "INC-XXX",
-  "difficulty": "easy|medium|hard|ddos|data_breach",
-  "alert": "string",
-  "services": ["service_a", "service_b"],
-  "max_queries": 30,
-  "service_metrics": {"service_a": {"latency_ms": 0, "error_rate": 0, "cpu_percent": 0, "memory_percent": 0, "status": "healthy"}},
-  "logs": {"service_a": ["..."]},
-  "traces": {"service_a": [{"trace_id": "t-1", "span": "op", "duration_ms": 12, "status": "ok"}]},
-  "dependencies": {"service_a": {"upstream": [], "downstream": []}},
-  "ground_truth": {
-    "root_cause_service": "service_a",
-    "root_cause_type": "type",
-    "affected_services": ["service_b"],
-    "causal_chain": ["service_a", "service_b"],
-    "optimal_queries": 5,
-    "difficulty_rationale": "string",
-    "teaching_points": ["string"]
-  }
-}
-```
-
-## Setup and Usage Instructions
+### 1. Run Locally (Python)
 
 ```bash
 git clone https://github.com/sujal-sk-01/finalestRCAA
 cd finalestRCAA
 pip install -r requirements.txt
 cp .env.example .env
+# Edit .env — set API_BASE_URL, MODEL_NAME, HF_TOKEN
+uvicorn server.app:app --host 0.0.0.0 --port 7860 --reload
 ```
 
-Set environment variables in `.env`:
+Open → http://127.0.0.1:7860
 
-```bash
-HF_TOKEN=your_api_token
-API_BASE_URL=https://router.huggingface.co/v1
-MODEL_NAME=meta-llama/Llama-3.3-70B-Instruct
-```
+---
 
-Run server:
-
-```bash
-uvicorn server.app:app --host 0.0.0.0 --port 7860
-```
-
-Run inference baseline:
+### 2. Run Baseline Inference (All 3 Tasks)
 
 ```bash
 python inference.py
 ```
 
-## Baseline Scores
+---
 
-- easy: `0.72`
-- medium: `0.51`
-- hard: `0.31`
+### 3. Run with Docker
 
-## Tech Stack
+```bash
+docker build -t rcaagent-env .
+docker run --rm -p 7860:7860 --env-file .env rcaagent-env
+```
 
-- Python 3.11
-- FastAPI + Uvicorn
-- Pydantic v2
-- OpenAI-compatible client (configured by env)
-- Vanilla HTML/CSS/JS frontend
+Open → http://127.0.0.1:7860
 
-## Citation
+---
 
-If you use RCAAgent-Env in your research or evaluation pipeline, please cite:
+### 4. Deploy on Hugging Face Space
 
-```bibtex
-@misc{rcaagent-env-2025,
-  title={RCAAgent-Env: An OpenEnv Environment for SRE Incident Root Cause Analysis},
-  author={Sujal K},
-  year={2025},
-  publisher={Hugging Face},
-  url={https://huggingface.co/spaces/Sujalk123/rcaagent-env}
+Deploy this repo as a **Docker Space** and add these repository secrets:
+
+| Secret | Description |
+|---|---|
+| `API_BASE_URL` | OpenAI-compatible API base URL |
+| `MODEL_NAME` | Model identifier for inference |
+| `HF_TOKEN` | Hugging Face token / API key |
+
+---
+
+## 🌍 Environment Description
+
+RCAAgent-Env exposes a full OpenEnv-style interaction loop over FastAPI:
+
+| Feature | Detail |
+|---|---|
+| Backend | FastAPI with full `reset()` / `step()` / `state()` lifecycle |
+| Scenarios | 5 incidents: `easy`, `medium`, `hard`, `ddos`, `data_breach` |
+| Contracts | Typed Pydantic models: `Action`, `Observation`, `Reward`, `RCAReport`, `EnvironmentState` |
+| Grader | Deterministic, reproducible `0.0–1.0` scoring |
+| Rewards | Partial, non-binary, checkpoint-based progress signals |
+| Logging | `inference.py` emits strict JSON: `START`, `STEP`, `END` |
+| LLM Client | OpenAI-compatible, driven by environment variables |
+| Runtime | Dockerized on port `7860` |
+| Spec | Full OpenEnv specification in `openenv.yaml` |
+| Dashboard | Single-page investigation UI at `server/ui.html` |
+
+---
+
+## 🔄 Agent ↔ Environment Loop
+
+```
++--------------------------+        Action (JSON)         +-----------------------------+
+|         AI Agent         | --------------------------> |      RCAAgent-Env API       |
+| (LLM / policy / planner) |                              |  /reset  /step  /state      |
++--------------------------+                              +-----------------------------+
+            ^                                                           |
+            |            Observation + Reward (JSON)                    |
+            +-----------------------------------------------------------+
+
+                       +-----------------------------------+
+                       | Deterministic Grader (0.0 - 1.0) |
+                       | root cause · path · efficiency   |
+                       | rule-based report quality         |
+                       +-----------------------------------+
+```
+
+---
+
+## 📋 Task Descriptions
+
+| Difficulty | Scenario Type | What the Agent Must Handle |
+|---|---|---|
+| `easy` | Single dominant service fault | Short causal chain, clear root indicator |
+| `medium` | Config cascade failure | Multi-hop propagation, selective relevance |
+| `hard` | Diffuse network degradation | Broad symptoms with weak local signals |
+| `ddos` | Volumetric ingress saturation | Edge overload and downstream service effects |
+| `data_breach` | Security + reliability overlap | Auth/data anomalies with incident propagation |
+
+---
+## 📁 Download Scenarios
+
+You can download scenario files here:
+
+https://drive.google.com/drive/folders/1Aig_AIK0a-3YzYi4Aw9UXxvj9YX_xON_?usp=sharing
+## 🎮 Action Space
+
+Agents send one structured JSON action per step:
+
+| Action Type | Description | Required Field |
+|---|---|---|
+| `query_metrics` | Fetch service metrics (latency, error rate, CPU, memory, status) | `target_service` |
+| `query_logs` | Retrieve service log lines for anomaly clues | `target_service` |
+| `pull_traces` | Inspect distributed tracing spans and statuses | `target_service` |
+| `query_dependencies` | Inspect upstream/downstream service topology | `target_service` |
+| `form_hypothesis` | Record intermediate reasoning — **no budget cost** | `hypothesis` |
+| `submit_rca` | Submit final root cause analysis report | `rca_report` |
+
+### Example — Query Action
+
+```json
+{
+  "action_type": "query_metrics",
+  "target_service": "api_gateway"
 }
 ```
 
-## Custom Scenarios
+### Example — Submit RCA
 
-- Agents can upload custom JSON scenarios via `POST /api/investigate/custom`.
-- Custom scenarios must follow the same schema as `scenarios/easy.json`.
-- Required fields:
-  - `scenario_id`
-  - `difficulty`
-  - `alert`
-  - `services`
-  - `max_queries`
-  - `service_metrics`
-  - `logs`
-  - `traces`
-  - `dependencies`
-  - `ground_truth`
-- Use `scenarios/custom_example.json` as a template.
+```json
+{
+  "action_type": "submit_rca",
+  "rca_report": {
+    "root_cause_service": "cache",
+    "root_cause_type": "misconfiguration",
+    "affected_services": ["pricing_service", "order_service", "api_gateway"],
+    "causal_chain": ["cache", "pricing_service", "order_service", "api_gateway"],
+    "summary": "Cache misconfiguration triggered a miss storm and cascaded latency across pricing and order services.",
+    "suggested_fix": "Restore cache TTL policy, warm critical keys, and monitor miss/error SLOs.",
+    "confidence": 0.82
+  }
+}
+```
 
-## Evaluation Criteria Alignment
+---
 
-| Meta Criterion | Implementation |
+## 👁️ Observation Space
+
+Each step returns a structured observation:
+
+| Field | Type | Description |
+|---|---|---|
+| `success` | `bool` | Whether the action executed successfully |
+| `message` | `str` | Human-readable result summary |
+| `data` | `object \| null` | Payload: metrics / logs / traces / dependencies |
+| `anomaly_detected` | `bool` | Whether an anomaly signal was identified |
+| `anomaly_type` | `str \| null` | Classified anomaly category |
+| `queries_remaining` | `int` | Remaining investigation budget |
+| `reward` | `Reward \| null` | Step reward and cumulative signal |
+
+**Reward object fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `step_reward` | `float` | Reward earned this step |
+| `cumulative_reward` | `float` | Total reward accumulated in episode |
+| `reward_components` | `dict` | Breakdown of reward sources |
+| `done` | `bool` | Whether the episode has ended |
+
+### Example Observation
+
+```json
+{
+  "success": true,
+  "message": "Metrics for api_gateway",
+  "data": {
+    "service": "api_gateway",
+    "metrics": {
+      "error_rate": 0.12,
+      "latency_p99_ms": 1850.0,
+      "requests_per_second": 828.0,
+      "cpu_usage": 0.55,
+      "memory_usage": 0.62,
+      "status": "degraded"
+    }
+  },
+  "anomaly_detected": true,
+  "anomaly_type": "degraded",
+  "queries_remaining": 21,
+  "reward": {
+    "step_reward": 0.3,
+    "cumulative_reward": 0.4,
+    "reward_components": {
+      "affected_service_relevance": 0.3
+    },
+    "done": false
+  }
+}
+```
+
+---
+
+## 🏆 Reward Function
+
+RCAAgent-Env uses **incremental progress rewards** rather than binary pass/fail:
+
+- ✅ Early investigative signals earn low-to-mid reward
+- ✅ Root-cause-relevant evidence earns stronger reward
+- ✅ Hypothesis and submission actions have explicit checkpoints
+- ❌ Repeated or inefficient querying is penalized
+- All step rewards are **bounded and clamped** to `[0.0, 1.0]`
+
+This supports meaningful agent learning on both **investigation accuracy** and **query efficiency**.
+
+---
+
+## 🔬 Deterministic Grading
+
+`server/grader.py` computes reproducible scores in `[0.0, 1.0]` using rule-based logic only:
+
+| Component | What Is Evaluated |
 |---|---|
-| Real-world utility | SRE incident RCA is a daily task at every tech company |
-| Task & grader quality | 5 tasks, deterministic grader, 0.0-1.0 scores |
-| Environment design | Partial rewards, clean reset(), typed Pydantic models |
-| Code quality | OpenEnv spec compliant, Dockerfile, typed contracts |
-| Creativity | Novel RCA domain, budget-aware investigation mechanics |
+| Root-cause correctness | Exact match on service and fault type |
+| Causal chain quality | Path ordering and completeness vs. ground truth |
+| Query efficiency | Actual budget used vs. optimal expected budget |
+| Report quality | Rule-based checks on summary, fix, and confidence fields |
 
-## Contributing
+> **Reproducibility guarantee:** Optional LLM-based analysis, if configured, is **metadata-only** and does not affect the primary deterministic score.
 
-- Fork the repo
-- Create a feature branch
-- Submit a PR with clear description
-- Issues and scenario contributions welcome
+---
 
-## License
+## 🔌 API Endpoints
 
-MIT License. See LICENSE file for details.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/` | Single-page RCA investigation dashboard |
+| `GET` | `/tasks` | List available tasks and full action schema |
+| `POST` | `/reset/{difficulty}` | Initialize or reset a scenario session |
+| `POST` | `/step/{difficulty}` | Execute one action, receive observation |
+| `GET` | `/state/{difficulty}` | Retrieve current environment state |
+| `POST` | `/grader` | Grade a submitted RCA report |
+| `GET` | `/baseline` | Run baseline agent by difficulty |
+| `POST` | `/baseline` | Run baseline agent with JSON body |
+| `POST` | `/api/investigate/custom` | Run agent on a custom uploaded scenario |
+
+---
+
+## 🤖 Inference Runner
+
+`inference.py` runs the full evaluation loop:
+
+| Property | Value |
+|---|---|
+| Tasks | `easy`, `medium`, `hard` |
+| Max steps per task | `12` |
+| Per-task timeout | `360s` |
+| Credentials | `os.getenv`: `API_BASE_URL`, `MODEL_NAME`, `HF_TOKEN` |
+| LLM client | OpenAI-compatible |
+
+**Structured JSON stdout logs:**
+
+```json
+{"type": "START", "task": "easy", "env": "RCAEnvironment", "model": "..."}
+{"type": "STEP", "step": 1, "action": "query_metrics", "reward": 0.1, "done": false, "error": null}
+{"type": "END", "success": true, "steps": 9, "score": 0.2775, "rewards": [...]}
+```
+
+---
+
+## 📊 Baseline Scores
+
+| Task | Score |
+|---|---|
+| `easy` | 0.2775 |
+| `medium` | 0.2775 |
+| `hard` | 0.2775 |
+
+---
+
+## 🔧 Required Environment Variables
+
+| Variable | Purpose |
+|---|---|
+| `API_BASE_URL` | OpenAI-compatible API base URL |
+| `MODEL_NAME` | Model identifier for inference |
+| `HF_TOKEN` | API key used by the OpenAI-compatible client |
+
+**`.env` file:**
+
+```env
+API_BASE_URL=https://router.huggingface.co/v1
+MODEL_NAME=meta-llama/Llama-3.3-70B-Instruct
+HF_TOKEN=your_token_here
+```
+
+---
+
+## 📁 Project Structure
+
+```
+finalestRCAA/
+├── baseline/
+│   ├── __init__.py
+│   └── agent.py                 # Baseline agent implementation
+├── scenarios/
+│   ├── easy.json                # Easy incident scenario
+│   ├── medium.json              # Medium incident scenario
+│   ├── hard.json                # Hard incident scenario
+│   ├── ddos.json                # DDoS attack scenario
+│   ├── data_breach.json         # Data breach scenario
+│   └── custom_example.json      # Template for custom scenarios
+├── server/
+│   ├── app.py                   # FastAPI application entrypoint
+│   ├── environment.py           # Core environment logic
+│   ├── grader.py                # Deterministic scoring engine
+│   ├── llm.py                   # OpenAI-compatible LLM client
+│   └── ui.html                  # Single-page investigation dashboard
+├── static/
+│   └── neural-bg.js             # UI background asset
+├── models.py                    # Pydantic data models
+├── inference.py                 # Evaluation runner
+├── openenv.yaml                 # OpenEnv specification
+├── requirements.txt
+├── Dockerfile
+└── README.md
+```
+
+---
+
+## 🗂️ Custom Scenarios
+
+Upload custom incident scenarios via `POST /api/investigate/custom`.
+
+Use `scenarios/custom_example.json` as your template:
+
+```json
+{
+  "scenario_id": "custom-001",
+  "difficulty": "medium",
+  "alert": "Elevated error rate detected on payment_service",
+  "services": ["payment_service", "auth_service", "api_gateway"],
+  "max_queries": 20,
+  "service_metrics": { "...": "..." },
+  "logs": { "...": "..." },
+  "traces": { "...": "..." },
+  "dependencies": { "...": "..." },
+  "ground_truth": {
+    "root_cause_service": "auth_service",
+    "root_cause_type": "latency",
+    "affected_services": ["payment_service", "api_gateway"]
+  }
+}
+```
+
+---
+
+## 🚀 Deployment Notes
+
+- Docker image exposes port `7860`
+- Uvicorn entrypoint: `server.app:app` on `0.0.0.0:7860`
+- `openenv.yaml` defines environment metadata, task contracts, action/observation spaces
+- Hugging Face Space tagged as Docker SDK with health check on `/tasks`
+
+---
+
+## 📖 Citation
+
+```bibtex
+@misc{rcaagent-env-2025,
+  title     = {RCAAgent-Env: An OpenEnv Environment for SRE Incident Root Cause Analysis},
+  author    = {Sujal K},
+  year      = {2025},
+  publisher = {Hugging Face},
+  url       = {https://huggingface.co/spaces/Sujalk123/rcaagent-env}
+}
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m 'Add my feature'`
+4. Push to your branch: `git push origin feature/my-feature`
+5. Open a Pull Request with a clear description
+
+Issues and custom scenario contributions are especially encouraged.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+Made with ❤️ by [Sujal K](https://github.com/sujal-sk-01) &nbsp;·&nbsp; [Live Demo](https://huggingface.co/spaces/Sujalk123/rcaagent-env)
+
+</div>
