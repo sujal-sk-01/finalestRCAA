@@ -663,3 +663,13 @@ async def post_custom_investigation(body: CustomScenarioRequest) -> dict:
     except Exception as e:
         logger.exception("Custom investigation run failed")
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+def main() -> None:
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=7860)
+
+
+if __name__ == "__main__":
+    main()

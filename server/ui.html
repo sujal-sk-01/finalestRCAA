@@ -697,7 +697,7 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
     </div>
   </div>
 </div>
-<div id="uploadToast" class="upload-toast" role="status" aria-live="polite" hidden></div>
+<div id="uploadToast" class="upload-toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 
 <script>
 let difficulty = null;
@@ -705,45 +705,26 @@ let currentReportData = null;
 let customScenarioData = null;
 
 function showUploadToast(kind, message) {
-  try {
-    // Guaranteed fallback signal in case any overlay/style stack hides custom popup.
-    if (window.__forceUploadAlert === true) {
-      alert(message);
-      return;
-    }
-  } catch (e) {}
-
-  const oldBackdrop = document.getElementById('uploadToastBackdrop');
-  const oldModal = document.getElementById('uploadToastModal');
-  if (oldBackdrop) oldBackdrop.remove();
-  if (oldModal) oldModal.remove();
-
-  const backdrop = document.createElement('div');
-  backdrop.id = 'uploadToastBackdrop';
-  backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:1000000;';
-
-  const modal = document.createElement('div');
-  modal.id = 'uploadToastModal';
+  const toast = document.getElementById('uploadToast');
+  if (!toast) return;
   const isSuccess = kind === 'success';
-  const border = isSuccess ? 'rgba(34,197,94,.95)' : 'rgba(239,68,68,.95)';
-  const glow = isSuccess ? 'rgba(34,197,94,.35)' : 'rgba(239,68,68,.35)';
-  const text = isSuccess ? '#86efac' : '#fca5a5';
-  modal.style.cssText =
-    'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000001;' +
-    'min-width:360px;max-width:min(92vw,560px);padding:18px 20px;border-radius:14px;' +
-    'background:rgba(8,12,20,.98);border:1px solid ' + border + ';color:' + text + ';' +
-    'font-family:\"Courier New\",monospace;font-size:12px;font-weight:700;letter-spacing:.4px;text-align:center;' +
-    'box-shadow:0 0 0 1px ' + border + ',0 0 34px ' + glow + ';';
-  modal.textContent = message;
-
-  document.body.appendChild(backdrop);
-  document.body.appendChild(modal);
-
+  const icon = isSuccess ? '✓' : '✕';
+  toast.classList.remove('ok', 'err', 'show');
+  toast.classList.add(isSuccess ? 'ok' : 'err');
+  toast.innerHTML =
+    '<span class="upload-toast-icon" aria-hidden="true">' + icon + '</span>' +
+    '<span class="upload-toast-text">' + (message || '') + '</span>';
+  toast.hidden = false;
+  requestAnimationFrame(function () {
+    toast.classList.add('show');
+  });
   clearTimeout(window.__uploadToastTimer);
-  window.__uploadToastTimer = setTimeout(() => {
-    modal.remove();
-    backdrop.remove();
-  }, 2200);
+  window.__uploadToastTimer = setTimeout(function () {
+    toast.classList.remove('show');
+    setTimeout(function () {
+      toast.hidden = true;
+    }, 280);
+  }, 3000);
 }
 
 function validateCustomScenarioPayload(parsed) {
@@ -787,7 +768,7 @@ function handleFileUpload(event) {
         customScenarioData = null;
         difficulty = null;
         document.getElementById('customUploadBtn')?.classList.remove('active');
-        showUploadToast('error', 'Invalid Scenario Format — ' + validationError);
+        showUploadToast('error', 'Invalid JSON Format');
         document.getElementById('runBtn').disabled = true;
         return;
       }
@@ -799,12 +780,12 @@ function handleFileUpload(event) {
       rb.disabled = false;
       document.getElementById('btnText').textContent = 'RUN AGENT';
       clearLog();
-      showUploadToast('success', 'Scenario Loaded Successfully — ' + file.name);
+      showUploadToast('success', 'Scenario Loaded Successfully');
     } catch (err) {
       customScenarioData = null;
       difficulty = null;
       document.getElementById('customUploadBtn')?.classList.remove('active');
-      showUploadToast('error', 'Invalid Scenario Format — malformed JSON.');
+      showUploadToast('error', 'Invalid JSON Format');
       document.getElementById('runBtn').disabled = true;
     } finally {
       event.target.value = '';
@@ -814,7 +795,7 @@ function handleFileUpload(event) {
     customScenarioData = null;
     difficulty = null;
     document.getElementById('customUploadBtn')?.classList.remove('active');
-    showUploadToast('error', 'Invalid Scenario Format — file could not be read.');
+    showUploadToast('error', 'Invalid JSON Format');
     document.getElementById('runBtn').disabled = true;
     event.target.value = '';
   };
@@ -5893,13 +5874,35 @@ body.rca-meta-hackathon #bg-canvas {
   font-family: "Courier New", monospace;
   font-size: 11px;
   letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(13, 17, 23, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(14px);
   pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
 }
 .upload-toast.show {
   opacity: 1;
   transform: translateY(0);
+}
+.upload-toast-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  flex-shrink: 0;
+  border: 1px solid currentColor;
+}
+.upload-toast-text {
+  white-space: nowrap;
 }
 .upload-toast.ok {
   background: rgba(5, 46, 22, 0.96);
