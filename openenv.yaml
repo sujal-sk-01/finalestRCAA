@@ -55,10 +55,6 @@ server:
 
 endpoints:
   tasks: "GET /tasks"
-  reset: "POST /reset/{difficulty}"
-  step: "POST /step/{difficulty}"
-  state: "GET /state/{difficulty}"
-  grader: "POST /grader"
-  baseline_get: "GET /baseline"
-  baseline_post: "POST /baseline"
-  investigate_custom: "POST /api/investigate/custom"
+  reset: "POST /openenv/reset"
+  step: "POST /openenv/step"
+  validate: "POST /openenv/validate"

@@ -53,6 +53,19 @@ def _load_all_scenarios() -> None:
             SCENARIOS[key] = json.load(f)
 
 
+def _normalize_task_or_difficulty(value: str | None) -> str:
+    # Accept grader inputs as either difficulty labels (easy/medium/...)
+    # or scenario IDs (INC-001, etc.).
+    raw = (value or "").strip().lower()
+    if raw in SCENARIOS:
+        return raw
+    for diff, sc in SCENARIOS.items():
+        scenario_id = str(sc.get("scenario_id", "")).strip().lower()
+        if raw and raw == scenario_id:
+            return diff
+    return raw or "easy"
+
+
 def _service_metrics_from_scenario(scenario: dict) -> dict[str, ServiceMetrics]:
     out: dict[str, ServiceMetrics] = {}
     for name, data in scenario.get("service_metrics", {}).items():
@@ -107,26 +120,51 @@ async def get_ui():
 
 
 @app.post("/openenv/reset")
+@app.post("/openenv/reset/", include_in_schema=False)
 async def openenv_reset_standard(request: Request):
     """The standard OpenEnv grader path."""
     print(f"GRADER HIT OPENENV RESET: {request.url.path}")
-    body = await request.json()
+    try:
+        body = await request.json()
+        if not isinstance(body, dict):
+            body = {}
+    except Exception:
+        body = {}
     # The grader usually sends the task in the body for this endpoint
-    difficulty = body.get("task_id", body.get("difficulty", "easy"))
-    return await _reset_impl(difficulty, request)
+    task_or_difficulty = body.get("task_id", body.get("difficulty", "easy"))
+    difficulty = _normalize_task_or_difficulty(task_or_difficulty)
+    state = await _reset_impl(difficulty, request)
+    return {"observation": state.model_dump(), "info": {}}
 
 
 @app.post("/openenv/step")
-async def openenv_step_standard(body: Action, request: Request):
+@app.post("/openenv/step/", include_in_schema=False)
+async def openenv_step_standard(request: Request):
     """The standard OpenEnv step path."""
     print(f"GRADER HIT OPENENV STEP: {request.url.path}")
-    # Logic to detect current session difficulty
-    difficulty = "easy" # Fallback or detect from session
-    return take_step(difficulty, body, request)
+    try:
+        payload = await request.json()
+        if not isinstance(payload, dict):
+            payload = {}
+    except Exception:
+        payload = {}
+    task_or_difficulty = payload.get("task_id", payload.get("difficulty", "easy"))
+    difficulty = _normalize_task_or_difficulty(task_or_difficulty)
+    action_payload = payload.get("action") if isinstance(payload.get("action"), dict) else payload
+    if not isinstance(action_payload, dict):
+        action_payload = {}
+    if "action_type" not in action_payload:
+        action_payload["action_type"] = "query_metrics"
+    if action_payload.get("action_type") in {"query_metrics", "query_logs", "pull_traces", "query_dependencies"} and "target_service" not in action_payload:
+        action_payload["target_service"] = "api_gateway"
+    body = Action.model_validate(action_payload)
+    obs = take_step(difficulty, body, request)
+    return {"observation": obs.model_dump(), "reward": 0, "done": False, "info": {}}
 
     
 
 @app.post("/openenv/validate")
+@app.post("/openenv/validate/", include_in_schema=False)
 async def openenv_validate() -> dict:
     return {"status": "ok"}
 
