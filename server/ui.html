@@ -40,12 +40,13 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
 
 /* METRICS */
 .metrics-bar{background:rgba(13,17,23,.9);border-top:1px solid #1e2d3d;border-bottom:1px solid #1e2d3d;display:flex}
-.metrics-bar .metric{flex:1;padding:28px 40px;border-right:1px solid #1e2d3d}
+.metrics-bar .metric{flex:1;padding:28px 40px;border-right:1px solid #1e2d3d;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .metrics-bar .metric:last-child{border-right:none}
 .metrics-bar .metric-value{font-size:32px;font-weight:900;color:#e6edf3}
 .metrics-bar .metric-value.blue{color:#388bfd}
 .metrics-bar .metric-value.green{color:#3fb950}
 .metrics-bar .metric-value.yellow{color:#d29922}
+.metrics-bar .metric-value.metric-model-fit{font-size:28px;line-height:1.1;white-space:nowrap}
 .metrics-bar .metric-label{margin-top:10px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#7d8590}
 
 /* MAIN */
@@ -479,7 +480,7 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
 
 <section class="metrics-bar">
   <div class="metric">
-    <div class="metric-value blue">04</div>
+    <div class="metric-value blue">05 + Custom</div>
     <div class="metric-label">SCENARIOS</div>
   </div>
   <div class="metric">
@@ -487,7 +488,7 @@ body>section,body>div.main,nav,header,.hero,.metrics-bar,.main,.left-panel,.righ
     <div class="metric-label">MAX SCORE</div>
   </div>
   <div class="metric">
-    <div class="metric-value">LLAMA 3.1</div>
+    <div class="metric-value metric-model-fit">Qwen + Llama 3.1</div>
     <div class="metric-label">BASELINE MODEL</div>
   </div>
   <div class="metric">
@@ -3450,7 +3451,7 @@ body.rca-meta-hackathon .right-panel.rca-tab-log #scorePanel.show {
       if (lj && vj && lj.textContent.indexOf("BASELINE MODEL") !== -1) vj.style.opacity = "0";
     }
     var targets = [
-      { end: 4, fmt: function (v) { return String(Math.round(v)).padStart(2, "0"); } },
+      { end: 5, fmt: function (v) { return String(Math.round(v)).padStart(2, "0"); } },
       { end: 100, fmt: function (v) { return (v / 100).toFixed(2); } },
       null,
       null
@@ -3484,7 +3485,8 @@ body.rca-meta-hackathon .right-panel.rca-tab-log #scorePanel.show {
           var vj = metrics[j].querySelector(".metric-value");
           var lj = metrics[j].querySelector(".metric-label");
           if (!vj || !lj) continue;
-          if (lj.textContent.trim() === labels[2]) vj.textContent = "Qwen 72B";
+          if (lj.textContent.trim() === labels[0]) vj.textContent = "05 + Custom";
+          if (lj.textContent.trim() === labels[2]) vj.textContent = "Qwen + Llama 3.1";
           if (lj.textContent.trim() === labels[3]) vj.textContent = "v2.0";
         }
       }
@@ -4545,7 +4547,7 @@ body > *:not(#neural-bg):not(#rca-topology-canvas):not(#rca-viz-overlay):not(#rc
           if (!vel || !snap) continue;
           if (snap.label === "SCENARIOS") {
             var n = parseInt(snap.text, 10) || 4;
-            vel.textContent = String(Math.round(n * e)).padStart(2, "0");
+            vel.textContent = u >= 1 ? snap.text : String(Math.round(n * e)).padStart(2, "0");
           } else if (snap.label === "MAX SCORE") {
             var mx = parseFloat(snap.text) || 1;
             vel.textContent = (mx * e).toFixed(2);
