@@ -169,6 +169,42 @@ async def openenv_validate() -> dict:
     return {"status": "ok"}
 
 
+@app.post("/reset", include_in_schema=False)
+async def reset_legacy(request: Request) -> dict:
+    try:
+        body = await request.json()
+        if not isinstance(body, dict):
+            body = {}
+    except Exception:
+        body = {}
+    task_or_difficulty = body.get("task_id", body.get("difficulty", "easy"))
+    difficulty = _normalize_task_or_difficulty(task_or_difficulty)
+    state = await _reset_impl(difficulty, request)
+    return {"observation": state.model_dump(), "info": {}}
+
+
+@app.post("/step", include_in_schema=False)
+async def step_legacy(request: Request) -> dict:
+    try:
+        payload = await request.json()
+        if not isinstance(payload, dict):
+            payload = {}
+    except Exception:
+        payload = {}
+    task_or_difficulty = payload.get("task_id", payload.get("difficulty", "easy"))
+    difficulty = _normalize_task_or_difficulty(task_or_difficulty)
+    action_payload = payload.get("action") if isinstance(payload.get("action"), dict) else payload
+    if not isinstance(action_payload, dict):
+        action_payload = {}
+    if "action_type" not in action_payload:
+        action_payload["action_type"] = "query_metrics"
+    if action_payload.get("action_type") in {"query_metrics", "query_logs", "pull_traces", "query_dependencies"} and "target_service" not in action_payload:
+        action_payload["target_service"] = "api_gateway"
+    body = Action.model_validate(action_payload)
+    obs = take_step(difficulty, body, request)
+    return {"observation": obs.model_dump(), "reward": 0, "done": False, "info": {}}
+
+
 @app.get("/ui", response_class=HTMLResponse)
 async def ui_page():
     html = open(_PROJECT_ROOT / "server" / "ui.html", encoding="utf-8").read()
