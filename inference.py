@@ -17,34 +17,16 @@ load_dotenv(_ROOT / ".env")
 load_dotenv()
 
 
-def log_start(task: str, env: str, model: str):
-    print(json.dumps({
-        "type": "START",
-        "task": task,
-        "env": env,
-        "model": model
-    }), flush=True)
+def log_start(task_id: str) -> None:
+    print(f"[START] task={task_id}", flush=True)
 
 
-def log_step(step: int, action: str, reward: float, done: bool, error):
-    print(json.dumps({
-        "type": "STEP",
-        "step": step,
-        "action": action,
-        "reward": reward,
-        "done": done,
-        "error": error
-    }), flush=True)
+def log_step(step_count: int, step_reward: float) -> None:
+    print(f"[STEP] step={step_count} reward={step_reward}", flush=True)
 
 
-def log_end(success: bool, steps: int, score: float, rewards: list):
-    print(json.dumps({
-        "type": "END",
-        "success": success,
-        "steps": steps,
-        "score": score,
-        "rewards": rewards
-    }), flush=True)
+def log_end(task_id: str, final_score: float, total_steps: int) -> None:
+    print(f"[END] task={task_id} score={final_score} steps={total_steps}", flush=True)
 
 
 API_BASE_URL = os.getenv("API_BASE_URL", "")
@@ -113,10 +95,9 @@ def _fallback_action(state) -> Action:
 
 
 def run_task(task: str, client: OpenAI | None) -> dict:
-    env_name = "RCAEnvironment"
-    log_start(task, env_name, MODEL_NAME or "unset")
     env = RCAEnvironment(task)
     state = env.reset()
+    log_start(task)
     history: list[str] = []
     rewards: list[float] = []
     success = False
@@ -129,7 +110,7 @@ def run_task(task: str, client: OpenAI | None) -> dict:
     try:
         for i in range(1, MAX_STEPS + 1):
             if time.time() - start > max_runtime_per_task:
-                log_step(i, "timeout", 0.0, True, "task_timeout")
+                log_step(i, 0.0)
                 break
 
             action = _fallback_action(state)
@@ -156,8 +137,7 @@ def run_task(task: str, client: OpenAI | None) -> dict:
             steps = i
             step_reward = float(obs.reward.step_reward if obs.reward else 0.0)
             rewards.append(step_reward)
-            done = bool(obs.reward.done) if obs.reward else False
-            log_step(i, action.action_type.value, step_reward, done, error)
+            log_step(i, step_reward)
             history.append(f"{i}:{action.action_type.value}:{obs.message}")
 
             if action.action_type == ActionType.SUBMIT_RCA and obs.success:
@@ -181,7 +161,7 @@ def run_task(task: str, client: OpenAI | None) -> dict:
         scores = grade(last_report, env.state(), env.raw_scenario)
         final_score = float(scores.get("final_score", 0.0))
     finally:
-        log_end(success, steps, final_score, rewards)
+        log_end(task, final_score, steps)
 
     return {
         "task": task,
