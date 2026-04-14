@@ -330,14 +330,12 @@ This supports meaningful agent learning on both **investigation accuracy** and *
 ```
 
 ---
-
-## 📊 Baseline Scores
-
-| Task | Score |
-|---|---|
-| `easy` | 0.2775 |
-| `medium` | 0.2775 |
-| `hard` | 0.2775 |
+📊 Baseline Scores
+Task	Score
+easy	0.94
+medium	0.77
+hard	0.73
+ddos	0.92
 
 ---
 
