@@ -328,16 +328,14 @@ This supports meaningful agent learning on both **investigation accuracy** and *
 {"type": "STEP", "step": 1, "action": "query_metrics", "reward": 0.1, "done": false, "error": null}
 {"type": "END", "success": true, "steps": 9, "score": 0.2775, "rewards": [...]}
 ```
+## 📊 Baseline Scores
 
----
-📊 Baseline Scores
-Task	Score
-easy	0.94
-medium	0.77
-hard	0.73
-ddos	0.92
-
----
+| Task | Score |
+|------|-------|
+| easy | 0.94 |
+| medium | 0.77 |
+| hard | 0.73 |
+| ddos | 0.92 |
 
 ## 🔧 Required Environment Variables
 
