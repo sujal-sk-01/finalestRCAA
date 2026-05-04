@@ -6,7 +6,11 @@ import time
 from pathlib import Path
 
 from dotenv import load_dotenv
-from openai import OpenAI
+
+try:
+    from openai import OpenAI
+except ImportError:
+    OpenAI = None
 
 from models import Action, ActionType, RCAReport
 from server.environment import RCAEnvironment
